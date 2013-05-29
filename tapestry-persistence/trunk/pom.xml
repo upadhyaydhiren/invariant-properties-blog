@@ -1,0 +1,269 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<artifactId>tapestry-persistence</artifactId>
+	<name>Tapestry with persistence</name>
+    <groupId>com.invariantproperties.blog</groupId>
+    <description>This project demonstrates tapestry with persistence.</description>
+    <inceptionYear>2013</inceptionYear>
+    <organization>
+        <name>Bear Giles &lt;bgiles@coyotesong.com&gt;</name>
+        <url>http://invariantproperties.com</url>
+    </organization>
+    <version>0.0.1-SNAPSHOT</version>
+    <url>http://otterca.com/otterca-test-support/</url>
+    <licenses>
+      <license>
+        <name>Apache License, Version 2.0</name>
+      </license>
+    </licenses>
+    <developers>
+      <developer>
+        <name>Bear Giles</name>
+        <email>bgiles@coyotesong.com</email>
+        <roles>
+          <role>owner</role>
+        </roles>
+      </developer>
+    </developers>
+    <scm>
+      <connection>scm:svn:http://invariant-properties-blog.googlecode.com/svn/tapestry-persistence-trunk</connection>
+      <developerConnection>scm:svn:https://invariant-properties-blog.googlecode.com/svn/tapestry-persistence/trunk</developerConnection>
+    </scm>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>  
+                <version>2.4</version>
+                <configuration>
+                    <source>1.7</source>
+                    <target>1.7</target>
+                </configuration>
+            </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-scm-plugin</artifactId>
+                    <version>1.0</version>
+                    <configuration>
+                        <goals>install</goals>
+                    </configuration>
+                </plugin>
+        </plugins>
+    </build>
+
+    <properties>
+        <spring.version>3.1.1.RELEASE</spring.version>
+    </properties>
+    
+    <!-- dependency management - this would normally go into a parent pom. -->
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-log4j12</artifactId>
+                <version>1.6.4</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-core</artifactId>
+                <version>${spring.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-beans</artifactId>
+                <version>${spring.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-web</artifactId>
+                <version>${spring.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-context</artifactId>
+                <version>${spring.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>commons-lang</groupId>
+                <artifactId>commons-lang</artifactId>
+                <version>2.6</version>
+            </dependency>
+            <dependency>
+                <groupId>commons-codec</groupId>
+                <artifactId>commons-codec</artifactId>
+                <version>1.6</version>
+            </dependency>
+            <dependency>
+                <groupId>commons-digester</groupId>
+                <artifactId>commons-digester</artifactId>
+                <version>2.1</version>
+            </dependency>
+            <dependency>
+                <groupId>org.jasypt</groupId>
+                <artifactId>jasypt</artifactId>
+                <version>1.9.0</version>
+            </dependency>
+            <dependency>
+                <groupId>org.owasp.esapi</groupId>
+                <artifactId>esapi</artifactId>
+                <version>2.0.2</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.google.code.findbugs</groupId>
+                <artifactId>annotations</artifactId>
+                <version>2.0.0</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.code.findbugs</groupId>
+                <artifactId>jsr305</artifactId>
+                <version>2.0.0</version>
+            </dependency>
+
+            <!-- dependencies we only need for testing -->
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-test</artifactId>
+                <version>${spring.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.testng</groupId>
+                <artifactId>testng</artifactId>
+                <version>6.5.2</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-log4j12</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.jasypt</groupId>
+			<artifactId>jasypt</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-core</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-context</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.google.code.findbugs</groupId>
+			<artifactId>jsr305</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>javax.persistence</groupId>
+			<artifactId>persistence-api</artifactId>
+			<version>1.0.2</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-test</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>commons-codec</groupId>
+			<artifactId>commons-codec</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.testng</groupId>
+			<artifactId>testng</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>cglib</groupId>
+			<artifactId>cglib-nodep</artifactId>
+			<version>2.2.2</version>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+
+	
+    <profiles>
+        <!-- Jenkins defines a property BUILD_NUMBER which we can use to selectively 
+            enable Cobertura to reduce the load during normal development. -->
+        <profile>
+            <id>jenkins</id>
+            <activation>
+                <property>
+                    <name>env.BUILD_NUMBER</name>
+                </property>
+            </activation>
+            <build>
+                <pluginManagement>
+                    <plugins>
+                        <plugin>
+                            <groupId>org.codehaus.mojo</groupId>
+                            <artifactId>cobertura-maven-plugin</artifactId>
+                            <version>2.5.1</version>
+                            <configuration>
+                                <check>
+                                    <branchRate>85</branchRate>
+                                    <lineRate>85</lineRate>
+                                    <haltOnFailure>false</haltOnFailure>
+                                    <totalBranchRate>85</totalBranchRate>
+                                    <totalLineRate>85</totalLineRate>
+                                    <packageLineRate>85</packageLineRate>
+                                    <packageBranchRate>85</packageBranchRate>
+                                </check>
+                            </configuration>
+                            <executions>
+                                <execution>
+                                    <goals>
+                                        <goal>clean</goal>
+                                        <goal>check</goal>
+                                    </goals>
+                                </execution>
+                            </executions>
+                        </plugin>
+                    </plugins>
+                </pluginManagement>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>findbugs-maven-plugin</artifactId>
+                        <version>2.4.0</version>
+                        <configuration>
+                            <xmlOutput>true</xmlOutput>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+            <reporting>
+                <plugins>
+                    <!-- plugin> <groupId>org.codehaus.mojo</groupId> <artifactId>findbugs-checkstyle-plugin</artifactId> 
+                        <version>2.9.1</version> <configuration> <suppressionsLocation>checkstyle-suppressions.xml</suppressionsLocation> 
+                        </configuration> </plugin> -->
+
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>findbugs-maven-plugin</artifactId>
+                        <version>2.4.0</version>
+                        <configuration>
+                            <xmlOutput>true</xmlOutput>
+                        </configuration>
+                    </plugin>
+
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>cobertura-maven-plugin</artifactId>
+                        <version>2.5.1</version>
+                    </plugin>
+
+                    <plugin>
+                        <groupId>org.codehaus.sonar</groupId>
+                        <artifactId>sonar-maven-plugin</artifactId>
+                        <version>3.0.1</version>
+                    </plugin>
+
+                    <!-- <plugin> <groupId>org.apache.maven.plugins</groupId> <artifactId>maven-surefire-report-plugin</artifactId> 
+                        <version>2.12</version> </plugin> -->
+                </plugins>
+            </reporting>
+        </profile>
+    </profiles>
+</project>
