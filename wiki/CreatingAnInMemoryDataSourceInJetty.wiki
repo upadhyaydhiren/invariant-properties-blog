@@ -1,0 +1,90 @@
+#labels jetty,h2,testing,container-manageddatasource
+#Creating an in-memory data source in Jetty
+
+= Introduction =
+
+Jetty is a popular light-weight webserver for integration tests - you can quickly stand up a server for testing as part of a maven build.
+
+Container-managed data sources are a common solution to problem of how to manage resources in a deployed application - the admins can configure it via the standard appserver interface instead of dealing with a custom solution.
+
+Can you use an in-memory database for a container-managed datasource in Jetty?
+
+Yes!
+
+= Details =
+
+The solution is straightforward with a bit of research.
+
+=== jetty-env.xml ===
+
+First, we must define the database in a jetty configuration file:
+
+{{{
+<?xml version="1.0"?>
+<!DOCTYPE Configure PUBLIC "-//Jetty//Configure//EN" "http://www.eclipse.org/jetty/configure.dtd">
+
+<Configure id="Server" class="org.eclipse.jetty.server.Server">
+    <New id="DSTest" class="org.eclipse.jetty.plus.jndi.Resource">
+        <Arg></Arg>
+        <Arg>jdbc/test</Arg>
+        <Arg>
+            <New class="org.h2.jdbcx.JdbcDataSource">
+                <Set name="URL">jdbc:h2:mem:</Set>
+                <Set name="User">sa</Set>
+                <Set name="Password">sa</Set>
+            </New>
+        </Arg>
+    </New>
+</Configure>
+}}}
+
+=== pom.xml ===
+
+Second, we must tell the maven the necessary dependencies:
+
+{{{
+<!-- under <build><plugins>... -->
+<!-- run as standalone application using "mvn jetty:run" -->
+<plugin>
+    <groupId>org.mortbay.jetty</groupId>
+    <artifactId>jetty-maven-plugin</artifactId>
+    <version>8.1.10.v20130312</version>
+
+    <configuration>
+        <systemProperties>
+            <systemProperty>
+                <name>tapestry.execution-mode</name>
+                <value>development</value>
+            </systemProperty>
+        </systemProperties>
+        <jettyConfig>jetty/etc/jetty.xml</jettyConfig>
+    </configuration>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <version>1.3.172</version>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate.javax.persistence</groupId>
+            <artifactId>hibernate-jpa-2.0-api</artifactId>
+            <version>1.0.1.Final</version>
+        </dependency>
+    </dependencies>
+</plugin>
+}}}
+
+The dependency on the H2 database is obvious.
+
+The dependency on the JPA2 API is more subtle and only comes up when using JPA2 as your ORM. Don't be misled by the fact it's labeled hibernate - all it contains is the standard javax.persistence API classes that would normally be provided by your app container.
+
+=== Data ===
+
+Finally we must populate the database as necessary. Since this approach only makes sense with unit and integration tests (otherwise you would just use a standard connection to an existing database) in my experience the cleanest approach to use custom annotations in your test code. The annotations give the name of a file, often in a zip archive, that contains the SQL to execute to set up the test. The implementation behind the annotation is straightforward.
+
+TestNG is somewhat preferable to JUnit since the former allows you to bundle test methods and classes into larger collections that share resources. In this case you would only need to initialize the database once for a collection of tests, vs. initializing it for each test.
+
+=== Warning ===
+
+It's important to remember that you will get a fresh database every time you start up jetty with an anonymous in-memory database BUT it's still just one database and you have to worry about concurrent tests stepping on each other.
