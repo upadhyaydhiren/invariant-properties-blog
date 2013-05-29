@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<!DOCTYPE Configure PUBLIC "-//Jetty//Configure//EN" "http://www.eclipse.org/jetty/configure.dtd">
+
+<Configure id="Server" class="org.eclipse.jetty.server.Server">
+<!-- 
+	<New id="DSTest" class="org.eclipse.jetty.plus.jndi.Resource">
+		<Arg></Arg>
+		<Arg>jdbc/test</Arg>
+		<Arg>
+			<New class="org.postgresql.ds.PGSimpleDataSource">
+				<Set name="User">test</Set>
+				<Set name="Password">test</Set>
+				<Set name="DatabaseName">test</Set>
+				<Set name="ServerName">localhost</Set>
+				<Set name="PortNumber">5432</Set>
+			</New>
+		</Arg>
+	</New>
+ -->
+    <New id="DSTest" class="org.eclipse.jetty.plus.jndi.Resource">
+        <Arg></Arg>
+        <Arg>jdbc/test</Arg>
+        <Arg>
+            <New class="org.h2.jdbcx.JdbcDataSource">
+                <!-- <Set name="driverClassName">org.h2.Driver</Set> -->
+                <Set name="URL">jdbc:h2:mem:</Set>
+                <Set name="User">sa</Set>
+                <Set name="Password">sa</Set>
+            </New>
+        </Arg>
+    </New>
+</Configure>
