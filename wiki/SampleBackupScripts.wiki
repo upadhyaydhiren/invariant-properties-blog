@@ -1,0 +1,136 @@
+#Sample backup scripts for Linux (Ubuntu)
+
+= Introduction =
+
+Everyone knows that backups are important. Everyone knows it's never done if you have to do it by hand - it's important to automate this task.
+
+These scripts can be used on Linux systems. They assume that backups are written to a separate physical disk mounted at /backups. Even better would be using NFS to mount a disk on a second system since that reduces the risk of a dying system scribbling over your backups.
+
+=== Layout ===
+
+The daily/weekly backups are laid out in the following directory structure:
+
+* _/backups/weekly_ - the top-most level. This is in contrast to _backups/monthly_.
+* _system_ - system name. This allows multiple systems to use the same NFS-mounted /backup location.
+* _filesystem_ - the filesystem being backed up. E.g., "home" for user home directories (/home)
+* _week_ - the current date using week number instead of month and day. This feels odd at first but
+it /greatly/ simplifies the scripts and the conventional date is available on the actual files.
+* _system-filesystem-user-date.tar.gz_ - the actual compressed tarball.
+
+Put everything together and a typical filename is /backups\/weekly\/oberon\/home\/2013w21\/oberon-home-bgiles-2013-05-31.tar.gz/.
+
+The backup files include a "label" so they can be identified even if the filename is changed.
+
+The monthly backups follow a similar convention.
+
+=== Daily Backups ===
+
+This file should be put in /etc/cron.daily/backups-daily.
+
+A full backup is performed every Sunday, followed by a daily incremental backup.
+
+{{{
+#!/bin/bash
+
+PREFIX=/backups/weekly
+SYSTEM=`uname -n`
+FS=home
+DOW=`/bin/date +%u`
+TS=`/bin/date +%Y-%m-%d`
+TS2=`/bin/date +%Yw%U`
+DIR=${PREFIX}/${SYSTEM}/${FS}/${TS2}
+
+/usr/bin/install -d ${DIR}
+
+for USER in bgiles
+do
+	LABEL=${SYSTEM}-${FS}-${USER}
+	BASENAME=${DIR}/${LABEL}
+
+	TARNAME=${BASENAME}-${TS}.tar.gz
+
+	/bin/tar czf ${TARNAME} \
+		--listed-incremental=${BASENAME}-${TS2}.snar \
+		--exclude-caches-all \
+		--exclude-tag=NOARCHIVE.TAG \
+		--exclude-caches-all \
+		--preserve-permissions \
+		--sparse \
+		--label=${LABEL} \
+		--one-file-system \
+		--directory /${FS} ${USER}
+
+    /bin/chown -R backup:backup ${DIR}
+    /bin/chmod -R o-rwx ${DIR}
+done
+}}}
+
+=== Weekly Backups ===
+
+There are no explicit weekly backups. (A full backup is performed every Sunday by the daily script.) Developers may want to pull in some of the additional tasks performed by the monthly backups.
+
+=== Monthly Backups ===
+
+This file should be put in /etc/cron.monthly/backups-monthly.
+
+A full backup is performed on the first of every month. It is similar to the daily/weekly backups but
+also can also back up applications that should be done via specialized tools. Databases are a classic
+example of this - you do not want to back up or restore the underlying files of a live database. Developers
+may want to back up their subversion server.
+
+{{{
+#!/bin/bash
+
+PREFIX=/backups/monthly
+SYSTEM=`uname -n`
+FS=home
+TS=`/bin/date +%Y-%m`
+DIR=${PREFIX}/${SYSTEM}/${FS}/${TS}
+
+/usr/bin/install -d ${DIR}
+
+#
+# back up filesystem
+#
+for USER in bgiles
+do
+	/bin/tar czf ${DIR}/${SYSTEM}-${FS}-${USER}-${TS}.tar.gz  \
+		--index-file ${DIR}/${SYSTEM}-${FS}-${USER}-${TS}.idx \
+		--exclude-caches-all \
+		--exclude-tag=NOARCHIVE.TAG \
+		--exclude-caches-all \
+		--preserve-permissions \
+		--sparse \
+		--label=${LABEL} \
+		--one-file-system \
+		--directory /${FS}/${USER} .
+
+	/bin/chown -R backup:backup ${DIR}
+	/bin/chmod -R o-rwx ${DIR}
+done
+	
+
+#
+# back up databases
+#
+export PGUSER=bgiles
+export PGPASSFILE=/root/.pgpass
+
+DIR=${PREFIX}/${SYSTEM}/databases/`/bin/date +%y`/${TS}
+
+/usr/bin/install -d ${DIR}
+
+for DB in bgiles 
+do
+  /usr/bin/pg_dump --create --file ${DIR}/${SYSTEM}-${DB}-${TS}.pgsql \
+      --format=custom -h localhost ${DB}
+done
+}}}
+
+=== Caches ===
+
+You do not want to back up caches.
+
+=== Reapers ===
+
+You do not want to keep backups indefinitely.
