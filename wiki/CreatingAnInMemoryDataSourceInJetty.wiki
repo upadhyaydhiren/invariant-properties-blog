@@ -81,9 +81,86 @@ The dependency on the JPA2 API is more subtle and only comes up when using JPA2 
 
 === Data ===
 
-Finally we must populate the database as necessary. Since this approach only makes sense with unit and integration tests (otherwise you would just use a standard connection to an existing database) in my experience the cleanest approach to use custom annotations in your test code. The annotations give the name of a file, often in a zip archive, that contains the SQL to execute to set up the test. The implementation behind the annotation is straightforward.
+Finally we must populate the database as necessary. Spring has good support for temporary databases, an example for Tapestry follows. (The code snippet should go into AppModule, QaModule or DevelopmentModule.)
+
+{{{
+// see https://tapestry.apache.org/integrating-with-jpa.html
+@Contribute(EntityManagerSource.class)
+public static void configurePersistenceUnitInfos(MappedConfiguration<String, PersistenceUnitConfigurer> cfg) {
+    PersistenceUnitConfigurer configurer = new PersistenceUnitConfigurer() 
+        final String DATASOURCE = "jdbc/test";
+
+        /**
+         * Set up database.
+         */
+        public void setupDatabase(Reader r) throws SQLException {
+            try {
+                InitialContext ctx = new InitialContext(null);
+                Object o = ctx.lookup("jdbc/test");
+                if (o instanceof DataSource) {
+                    DataSource ds = (DataSource) o;
+                    Connection conn = null;
+                    try {
+                        conn = ds.getConnection();
+                        RunScript.execute(conn, r);
+                    } finally {
+                        if (conn != null) {
+                            conn.close();
+                        }
+                    }
+                }
+            } catch (NamingException e) {
+                System.out.println(e.getMessage());
+            }
+        }
+
+        /**
+         * Configure unit info.
+         */
+        @Override
+        public void configure(TapestryPersistenceUnitInfo unitInfo) {
+            InputStream is = null;
+            try {
+                is = Thread.currentThread().getContextClassLoader().getResourceAsStream("setup.sql");
+                if (is != null) {
+                    Reader r = new InputStreamReader(is);
+                    setupDatabase(r);
+                }
+            } catch (SQLException e) {
+                log.debug("setup: error setting up database: " +
+                        e.getMessage());
+            } finally {
+                if (is != null) {
+                    try {
+                        is.close();
+                    } catch (IOException e) {
+                        log.debug("setup: error loading resource 'setup.sql': " + e.getMessage());
+                    }
+                }
+            }
+
+            unitInfo.nonJtaDataSource(DATASOURCE);
+            // we don't want to do this if we initialize DB with script.
+            // unitInfo.addProperty("hibernate.hbm2ddl.auto", "create");
+        }
+    };
+    cfg.add("defaultPU", configurer);
+}
+}}}
+
+Note: RunScript is an H2 class.
+
+The 'setup.sql' file can create the tables and perform initialization of 'constant' tables, e.g., enumerations used in foreign keys to ensure that the various tables only contain 'valid' data.
+
+In practice you probably want to inject the 'configure' logic unless you always use the same database. (As mentioned elsewhere you might want to use different databases in maven integration testing and production.) Maven is smart enough to load main/test/resources/setup.sql instead of main/java/resources/setup.sql during tests.
+
+=== Testing ===
+
+A transient in-memory database only makes sense in testing^*^ and in my experience the cleanest approach to use custom annotations in your test code. The annotations give the name of a file, often in a zip archive, that contains the SQL to execute to set up the test. The implementation behind the annotation is straightforward. The implementation should be smart enough to not touch 'constant' tables.
 
 TestNG is somewhat preferable to JUnit since the former allows you to bundle test methods and classes into larger collections that share resources. In this case you would only need to initialize the database once for a collection of tests, vs. initializing it for each test.
+
+^*^ There is an exception to this rule of thumb - transient in-memory databases are a good match for data that is intrinsically ephemeral. For instance session information - as a general rule sessions should not last forever or survive server reboots.
 
 === Warning ===
 
