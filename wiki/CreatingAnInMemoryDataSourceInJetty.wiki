@@ -29,7 +29,7 @@ First, we must define the database in a jetty configuration file:
         <Arg>jdbc/test</Arg>
         <Arg>
             <New class="org.h2.jdbcx.JdbcDataSource">
-                <Set name="URL">jdbc:h2:mem:</Set>
+                <Set name="URL">jdbc:h2:mem:;DB_CLOSE_DELAY=-1</Set>
                 <Set name="User">sa</Set>
                 <Set name="Password">sa</Set>
             </New>
