@@ -44,21 +44,18 @@ DIR=${PREFIX}/${SYSTEM}/${FS}/${TS2}
 
 for USER in bgiles
 do
-	LABEL=${SYSTEM}-${FS}-${USER}
+	LABEL=${SYSTEM}-${FS}-${USER}-${TS}
 	BASENAME=${DIR}/${LABEL}
 
-	TARNAME=${BASENAME}-${TS}.tar.gz
-
-	/bin/tar czf ${TARNAME} \
-		--listed-incremental=${BASENAME}-${TS2}.snar \
-		--exclude-caches-all \
+	/bin/tar czf ${BASENAME}.tar.gz \
+		--listed-incremental=${BASENAME}.snar \
 		--exclude-tag=NOARCHIVE.TAG \
 		--exclude-caches-all \
 		--preserve-permissions \
 		--sparse \
 		--label=${LABEL} \
 		--one-file-system \
-		--directory /${FS} ${USER}
+		--directory /${FS}/${USER} .
 
     /bin/chown -R backup:backup ${DIR}
     /bin/chmod -R o-rwx ${DIR}
@@ -94,9 +91,11 @@ DIR=${PREFIX}/${SYSTEM}/${FS}/${TS}
 #
 for USER in bgiles
 do
-	/bin/tar czf ${DIR}/${SYSTEM}-${FS}-${USER}-${TS}.tar.gz  \
-		--index-file ${DIR}/${SYSTEM}-${FS}-${USER}-${TS}.idx \
-		--exclude-caches-all \
+	LABEL=${SYSTEM}-${FS}-${USER}-${TS}
+	BASENAME=${DIR}/${LABEL}
+
+	/bin/tar czf ${BASENAME}.tar.gz  \
+		--index-file ${BASENAME}.idx \
 		--exclude-tag=NOARCHIVE.TAG \
 		--exclude-caches-all \
 		--preserve-permissions \
