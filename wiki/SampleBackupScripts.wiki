@@ -6,6 +6,64 @@ Everyone knows that backups are important. Everyone knows it's never done if you
 
 These scripts can be used on Linux systems. They assume that backups are written to a separate physical disk mounted at /backups. Even better would be using NFS to mount a disk on a second system since that reduces the risk of a dying system scribbling over your backups.
 
+=== Purpose ===
+
+There are three distinct reasons to maintain backups.
+
+_System Restoration._ You lost a disk and want to recover the data. You only need the most recent snapshot.
+In fact the best approach is to maintain a 'hot copy' using rsync run at least once an hour.
+
+_Deleted File Recovery._ You accidently deleted a file and want to restore it. You need a succession of
+snapshots, depending upon how sensitive you are to lost data. Historically this has been widely implemented
+using a combination of weekly full backups and daily incremental backups.
+
+At some point it no longer makes sense to recover lost files and backups are discarded.
+
+_Archives._ You need to be able to prove you had files at a specific time. This isn't usually an issue
+for home users but it can come up in business and academic settings. A typical archive is produced monthly
+and retained forever.
+
+In all cases the backup media plays a big role. How much can you store? How fast can you do it? Will you
+lose it if you have a power spike? House fire? Flood? Earthquake? Plague of locusts? Does it require manual intervention? For what it's worth cloud storage sounds promising but the bottleneck is the time it takes
+to upload and download data. Archival-quality CD-Rs and DVD-Rs are known to be readable for decades but
+it will probably require having someone physically swap media. Repeatedly.  (N.B., the bargain
+basement media is _not_ suitable for backups.) Taiyo Yuden is highly recommended.
+
+You have to decide what works best for you.
+
+=== What You Should Not Backup ===
+
+Not everything should be backed up. The key questions to ask yourself are "can I get this elsewhere?"
+and "how often does this change?".
+
+Your operating system and applications, for instance, should be reinstalled from trusted media
+instead of backups. This saves a lot of space and avoids reinstalling software that's been compromised
+by an attacker.
+
+Your purchased music and video should also not be covered by routine backups. You can repurchase or
+re-rip it if you kept the original media. (It does make sense to make archive copies of MP3s.)
+
+You do want to back up your photographs - but do it intelligently. Make a few archive copies of the
+existing photographs and only make routine backups of the most recent ones. This can save many gigabytes
+of backup space.
+
+A more subtle issue is encrypted home directories. You want to back up the _encrypted_ files, not
+the unencrypted files that a logged-in user sees, but if you're not careful you'll back up the
+unencrypted files and defeat the purpose of the encryption if someone somehow gets a copy of your
+backups.
+
+Finally, many applications require their own backup and restoration programs. Databases are a classic
+example - you never want to back up and restore the underlying files, esp. from a live database. You
+should use the backup and restore applications provided with the database.
+
+Subversion databases are another example of an application with its own backup and restore tools.
+
+=== Caches ===
+
+You do not want to back up caches - by definition you can get this information elsewhere. With tar, 
+at least, you can identify cache directories with a file named CACHEDIR.TAG and it will not be
+backed up.
+
 === Layout ===
 
 The daily/weekly backups are laid out in the following directory structure:
@@ -132,10 +190,6 @@ do
       --format=custom -h localhost ${DB}
 done
 }}}
-
-=== Caches ===
-
-You do not want to back up caches.
 
 === Reapers ===
 
