@@ -104,10 +104,17 @@ do
 		--one-file-system \
 		--directory /${FS}/${USER} .
 
+	/bin/gzip ${BASENAME}.idx
+
 	/bin/chown -R backup:backup ${DIR}
 	/bin/chmod -R o-rwx ${DIR}
 done
-	
+
+#
+# back up packages.  (should also backup /etc?)
+#
+DIR=${PREFIX}/${SYSTEM}/packages
+/usr/bin/dpkg --get-selections | gzip - > ${DIR}/${SYSTEM}-packages-${TS}.txt.gz
 
 #
 # back up databases
