@@ -37,23 +37,23 @@ SYSTEM=`uname -n`
 FS=home
 DOW=`/bin/date +%u`
 TS=`/bin/date +%Y-%m-%d`
-TS2=`/bin/date +%Yw%U`
-DIR=${PREFIX}/${SYSTEM}/${FS}/${TS2}
+TSWEEKLY=`/bin/date +%Yw%U`
+DIR=${PREFIX}/${SYSTEM}/${FS}/${TSWEEKLY}
 
 /usr/bin/install -d ${DIR}
 
 for USER in bgiles
 do
-	LABEL=${SYSTEM}-${FS}-${USER}-${TS}
+	LABEL=${SYSTEM}-${FS}-${USER}
 	BASENAME=${DIR}/${LABEL}
 
-	/bin/tar czf ${BASENAME}.tar.gz \
-		--listed-incremental=${BASENAME}.snar \
+	/bin/tar czf ${BASENAME}-${TS}.tar.gz \
+		--listed-incremental=${BASENAME}-${TSWEEKLY}.snar \
 		--exclude-tag=NOARCHIVE.TAG \
 		--exclude-caches-all \
 		--preserve-permissions \
 		--sparse \
-		--label=${LABEL} \
+		--label=${LABEL}-${TS} \
 		--one-file-system \
 		--directory /${FS}/${USER} .
 
