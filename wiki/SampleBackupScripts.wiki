@@ -92,17 +92,19 @@ A full backup is performed every Sunday, followed by a daily incremental backup.
 
 PREFIX=/backups/weekly
 SYSTEM=`uname -n`
-FS=home
 DOW=`/bin/date +%u`
 TS=`/bin/date +%Y-%m-%d`
 TSWEEKLY=`/bin/date +%Yw%U`
-DIR=${PREFIX}/${SYSTEM}/${FS}/${TSWEEKLY}
 
-/usr/bin/install -d ${DIR}
-
+#
+# back up user home directories.
+#
 for USER in bgiles
 do
-	LABEL=${SYSTEM}-${FS}-${USER}
+	DIR=${PREFIX}/users/${USER}/home/${TSWEEKLY}
+	/usr/bin/install -d ${DIR}
+
+	LABEL=home-${USER}-${SYSTEM}
 	BASENAME=${DIR}/${LABEL}
 
 	/bin/tar czf ${BASENAME}-${TS}.tar.gz \
@@ -122,36 +124,65 @@ done
 
 === Weekly Backups ===
 
-There are no explicit weekly backups. (A full backup is performed every Sunday by the daily script.) Developers may want to pull in some of the additional tasks performed by the monthly backups.
+There's no need for an explicit weekly backup since the script above will create a full backup every Sunday.
+However it's a good time to purge old backups and, if you're a developer, create database backups.
 
-=== Monthly Backups ===
+{{{
+#!/bin/bash
+
+PREFIX=/backups/weekly
+SYSTEM=`uname -n`
+TS=`/bin/date +%Y-%m-%d`
+
+#
+# delete any daily/weekly backup over 8 weeks old.
+#
+for USER in bgiles
+do
+   DIR=${PREFIX}/users/${USER}
+   /usr/bin/find ${DIR} -ctime +54 -exec /bin/rm {} \;
+done
+
+#
+# back up personal databases
+#
+for USER in bgiles
+do
+   DIR=${PREFIX}/users/${USER}/databases
+   /usr/bin/install -d ${DIR}
+   /bin/chown ${USER} ${DIR}
+
+   export PGUSER=${USER}
+   export PGPASSFILE=/home/${USER}/.pgpass
+   su -c "/usr/bin/pg_dump --create --format=custom \
+      --file ${DIR}/${USER}-${SYSTEM}-${TS}.pgsql" ${USER}
+done
+}}}
+
+=== Monthly Archives ===
 
 This file should be put in /etc/cron.monthly/backups-monthly.
 
-A full backup is performed on the first of every month. It is similar to the daily/weekly backups but
-also can also back up applications that should be done via specialized tools. Databases are a classic
-example of this - you do not want to back up or restore the underlying files of a live database. Developers
-may want to back up their subversion server.
+A full backup is performed on the first of every month. It is similar to the daily/weekly backups
+but should never be purged.
 
 {{{
 #!/bin/bash
 
 PREFIX=/backups/monthly
 SYSTEM=`uname -n`
-FS=home
-TS=`/bin/date +%Y-%m`
-DIR=${PREFIX}/${SYSTEM}/${FS}/${TS}
-
-/usr/bin/install -d ${DIR}
+TS=`/bin/date +%Y-%m-%d`
 
 #
-# back up filesystem
+# back up user home directories.
 #
 for USER in bgiles
 do
-	LABEL=${SYSTEM}-${FS}-${USER}-${TS}
-	BASENAME=${DIR}/${LABEL}
+	DIR=${PREFIX}/users/${USER}/home/${TS}
+	/usr/bin/install -d ${DIR}
 
+	LABEL=home-${USER}-${SYSTEM}-${TS}
+	BASENAME=${DIR}/${LABEL}
 	/bin/tar czf ${BASENAME}.tar.gz  \
 		--index-file ${BASENAME}.idx \
 		--exclude-tag=NOARCHIVE.TAG \
@@ -169,28 +200,25 @@ do
 done
 
 #
+# back up personal databases
+#
+for USER in bgiles
+do
+  DIR=${PREFIX}/users/${USER}/databases
+  /usr/bin/install -d ${DIR}
+  /bin/chown ${USER} ${DIR}
+
+  export PGUSER=${USER}
+  export PGPASSFILE=/home/${USER}/.pgpass
+  su -c "/usr/bin/pg_dump --create --format=custom \
+     --file=${DIR}/${USER}-${SYSTEM}-${TS}.pgsql ${USER}" ${USER}
+done
+
+#
 # back up packages.  (should also backup /etc?)
 #
 DIR=${PREFIX}/${SYSTEM}/packages
-/usr/bin/dpkg --get-selections | gzip - > ${DIR}/${SYSTEM}-packages-${TS}.txt.gz
-
-#
-# back up databases
-#
-export PGUSER=bgiles
-export PGPASSFILE=/root/.pgpass
-
-DIR=${PREFIX}/${SYSTEM}/databases/`/bin/date +%y`/${TS}
-
 /usr/bin/install -d ${DIR}
-
-for DB in bgiles 
-do
-  /usr/bin/pg_dump --create --file ${DIR}/${SYSTEM}-${DB}-${TS}.pgsql \
-      --format=custom -h localhost ${DB}
-done
+/usr/bin/dpkg --get-selections | gzip - > ${DIR}/${SYSTEM}-packages-${TS}.txt.g
 }}}
 
-=== Reapers ===
-
-You do not want to keep backups indefinitely.
