@@ -165,3 +165,10 @@ TestNG is somewhat preferable to JUnit since the former allows you to bundle tes
 === Warning ===
 
 It's important to remember that you will get a fresh database every time you start up jetty with an anonymous in-memory database BUT it's still just one database and you have to worry about concurrent tests stepping on each other.
+
+=== Using External Database ===
+
+The in-memory database does not have to live within the Jetty server. For instance [https://github.com/ljnelson/h2-maven-plugin h2-maven-plugin] lets you launch an H2 database before launching Jetty.
+
+Of course it's also easy to use a standard database server. See
+http://wiki.eclipse.org/Jetty/Howto/Configure_JNDI_Datasource
