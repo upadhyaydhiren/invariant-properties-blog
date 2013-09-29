@@ -22,10 +22,23 @@
  */
 package com.invariantproperties.sandbox.springentitylistener.persistence;
 
-import src.main.java.com.invariantproperties.sandbox.springentitylistener.domain.TwitterUser;
-import src.main.java.com.invariantproperties.sandbox.springentitylistener.persistence.ObjectNotFoundException;
-import src.main.java.com.invariantproperties.sandbox.springentitylistener.persistence.UserService;
-import src.test.java.com.invariantproperties.sandbox.springentitylistener.listener.ApplicationContext;
+import static com.invariantproperties.sandbox.springentitylistener.matcher.UserEquality.equalTo;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+
+import javax.annotation.Resource;
+
+import org.apache.log4j.Logger;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.transaction.TransactionConfiguration;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.invariantproperties.sandbox.springentitylistener.domain.TwitterUser;
+import com.invariantproperties.sandbox.springentitylistener.listener.ApplicationContext;
 
 /**
  * @author Bear Giles <bgiles@coyotesong.com>
