@@ -22,27 +22,10 @@
  */
 package com.invariantproperties.sandbox.springentitylistener.persistence;
 
-import static com.invariantproperties.sandbox.springentitylistener.matcher.UserEquality.equalTo;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
-
-import java.sql.DriverManager;
-import java.sql.SQLException;
-
-import javax.annotation.Resource;
-
-import org.apache.log4j.Logger;
-import org.h2.tools.Server;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.transaction.TransactionConfiguration;
-import org.springframework.transaction.annotation.Transactional;
-
-import com.invariantproperties.sandbox.springentitylistener.domain.TwitterUser;
-import com.invariantproperties.sandbox.springentitylistener.listener.ApplicationContext;
+import src.main.java.com.invariantproperties.sandbox.springentitylistener.domain.TwitterUser;
+import src.main.java.com.invariantproperties.sandbox.springentitylistener.persistence.ObjectNotFoundException;
+import src.main.java.com.invariantproperties.sandbox.springentitylistener.persistence.UserService;
+import src.test.java.com.invariantproperties.sandbox.springentitylistener.listener.ApplicationContext;
 
 /**
  * @author Bear Giles <bgiles@coyotesong.com>
@@ -57,26 +40,6 @@ public class UserServiceIntegrationTest {
 
     @Resource
     private UserService dao;
-
-    private static Server server;
-
-    // @BeforeClass
-    public static void setupDatabase() throws SQLException {
-        java.sql.Driver driver = new org.h2.Driver();
-        DriverManager.registerDriver(driver);
-
-        System.out.println("starting database...");
-        server = Server.createTcpServer(new String[] { "-tcpAllowOthers" });
-        server.start();
-    }
-
-    // @AfterClass
-    public static void teardownDatabase() {
-        if (server != null && server.isRunning(false)) {
-            server.shutdown();
-            server = null;
-        }
-    }
 
     @Test
     public void testUserLifecycle() throws Exception {
