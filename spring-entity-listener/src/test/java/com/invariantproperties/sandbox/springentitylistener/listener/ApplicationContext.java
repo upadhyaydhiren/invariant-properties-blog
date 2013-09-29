@@ -50,7 +50,8 @@ import org.springframework.transaction.PlatformTransactionManager;
  */
 @Configuration
 @ComponentScan(basePackages = { "com.invariantproperties.sandbox.springentitylistener.persistence",
-        "com.invariantproperties.sandbox.springentitylistener.listener" })
+        "com.invariantproperties.sandbox.springentitylistener.listener",
+        "com.invariantproperties.sandbox.springentitylistener.service" })
 @EnableJpaRepositories(basePackages = { "com.invariantproperties.sandbox.springentitylistener.repository" })
 @ImportResource("classpath:applicationContext.xml")
 @PropertySource("classpath:application.properties")

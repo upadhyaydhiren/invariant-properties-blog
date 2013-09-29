@@ -25,14 +25,14 @@ package com.invariantproperties.sandbox.springentitylistener.repository;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import com.invariantproperties.sandbox.springentitylistener.domain.User;
+import com.invariantproperties.sandbox.springentitylistener.domain.TwitterUser;
 
 /**
  * @author Bear Giles <bgiles@coyotesong.com>
  */
 @Repository
-public interface UserRepository extends JpaRepository<User, Integer> {
-    User findUserByUuid(String uuid);
+public interface UserRepository extends JpaRepository<TwitterUser, Integer> {
+    TwitterUser findUserByUuid(String uuid);
 
-    User findUserByEmailAddress(String emailAddress);
+    TwitterUser findUserByEmailAddress(String emailAddress);
 }

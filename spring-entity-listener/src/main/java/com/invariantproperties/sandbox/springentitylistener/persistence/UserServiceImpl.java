@@ -31,7 +31,7 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.invariantproperties.sandbox.springentitylistener.domain.User;
+import com.invariantproperties.sandbox.springentitylistener.domain.TwitterUser;
 import com.invariantproperties.sandbox.springentitylistener.repository.UserRepository;
 
 /**
@@ -67,8 +67,8 @@ public class UserServiceImpl implements UserService {
      */
     @Transactional(readOnly = true)
     @Override
-    public List<User> getAllUsers() {
-        final List<User> users = userRepository.findAll();
+    public List<TwitterUser> getAllUsers() {
+        final List<TwitterUser> users = userRepository.findAll();
 
         return users;
     }
@@ -77,8 +77,8 @@ public class UserServiceImpl implements UserService {
      */
     @Transactional(readOnly = true)
     @Override
-    public User getUserById(Integer id) {
-        User user = null;
+    public TwitterUser getUserById(Integer id) {
+        TwitterUser user = null;
         try {
             user = userRepository.findOne(id);
         } catch (DataAccessException e) {
@@ -98,8 +98,8 @@ public class UserServiceImpl implements UserService {
      */
     @Transactional(readOnly = true)
     @Override
-    public User getUserByUuid(String uuid) {
-        User user = null;
+    public TwitterUser getUserByUuid(String uuid) {
+        TwitterUser user = null;
         try {
             user = userRepository.findUserByUuid(uuid);
         } catch (DataAccessException e) {
@@ -119,8 +119,8 @@ public class UserServiceImpl implements UserService {
      */
     @Transactional(readOnly = true)
     @Override
-    public User getUserByEmailAddress(String emailAddress) {
-        User user = null;
+    public TwitterUser getUserByEmailAddress(String emailAddress) {
+        TwitterUser user = null;
         try {
             user = userRepository.findUserByEmailAddress(emailAddress);
         } catch (DataAccessException e) {
@@ -140,11 +140,12 @@ public class UserServiceImpl implements UserService {
      */
     @Transactional
     @Override
-    public User createUser(String name, String emailAddress) {
-        final User user = new User();
+    public TwitterUser createUser(String name, String emailAddress, String password) {
+        final TwitterUser user = new TwitterUser();
         user.setName(name);
         user.setEmailAddress(emailAddress);
-        final User actual = userRepository.saveAndFlush(user);
+        user.setPassword(password);
+        final TwitterUser actual = userRepository.saveAndFlush(user);
 
         return actual;
     }
@@ -153,8 +154,8 @@ public class UserServiceImpl implements UserService {
      */
     @Transactional(rollbackFor = ObjectNotFoundException.class)
     @Override
-    public User updateUser(User user, String name, String emailAddress) {
-        User existingUser = null;
+    public TwitterUser updateUser(TwitterUser user, String name, String emailAddress, String password) {
+        TwitterUser existingUser = null;
         try {
             existingUser = userRepository.findUserByUuid(user.getUuid());
         } catch (DataAccessException e) {
@@ -170,14 +171,16 @@ public class UserServiceImpl implements UserService {
         // we only allow a few fields to be set
         existingUser.setName(name);
         existingUser.setEmailAddress(emailAddress);
+        existingUser.setPassword(password);
 
         // (also update original object in case caller doesn't use returned
         // value)
         user.setName(name);
         user.setEmailAddress(emailAddress);
+        user.setPassword(password);
 
         // update record
-        final User newUser = userRepository.saveAndFlush(existingUser);
+        final TwitterUser newUser = userRepository.saveAndFlush(existingUser);
 
         return newUser;
     }
@@ -187,7 +190,7 @@ public class UserServiceImpl implements UserService {
     @Transactional(rollbackFor = ObjectNotFoundException.class)
     @Override
     public void deleteUser(String uuid) {
-        User user = null;
+        TwitterUser user = null;
         try {
             user = userRepository.findUserByUuid(uuid);
         } catch (DataAccessException e) {

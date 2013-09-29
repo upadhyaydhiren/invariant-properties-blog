@@ -24,59 +24,58 @@ package com.invariantproperties.sandbox.springentitylistener.listener;
 
 import javax.annotation.Resource;
 import javax.persistence.PostLoad;
-import javax.persistence.PostPersist;
-import javax.persistence.PostRemove;
 import javax.persistence.PostUpdate;
 import javax.persistence.PrePersist;
-import javax.persistence.PreRemove;
 import javax.persistence.PreUpdate;
 
 import org.springframework.stereotype.Component;
 
 import com.invariantproperties.sandbox.springentitylistener.domain.TwitterUser;
+import com.invariantproperties.sandbox.springentitylistener.service.EncryptorBean;
 
 /**
- * Simple Spring EntityListener.
+ * Listener that transparently handles password encryption.
  * 
  * @author Bear Giles <bgiles@coyotesong.com>
  */
 @Component
-public class SpringListener {
-    @Resource(name = "springListenerKey")
-    private String key;
+public class PasswordListener {
 
-    @PrePersist
-    public void prePersist(TwitterUser entity) {
-        System.out.println("Spring PrePersist, key: " + key);
-    }
+    @Resource
+    private EncryptorBean encryptor;
 
-    @PostPersist
-    public void postPersist(TwitterUser entity) {
-        System.out.println("Spring PostPersist, key: " + key);
-    }
-
-    @PreUpdate
-    public void preUpdate(TwitterUser entity) {
-        System.out.println("Spring PreUpdate, key: " + key);
-    }
-
-    @PostUpdate
-    public void postUpdate(TwitterUser entity) {
-        System.out.println("Spring PostUpdate, key: " + key);
-    }
-
-    @PreRemove
-    public void preRemove(TwitterUser entity) {
-        System.out.println("Spring PreRemove, key: " + key);
-    }
-
-    @PostRemove
-    public void postRemove(TwitterUser entity) {
-        System.out.println("Spring PostRemove, key: " + key);
-    }
-
+    /**
+     * Decrypt password after loading.
+     */
     @PostLoad
-    public void postLoad(TwitterUser entity) {
-        System.out.println("Spring PostLoad, key: " + key);
+    @PostUpdate
+    public void decryptPassword(TwitterUser user) {
+        user.setPassword(null);
+
+        if (user.getEncryptedPassword() != null) {
+            user.setPassword(encryptor.decryptString(user.getEncryptedPassword(), user.getSalt()));
+        }
+
+        // obviously we would never do this in practice
+        System.out.printf("decrypted password '%s'\n", user.getPassword());
+    }
+
+    /**
+     * Decrypt password before persisting
+     */
+    @PrePersist
+    @PreUpdate
+    public void encryptPassword(TwitterUser user) {
+        user.setEncryptedPassword(null);
+        user.setSalt(null);
+
+        if (user.getPassword() != null) {
+            String[] elements = encryptor.encryptString(user.getPassword());
+            user.setEncryptedPassword(elements[0]);
+            user.setSalt(elements[1]);
+        }
+
+        // obviously we would never do this in practice
+        System.out.printf("encrypted password '%s' to '%s'\n", user.getPassword(), user.getEncryptedPassword());
     }
 }
