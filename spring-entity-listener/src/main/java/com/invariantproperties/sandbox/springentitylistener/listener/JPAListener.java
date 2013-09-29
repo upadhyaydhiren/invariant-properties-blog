@@ -30,7 +30,7 @@ import javax.persistence.PrePersist;
 import javax.persistence.PreRemove;
 import javax.persistence.PreUpdate;
 
-import com.invariantproperties.sandbox.springentitylistener.domain.User;
+import com.invariantproperties.sandbox.springentitylistener.domain.TwitterUser;
 
 /**
  * Simple JPA EntityListener.
@@ -39,37 +39,37 @@ import com.invariantproperties.sandbox.springentitylistener.domain.User;
  */
 public class JPAListener {
     @PrePersist
-    public void prePersist(User entity) {
+    public void prePersist(TwitterUser entity) {
         System.out.println("JPA PrePersist");
     }
 
     @PostPersist
-    public void postPersist(User entity) {
+    public void postPersist(TwitterUser entity) {
         System.out.println("JPA PostPersist");
     }
 
     @PreUpdate
-    public void preUpdate(User entity) {
+    public void preUpdate(TwitterUser entity) {
         System.out.println("JPA PreUpdate");
     }
 
     @PostUpdate
-    public void postUpdate(User entity) {
+    public void postUpdate(TwitterUser entity) {
         System.out.println("JPA PostUpdate");
     }
 
     @PreRemove
-    public void preRemove(User entity) {
+    public void preRemove(TwitterUser entity) {
         System.out.println("JPA PreRemove");
     }
 
     @PostRemove
-    public void postRemove(User entity) {
+    public void postRemove(TwitterUser entity) {
         System.out.println("JPA PostRemove");
     }
 
     @PostLoad
-    public void postLoad(User entity) {
+    public void postLoad(TwitterUser entity) {
         System.out.println("JPA PostLoad");
     }
 }

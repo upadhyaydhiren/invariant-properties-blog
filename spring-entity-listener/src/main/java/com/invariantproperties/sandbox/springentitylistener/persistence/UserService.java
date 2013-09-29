@@ -24,7 +24,7 @@ package com.invariantproperties.sandbox.springentitylistener.persistence;
 
 import java.util.List;
 
-import com.invariantproperties.sandbox.springentitylistener.domain.User;
+import com.invariantproperties.sandbox.springentitylistener.domain.TwitterUser;
 
 /**
  * Sample service API.
@@ -32,17 +32,17 @@ import com.invariantproperties.sandbox.springentitylistener.domain.User;
  * @author Bear Giles <bgiles@coyotesong.com>
  */
 public interface UserService {
-    List<User> getAllUsers();
+    List<TwitterUser> getAllUsers();
 
-    User getUserById(Integer id);
+    TwitterUser getUserById(Integer id);
 
-    User getUserByUuid(String uuid);
+    TwitterUser getUserByUuid(String uuid);
 
-    User getUserByEmailAddress(String emailAddress);
+    TwitterUser getUserByEmailAddress(String emailAddress);
 
-    User createUser(String name, String emailAddress);
+    TwitterUser createUser(String name, String emailAddress, String password);
 
-    User updateUser(User user, String name, String emailAddress);
+    TwitterUser updateUser(TwitterUser user, String name, String emailAddress, String password);
 
     void deleteUser(String uuid);
 }

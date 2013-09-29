@@ -30,24 +30,32 @@ import javax.persistence.EntityListeners;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.PrePersist;
+import javax.persistence.PrimaryKeyJoinColumn;
+import javax.persistence.SecondaryTable;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import com.invariantproperties.sandbox.springentitylistener.annotation.SpringEntityListeners;
 import com.invariantproperties.sandbox.springentitylistener.listener.JPAListener;
+import com.invariantproperties.sandbox.springentitylistener.listener.PasswordListener;
 import com.invariantproperties.sandbox.springentitylistener.listener.SpringListener;
 
 /**
  * @author Bear Giles <bgiles@coyotesong.com>
  */
 @Entity
-@Table(name = "usr")
+@Table(name = "twitter_user")
+@SecondaryTable(name = "twitter_pw", pkJoinColumns = @PrimaryKeyJoinColumn(name = "twitter_user_id"))
 @EntityListeners(JPAListener.class)
-@SpringEntityListeners(SpringListener.class)
-public class User {
+@SpringEntityListeners({ SpringListener.class, PasswordListener.class })
+public class TwitterUser {
     private Integer id;
     private String uuid;
     private String name;
     private String emailAddress;
+    private String encryptedPassword;
+    private String salt;
+    transient private String password;
 
     @Id
     @GeneratedValue
@@ -84,6 +92,33 @@ public class User {
 
     public void setEmailAddress(String emailAddress) {
         this.emailAddress = emailAddress;
+    }
+
+    @Column(name = "password", table = "twitter_pw", length = 80)
+    public String getEncryptedPassword() {
+        return encryptedPassword;
+    }
+
+    public void setEncryptedPassword(String encryptedPassword) {
+        this.encryptedPassword = encryptedPassword;
+    }
+
+    @Column(name = "salt", table = "twitter_pw", length = 40)
+    public String getSalt() {
+        return salt;
+    }
+
+    public void setSalt(String salt) {
+        this.salt = salt;
+    }
+
+    @Transient
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     @PrePersist

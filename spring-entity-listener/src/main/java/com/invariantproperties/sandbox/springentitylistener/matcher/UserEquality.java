@@ -28,21 +28,21 @@ import org.hamcrest.Factory;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
 
-import com.invariantproperties.sandbox.springentitylistener.domain.User;
+import com.invariantproperties.sandbox.springentitylistener.domain.TwitterUser;
 
 /**
  * @author Bear Giles <bgiles@coyotesong.com>
  * 
  */
-public class UserEquality extends TypeSafeMatcher<User> {
-    private final User expected;
+public class UserEquality extends TypeSafeMatcher<TwitterUser> {
+    private final TwitterUser expected;
 
-    private UserEquality(User user) {
+    private UserEquality(TwitterUser user) {
         this.expected = user;
     }
 
     @Override
-    public boolean matchesSafely(User actual) {
+    public boolean matchesSafely(TwitterUser actual) {
         if (actual == null) {
             return false;
         }
@@ -52,6 +52,7 @@ public class UserEquality extends TypeSafeMatcher<User> {
         eq.append(expected.getUuid(), actual.getUuid());
         eq.append(expected.getName(), actual.getName());
         eq.append(expected.getEmailAddress(), actual.getEmailAddress());
+        eq.append(expected.getPassword(), actual.getPassword());
 
         return eq.isEquals();
     }
@@ -61,7 +62,7 @@ public class UserEquality extends TypeSafeMatcher<User> {
     }
 
     @Factory
-    public static <T> Matcher<User> equalTo(User user) {
+    public static <T> Matcher<TwitterUser> equalTo(TwitterUser user) {
         return new UserEquality(user);
     }
 }

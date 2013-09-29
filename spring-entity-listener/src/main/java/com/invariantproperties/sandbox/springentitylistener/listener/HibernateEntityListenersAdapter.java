@@ -199,9 +199,9 @@ public class HibernateEntityListenersAdapter implements PostInsertEventListener,
                         try {
                             entry.getKey().invoke(entry.getValue(), entity);
                         } catch (InvocationTargetException e) {
-
+                            // log it
                         } catch (IllegalAccessException e) {
-
+                            // log it
                         }
                     }
                 }
@@ -214,9 +214,9 @@ public class HibernateEntityListenersAdapter implements PostInsertEventListener,
                         try {
                             entry.getKey().invoke(entry.getValue(), entity);
                         } catch (InvocationTargetException e) {
-
+                            // log it
                         } catch (IllegalAccessException e) {
-
+                            // log it
                         }
                     }
                 }

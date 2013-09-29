@@ -41,7 +41,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.transaction.TransactionConfiguration;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.invariantproperties.sandbox.springentitylistener.domain.User;
+import com.invariantproperties.sandbox.springentitylistener.domain.TwitterUser;
 import com.invariantproperties.sandbox.springentitylistener.listener.ApplicationContext;
 
 /**
@@ -82,15 +82,17 @@ public class UserServiceIntegrationTest {
     public void testUserLifecycle() throws Exception {
         final String name = "Alice";
         final String emailAddress = "alice@example.com";
+        final String password = "password";
 
-        final User expected = new User();
+        final TwitterUser expected = new TwitterUser();
         expected.setName(name);
         expected.setEmailAddress(emailAddress);
+        expected.setPassword(password);
 
         assertNull(expected.getId());
 
         // create user
-        User actual = dao.createUser(name, emailAddress);
+        TwitterUser actual = dao.createUser(name, emailAddress, password);
         expected.setId(actual.getId());
         expected.setUuid(actual.getUuid());
 
@@ -108,7 +110,8 @@ public class UserServiceIntegrationTest {
         // update user
         expected.setName("Bob");
         expected.setEmailAddress("bob@example.com");
-        actual = dao.updateUser(actual, expected.getName(), expected.getEmailAddress());
+        expected.setPassword("new password");
+        actual = dao.updateUser(actual, expected.getName(), expected.getEmailAddress(), expected.getPassword());
         assertThat(expected, equalTo(actual));
 
         // delete user
@@ -124,7 +127,7 @@ public class UserServiceIntegrationTest {
     @Test
     public void testGetUserByIdWhenUserIsNotKnown() {
         final Integer id = 1;
-        final User user = dao.getUserById(id);
+        final TwitterUser user = dao.getUserById(id);
         assertNull(user);
     }
 
@@ -134,7 +137,7 @@ public class UserServiceIntegrationTest {
     @Test
     public void testGetUserByUuidWhenUserIsNotKnown() {
         final String uuid = "missing";
-        final User user = dao.getUserByUuid(uuid);
+        final TwitterUser user = dao.getUserByUuid(uuid);
         assertNull(user);
     }
 
@@ -145,10 +148,10 @@ public class UserServiceIntegrationTest {
      */
     @Test(expected = ObjectNotFoundException.class)
     public void testUpdateUserWhenUserIsNotFound() {
-        final User user = new User();
+        final TwitterUser user = new TwitterUser();
         user.setUuid("missing");
 
-        dao.updateUser(user, "Bob", "bob@example.com");
+        dao.updateUser(user, "Bob", "bob@example.com", "new password");
     }
 
     /**
