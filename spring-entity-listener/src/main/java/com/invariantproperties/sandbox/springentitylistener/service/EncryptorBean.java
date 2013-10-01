@@ -111,7 +111,7 @@ public class EncryptorBean {
                 // CipherText.fromPortableSerializedBytes(Base64.decode(ciphertext));
                 // plaintext = encryptor.decrypt(key, ct).toString();
                 IvParameterSpec iv = new IvParameterSpec(Base64.decode(salt));
-                Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+                Cipher cipher = Cipher.getInstance("AES/CBC/PKCS7Padding");
                 cipher.init(Cipher.DECRYPT_MODE, key, iv);
 
                 plaintext = new String(cipher.doFinal(Base64.decode(ciphertext)));
@@ -153,7 +153,7 @@ public class EncryptorBean {
                 // PlainText(plaintext));
                 // ciphertext =
                 // Base64.encodeBytes(ct.asPortableSerializedByteArray());
-                Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+                Cipher cipher = Cipher.getInstance("AES/CBC/PKCS7Padding");
                 cipher.init(Cipher.ENCRYPT_MODE, key);
                 ciphertext = Base64.encodeBytes(cipher.doFinal(plaintext.getBytes()));
                 salt = Base64.encodeBytes(cipher.getIV());
