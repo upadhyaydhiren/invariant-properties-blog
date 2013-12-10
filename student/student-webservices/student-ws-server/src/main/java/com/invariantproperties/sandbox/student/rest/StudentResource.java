@@ -115,7 +115,7 @@ public class StudentResource extends AbstractResource {
     @GET
     @Produces({ MediaType.APPLICATION_JSON, MediaType.TEXT_XML })
     public Response getStudent(@PathParam("studentId") String id) {
-        final Student student = dao.findStudentByUUID(id);
+        final Student student = dao.findStudentByUuid(id);
         if (student == null) {
             return Response.noContent().status(Status.NOT_FOUND).build();
         }
@@ -140,7 +140,7 @@ public class StudentResource extends AbstractResource {
         Student student = null;
 
         try {
-            student = dao.findStudentByUUID(id);
+            student = dao.findStudentByUuid(id);
         } catch (ObjectNotFoundException exception) {
             return Response.noContent().status(Status.NOT_FOUND).build();
         }
