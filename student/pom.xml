@@ -29,7 +29,7 @@
 
 	<scm>
 		<connection>scm:svn:http://invariant-properties-blog.googlecode.com/svn/student/trunk</connection>
-		<developerConnection>scm:svn:https://invariant-properties-blog.googlecode.com/svn/student/trunk/</developerConnection>
+		<developerConnection>scm:svn:https://invariant-properties-blog.googlecode.com/svn/student/</developerConnection>
 		<tag>HEAD</tag>
 		<url>http://.</url>
 	</scm>
@@ -39,7 +39,8 @@
 	<modules>
 		<module>student-common</module>
 		<module>student-persistence</module>
-		<!-- <module>student-webservices</module> -->
+		<module>student-webservices</module>
+		<module>student-webapp</module>
 	</modules>
 
 	<properties>
