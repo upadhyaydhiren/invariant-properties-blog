@@ -32,7 +32,7 @@
 				<version>2.1</version>
 				<configuration>
 					<server>tomcat</server>
-					<path>/vaa</path>
+					<path>/student</path>
 				</configuration>
 			</plugin>
 		</plugins>
