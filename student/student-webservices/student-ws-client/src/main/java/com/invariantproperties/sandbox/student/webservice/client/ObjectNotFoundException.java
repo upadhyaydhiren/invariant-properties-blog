@@ -36,6 +36,13 @@ public class ObjectNotFoundException extends RestClientException {
 	private final String resource;
 	private final String uuid;
 
+	/**
+	 * Constructor
+	 * 
+	 * @param resource
+	 * @param objectClass
+	 * @param uuid
+	 */
 	public ObjectNotFoundException(final String resource,
 			final Class<? extends PersistentObject> objectClass,
 			final String uuid) {
