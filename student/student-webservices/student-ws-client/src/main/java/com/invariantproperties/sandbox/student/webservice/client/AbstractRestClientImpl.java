@@ -75,9 +75,9 @@ public class AbstractRestClientImpl<T extends PersistentObject> {
 
 			if (response.getStatus() == Response.Status.OK.getStatusCode()) {
 				T[] entities = response.getEntity(objectArrayClass);
-				for (T entity : entities) {
-					entity.setSelf(resource + entity.getUuid());
-				}
+				// for (T entity : entities) {
+				// 	entity.setSelf(resource + entity.getUuid());
+				// }
 				return entities;
 			} else {
 				throw new RestClientFailureException(resource, objectClass,
@@ -101,7 +101,7 @@ public class AbstractRestClientImpl<T extends PersistentObject> {
 
 			if (response.getStatus() == Response.Status.OK.getStatusCode()) {
 				final T entity = response.getEntity(objectClass);
-				entity.setSelf(resource + entity.getUuid());
+				// entity.setSelf(resource + entity.getUuid());
 				return entity;
 			} else if (response.getStatus() == Response.Status.NOT_FOUND
 					.getStatusCode()) {
@@ -130,7 +130,7 @@ public class AbstractRestClientImpl<T extends PersistentObject> {
 
 			if (response.getStatus() == Response.Status.CREATED.getStatusCode()) {
 				final T entity = response.getEntity(objectClass);
-				entity.setSelf(resource + entity.getUuid());
+				// entity.setSelf(resource + entity.getUuid());
 				return entity;
 			} else {
 				throw new RestClientFailureException(resource, objectClass, "("
@@ -156,7 +156,7 @@ public class AbstractRestClientImpl<T extends PersistentObject> {
 
 			if (response.getStatus() == Response.Status.OK.getStatusCode()) {
 				final T entity = response.getEntity(objectClass);
-				entity.setSelf(resource + entity.getUuid());
+				// entity.setSelf(resource + entity.getUuid());
 				return entity;
 			} else if (response.getStatus() == Response.Status.NOT_FOUND
 					.getStatusCode()) {
