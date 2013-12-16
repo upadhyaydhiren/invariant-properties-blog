@@ -60,7 +60,10 @@ public class CourseRestClientImplTest {
 
 	@Test
 	public void testGetAllCoursesNonEmpty() {
-		CourseRestClient client = new CourseRestClientMock(200, new Course[1]);
+		Course course = new Course();
+		course.setUuid(UUID);
+		CourseRestClient client = new CourseRestClientMock(200,
+				new Course[] { course });
 		Course[] results = client.getAllCourses();
 		assertEquals(1, results.length);
 	}
@@ -78,6 +81,8 @@ public class CourseRestClientImplTest {
 		CourseRestClient client = new CourseRestClientMock(200, course);
 		Course results = client.getCourse(course.getUuid());
 		assertEquals(course.getUuid(), results.getUuid());
+		assertEquals(CourseRestClientMock.RESOURCE + course.getUuid(),
+				results.getSelf());
 	}
 
 	@Test(expected = ObjectNotFoundException.class)
@@ -100,6 +105,8 @@ public class CourseRestClientImplTest {
 				Response.Status.CREATED.getStatusCode(), course);
 		Course results = client.createCourse(course.getName());
 		assertEquals(course.getName(), results.getName());
+		assertEquals(CourseRestClientMock.RESOURCE + results.getUuid(),
+				results.getSelf());
 	}
 
 	@Test(expected = RestClientFailureException.class)
@@ -118,6 +125,8 @@ public class CourseRestClientImplTest {
 				.updateCourse(course.getUuid(), course.getName());
 		assertEquals(course.getUuid(), results.getUuid());
 		assertEquals(course.getName(), results.getName());
+		assertEquals(CourseRestClientMock.RESOURCE + course.getUuid(),
+				results.getSelf());
 	}
 
 	@Test(expected = ObjectNotFoundException.class)
@@ -159,7 +168,7 @@ public class CourseRestClientImplTest {
  * implementation details.
  */
 class CourseRestClientMock extends CourseRestClientImpl {
-	private static final String RESOURCE = "test://rest/course/";
+	static final String RESOURCE = "test://rest/course/";
 	private Client client;
 	private WebResource webResource;
 	private WebResource.Builder webResourceBuilder;
