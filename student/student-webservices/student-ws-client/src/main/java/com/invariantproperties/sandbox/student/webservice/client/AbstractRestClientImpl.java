@@ -31,7 +31,7 @@ import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 
 /**
- * Implementation of CourseRestClient.
+ * Abstract implementation of RestClient.
  * 
  * @author Bear Giles <bgiles@coyotesong.com>
  */
@@ -74,7 +74,11 @@ public class AbstractRestClientImpl<T extends PersistentObject> {
 					MediaType.APPLICATION_JSON).get(ClientResponse.class);
 
 			if (response.getStatus() == Response.Status.OK.getStatusCode()) {
-				return response.getEntity(objectArrayClass);
+				T[] entities = response.getEntity(objectArrayClass);
+				for (T entity : entities) {
+					entity.setSelf(resource + entity.getUuid());
+				}
+				return entities;
 			} else {
 				throw new RestClientFailureException(resource, objectClass,
 						"<none>", response);
@@ -96,7 +100,9 @@ public class AbstractRestClientImpl<T extends PersistentObject> {
 					MediaType.APPLICATION_JSON).get(ClientResponse.class);
 
 			if (response.getStatus() == Response.Status.OK.getStatusCode()) {
-				return response.getEntity(objectClass);
+				final T entity = response.getEntity(objectClass);
+				entity.setSelf(resource + entity.getUuid());
+				return entity;
 			} else if (response.getStatus() == Response.Status.NOT_FOUND
 					.getStatusCode()) {
 				throw new ObjectNotFoundException(resource, objectClass, uuid);
@@ -123,7 +129,9 @@ public class AbstractRestClientImpl<T extends PersistentObject> {
 					.post(ClientResponse.class, json);
 
 			if (response.getStatus() == Response.Status.CREATED.getStatusCode()) {
-				return (T) response.getEntity(objectClass);
+				final T entity = response.getEntity(objectClass);
+				entity.setSelf(resource + entity.getUuid());
+				return entity;
 			} else {
 				throw new RestClientFailureException(resource, objectClass, "("
 						+ json + ")", response);
@@ -147,7 +155,9 @@ public class AbstractRestClientImpl<T extends PersistentObject> {
 					.post(ClientResponse.class, json);
 
 			if (response.getStatus() == Response.Status.OK.getStatusCode()) {
-				return response.getEntity(objectClass);
+				final T entity = response.getEntity(objectClass);
+				entity.setSelf(resource + entity.getUuid());
+				return entity;
 			} else if (response.getStatus() == Response.Status.NOT_FOUND
 					.getStatusCode()) {
 				throw new ObjectNotFoundException(resource, objectClass, uuid);
