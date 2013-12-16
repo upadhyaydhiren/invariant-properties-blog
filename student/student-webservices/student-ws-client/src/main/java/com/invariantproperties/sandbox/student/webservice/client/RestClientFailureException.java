@@ -41,7 +41,8 @@ public class RestClientFailureException extends RestClientException {
 	/**
 	 * Constructor
 	 * 
-	 * @param cls
+	 * @param resource
+	 * @param objectClass
 	 * @param uuid
 	 * @param response
 	 */
