@@ -47,10 +47,6 @@ public class CourseRestClientImplTest {
 	private static final String UUID = "uuid";
 	private static final String NAME = "name";
 
-	public CourseRestClientImplTest() {
-		// TODO Auto-generated constructor stub
-	}
-
 	@Test
 	public void testGetAllCoursesEmpty() {
 		CourseRestClient client = new CourseRestClientMock(200, new Course[0]);
@@ -214,9 +210,5 @@ class CourseRestClientMock extends CourseRestClientImpl {
 		when(response.getStatus()).thenReturn(status);
 		when(response.getEntity(any(Class.class))).thenReturn(results);
 		return client;
-	}
-
-	public WebResource getWebResource() {
-		return webResource;
 	}
 }
