@@ -29,8 +29,8 @@ import javax.persistence.PrePersist;
  * 
  */
 public class TestListener {
-    @PrePersist
-    public void test(Course course) {
-        System.out.println("*** test ***");
-    }
+	@PrePersist
+	public void test(Course course) {
+		System.out.println("*** test ***");
+	}
 }
