@@ -32,139 +32,137 @@ import javax.ws.rs.core.Response;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-import com.invariantproperties.sandbox.student.domain.Course;
+import com.invariantproperties.sandbox.student.domain.Term;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 
 /**
- * Unit tests for CourseRestClientImpl. Remember that we want to test the
+ * Unit tests for TermRestClientImpl. Remember that we want to test the
  * behavior, not the implementation.
  * 
  * @author Bear Giles <bgiles@coyotesong.com>
  */
-public class CourseRestClientImplTest {
+public class TermRestClientImplTest {
 	private static final String UUID = "uuid";
 	private static final String NAME = "name";
 
 	@Test
-	public void testGetAllCoursesEmpty() {
-		CourseRestClient client = new CourseRestClientMock(200, new Course[0]);
-		Course[] results = client.getAllCourses();
+	public void testGetAllTermsEmpty() {
+		TermRestClient client = new TermRestClientMock(200, new Term[0]);
+		Term[] results = client.getAllTerms();
 		assertEquals(0, results.length);
 	}
 
 	@Test
-	public void testGetAllCoursesNonEmpty() {
-		Course course = new Course();
-		course.setUuid(UUID);
-		CourseRestClient client = new CourseRestClientMock(200,
-				new Course[] { course });
-		Course[] results = client.getAllCourses();
+	public void testGetAllTermsNonEmpty() {
+		Term term = new Term();
+		term.setUuid(UUID);
+		TermRestClient client = new TermRestClientMock(200, new Term[] { term });
+		Term[] results = client.getAllTerms();
 		assertEquals(1, results.length);
 	}
 
 	@Test(expected = RestClientFailureException.class)
-	public void testGetAllCoursesError() {
-		CourseRestClient client = new CourseRestClientMock(500, null);
-		client.getAllCourses();
+	public void testGetAllTermsError() {
+		TermRestClient client = new TermRestClientMock(500, null);
+		client.getAllTerms();
 	}
 
 	@Test
-	public void testGetCourse() {
-		Course expected = new Course();
+	public void testGetTerm() {
+		Term expected = new Term();
 		expected.setUuid(UUID);
-		CourseRestClient client = new CourseRestClientMock(200, expected);
-		Course actual = client.getCourse(expected.getUuid());
+		TermRestClient client = new TermRestClientMock(200, expected);
+		Term actual = client.getTerm(expected.getUuid());
 		assertEquals(expected.getUuid(), actual.getUuid());
-		// assertEquals(CourseRestClientMock.RESOURCE + course.getUuid(),
+		// assertEquals(TermRestClientMock.RESOURCE + term.getUuid(),
 		// actual.getSelf());
 	}
 
 	@Test(expected = ObjectNotFoundException.class)
-	public void testGetCourseMissing() {
-		CourseRestClient client = new CourseRestClientMock(404, null);
-		client.getCourse(UUID);
+	public void testGetTermMissing() {
+		TermRestClient client = new TermRestClientMock(404, null);
+		client.getTerm(UUID);
 	}
 
 	@Test(expected = RestClientFailureException.class)
-	public void testGetCourseError() {
-		CourseRestClient client = new CourseRestClientMock(500, null);
-		client.getCourse(UUID);
+	public void testGetTermError() {
+		TermRestClient client = new TermRestClientMock(500, null);
+		client.getTerm(UUID);
 	}
 
 	@Test
-	public void testCreateCourse() {
-		Course expected = new Course();
+	public void testCreateTerm() {
+		Term expected = new Term();
 		expected.setName(NAME);
-		CourseRestClient client = new CourseRestClientMock(
+		TermRestClient client = new TermRestClientMock(
 				Response.Status.CREATED.getStatusCode(), expected);
-		Course actual = client.createCourse(expected.getName());
+		Term actual = client.createTerm(expected.getName());
 		assertEquals(expected.getName(), actual.getName());
-		// assertEquals(CourseRestClientMock.RESOURCE + results.getUuid(),
+		// assertEquals(TermRestClientMock.RESOURCE + results.getUuid(),
 		// actual.getSelf());
 	}
 
 	@Test(expected = RestClientFailureException.class)
-	public void testCreateCourseError() {
-		CourseRestClient client = new CourseRestClientMock(500, null);
-		client.createCourse(UUID);
+	public void testCreateTermError() {
+		TermRestClient client = new TermRestClientMock(500, null);
+		client.createTerm(UUID);
 	}
 
 	@Test
-	public void testUpdateCourse() {
-		Course expected = new Course();
+	public void testUpdateTerm() {
+		Term expected = new Term();
 		expected.setUuid(UUID);
 		expected.setName(NAME);
-		CourseRestClient client = new CourseRestClientMock(200, expected);
-		Course actual = client.updateCourse(expected.getUuid(),
-				expected.getName());
+		TermRestClient client = new TermRestClientMock(200, expected);
+		Term actual = client.updateTerm(expected.getUuid(), expected.getName());
 		assertEquals(expected.getUuid(), actual.getUuid());
 		assertEquals(expected.getName(), actual.getName());
-		// assertEquals(CourseRestClientMock.RESOURCE + course.getUuid(),
+		// assertEquals(TermRestClientMock.RESOURCE + term.getUuid(),
 		// actual.getSelf());
 	}
 
 	@Test(expected = ObjectNotFoundException.class)
-	public void testUpdateCourseMissing() {
-		CourseRestClient client = new CourseRestClientMock(404, null);
-		client.updateCourse(UUID, NAME);
+	public void testUpdateTermMissing() {
+		TermRestClient client = new TermRestClientMock(404, null);
+		client.updateTerm(UUID, NAME);
 	}
 
 	@Test(expected = RestClientFailureException.class)
-	public void testUpdateCourseError() {
-		CourseRestClient client = new CourseRestClientMock(500, null);
-		client.updateCourse(UUID, NAME);
+	public void testUpdateTermError() {
+		TermRestClient client = new TermRestClientMock(500, null);
+		client.updateTerm(UUID, NAME);
 	}
 
 	@Test
-	public void testDeleteCourse() {
-		Course course = new Course();
-		course.setUuid(UUID);
-		CourseRestClient client = new CourseRestClientMock(
+	public void testDeleteTerm() {
+		Term term = new Term();
+		term.setUuid(UUID);
+		TermRestClient client = new TermRestClientMock(
 				Response.Status.GONE.getStatusCode(), null);
-		client.deleteCourse(course.getUuid());
+		client.deleteTerm(term.getUuid());
 	}
 
 	@Test
-	public void testDeleteCourseMissing() {
-		CourseRestClient client = new CourseRestClientMock(404, null);
-		client.deleteCourse(UUID);
+	public void testDeleteTermMissing() {
+		TermRestClient client = new TermRestClientMock(404, null);
+		client.deleteTerm(UUID);
 	}
 
 	@Test(expected = RestClientFailureException.class)
-	public void testDeleteCourseError() {
-		CourseRestClient client = new CourseRestClientMock(500, null);
-		client.deleteCourse(UUID);
+	public void testDeleteTermError() {
+		TermRestClient client = new TermRestClientMock(500, null);
+		client.deleteTerm(UUID);
 	}
 }
 
 /**
- * CourseRestClientImpl extended to mock jersey API. This class requires
+ * TermRestClientImpl extended to mock jersey API. This class requires
  * implementation details.
  */
-class CourseRestClientMock extends CourseRestClientImpl {
-	static final String RESOURCE = "test://rest/course/";
+class TermRestClientMock extends TermRestClientImpl {
+	static final String RESOURCE = "test://rest/term/";
 	private Client client;
 	private WebResource webResource;
 	private WebResource.Builder webResourceBuilder;
@@ -172,7 +170,7 @@ class CourseRestClientMock extends CourseRestClientImpl {
 	private final int status;
 	private final Object results;
 
-	CourseRestClientMock(int status, Object results) {
+	TermRestClientMock(int status, Object results) {
 		super(RESOURCE);
 		this.status = status;
 		this.results = results;

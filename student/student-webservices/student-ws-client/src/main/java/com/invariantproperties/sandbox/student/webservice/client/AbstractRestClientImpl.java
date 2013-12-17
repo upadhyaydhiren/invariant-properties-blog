@@ -76,7 +76,7 @@ public class AbstractRestClientImpl<T extends PersistentObject> {
 			if (response.getStatus() == Response.Status.OK.getStatusCode()) {
 				T[] entities = response.getEntity(objectArrayClass);
 				// for (T entity : entities) {
-				// 	entity.setSelf(resource + entity.getUuid());
+				// entity.setSelf(resource + entity.getUuid());
 				// }
 				return entities;
 			} else {
