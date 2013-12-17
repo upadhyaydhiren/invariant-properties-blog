@@ -22,6 +22,10 @@
  */
 package com.invariantproperties.sandbox.student.domain;
 
+import javax.persistence.AttributeOverride;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
@@ -29,6 +33,20 @@ import javax.xml.bind.annotation.XmlRootElement;
  * @author Bear Giles <bgiles@coyotesong.com>
  */
 @XmlRootElement
+@Entity
+@Table(name = "classroom")
+@AttributeOverride(name = "id", column = @Column(name = "classroom_pkey"))
 public class Classroom extends PersistentObject {
+	private static final long serialVersionUID = 1L;
 
+	private String name;
+
+	@Column(length = 80, unique = false, updatable = true)
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
 }

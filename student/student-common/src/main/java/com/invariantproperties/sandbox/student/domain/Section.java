@@ -25,6 +25,10 @@ package com.invariantproperties.sandbox.student.domain;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.persistence.AttributeOverride;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
@@ -33,10 +37,23 @@ import javax.xml.bind.annotation.XmlRootElement;
  * 
  */
 @XmlRootElement
+@Entity
+@Table(name = "section")
+@AttributeOverride(name = "id", column = @Column(name = "section_pkey"))
 public class Section extends PersistentObject {
+	private static final long serialVersionUID = 1L;
 
-    private Course course;
-    private List<Student> students = new ArrayList<Student>();
-    private List<Classroom> classrooms = new ArrayList<Classroom>();
+	private String name;
+	private Course course;
+	private List<Student> students = new ArrayList<Student>();
+	private List<Classroom> classrooms = new ArrayList<Classroom>();
 
+	@Column(length = 80, unique = false, updatable = true)
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
 }

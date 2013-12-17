@@ -27,7 +27,6 @@ import java.util.List;
 import javax.persistence.AttributeOverride;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.EntityListeners;
 import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -40,18 +39,18 @@ import javax.xml.bind.annotation.XmlRootElement;
 @Entity
 @Table(name = "course")
 @AttributeOverride(name = "id", column = @Column(name = "course_pkey"))
-@EntityListeners(TestListener.class)
 public class Course extends PersistentObject {
-    private String name;
-    private List<Section> sections;
+	private static final long serialVersionUID = 1L;
 
-    @Column(length = 80, unique = false, updatable = true)
-    public String getName() {
-        return name;
-    }
+	private String name;
+	private List<Section> sections;
 
-    public void setName(String name) {
-        this.name = name;
-    }
+	@Column(length = 80, unique = false, updatable = true)
+	public String getName() {
+		return name;
+	}
 
+	public void setName(String name) {
+		this.name = name;
+	}
 }

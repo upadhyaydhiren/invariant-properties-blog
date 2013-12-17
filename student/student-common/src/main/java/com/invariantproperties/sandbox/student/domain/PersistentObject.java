@@ -51,88 +51,89 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
  */
 @MappedSuperclass
 public abstract class PersistentObject implements Serializable {
-    private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
-    private Integer id;
-    private String uuid;
-    private Date creationDate;
-    private String self;
+	private Integer id;
+	private String uuid;
+	private Date creationDate;
+	private String self;
 
-    @Id
-    @GeneratedValue
-    public Integer getId() {
-        return id;
-    }
+	@Id
+	@GeneratedValue
+	public Integer getId() {
+		return id;
+	}
 
-    public void setId(Integer id) {
-        this.id = id;
-    }
+	public void setId(Integer id) {
+		this.id = id;
+	}
 
-    @Column(unique = true, length = 40, nullable = false, updatable = false)
-    public String getUuid() {
-        return uuid;
-    }
+	@Column(unique = true, length = 40, nullable = false, updatable = false)
+	public String getUuid() {
+		return uuid;
+	}
 
-    public void setUuid(String uuid) {
-        this.uuid = uuid;
-    }
+	public void setUuid(String uuid) {
+		this.uuid = uuid;
+	}
 
-    @Column(name = "creation_date", nullable = false, updatable = false)
-    @Temporal(TemporalType.TIMESTAMP)
-    public Date getCreationDate() {
-        return creationDate;
-    }
+	@Column(name = "creation_date", nullable = false, updatable = false)
+	@Temporal(TemporalType.TIMESTAMP)
+	public Date getCreationDate() {
+		return creationDate;
+	}
 
-    public void setCreationDate(Date creationDate) {
-        this.creationDate = creationDate;
-    }
+	public void setCreationDate(Date creationDate) {
+		this.creationDate = creationDate;
+	}
 
-    @Transient
-    public String getSelf() {
-        return self;
-    }
+	@Transient
+	public String getSelf() {
+		return self;
+	}
 
-    public void setSelf(String self) {
-        this.self = self;
-    }
+	public void setSelf(String self) {
+		this.self = self;
+	}
 
-    @PrePersist
-    public void prepersist() {
-        if (getCreationDate() == null) {
-            setCreationDate(new Date());
-        }
+	@PrePersist
+	public void prepersist() {
+		if (getCreationDate() == null) {
+			setCreationDate(new Date());
+		}
 
-        if (getUuid() == null) {
-            setUuid(UUID.randomUUID().toString());
-        }
-    }
+		if (getUuid() == null) {
+			setUuid(UUID.randomUUID().toString());
+		}
+	}
 
-    @Override
-    public int hashCode() {
-        return new HashCodeBuilder().append(uuid).hashCode();
-    }
+	@Override
+	public int hashCode() {
+		return new HashCodeBuilder().append(uuid).hashCode();
+	}
 
-    @Override
-    public boolean equals(Object o) {
-        if (o == null || !(o instanceof PersistentObject)) {
-            return false;
-        }
+	@Override
+	public boolean equals(Object o) {
+		if (o == null || !(o instanceof PersistentObject)) {
+			return false;
+		}
 
-        PersistentObject po = (PersistentObject) o;
+		PersistentObject po = (PersistentObject) o;
 
-        EqualsBuilder eq = new EqualsBuilder();
-        eq.append(uuid, po.getUuid());
+		EqualsBuilder eq = new EqualsBuilder();
+		eq.append(uuid, po.getUuid());
 
-        return eq.isEquals();
-    }
+		return eq.isEquals();
+	}
 
-    @Override
-    public String toString() {
-        // ToStringBuilder tsb = new ToStringBuilder(this,
-        // ToStringStyle.SHORT_PREFIX_STYLE);
-        // tsb.append(id).append(uuid).append(name).append(veracodeAppId);
-        // return tsb.toString();
+	@Override
+	public String toString() {
+		// ToStringBuilder tsb = new ToStringBuilder(this,
+		// ToStringStyle.SHORT_PREFIX_STYLE);
+		// tsb.append(id).append(uuid).append(name).append(veracodeAppId);
+		// return tsb.toString();
 
-        return String.format("[%s: %s, %s]", this.getClass().getSimpleName(), getId(), getUuid());
-    }
+		return String.format("[%s: %s, %s]", this.getClass().getSimpleName(),
+				getId(), getUuid());
+	}
 }
