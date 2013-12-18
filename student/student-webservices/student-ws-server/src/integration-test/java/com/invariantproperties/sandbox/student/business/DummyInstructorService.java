@@ -39,7 +39,7 @@ public class DummyInstructorService implements InstructorService {
     }
 
     public Instructor findInstructorById(Integer id) {
-        throw new ObjectNotFoundException(null);
+        throw new ObjectNotFoundException(id);
     }
 
     public Instructor findInstructorByUuid(String uuid) {
@@ -50,7 +50,7 @@ public class DummyInstructorService implements InstructorService {
     }
 
     public Instructor findInstructorByEmailAddress(String emailAddress) {
-        throw new ObjectNotFoundException(null);
+        throw new ObjectNotFoundException("[email]");
     }
 
     public Instructor createInstructor(String name, String emailAddress) {
