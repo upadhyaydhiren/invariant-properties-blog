@@ -142,14 +142,13 @@ public class SectionRestClientImplTest {
 	public void testDeleteSection() {
 		Section section = new Section();
 		section.setUuid(UUID);
-		SectionRestClient client = new SectionRestClientMock(
-				Response.Status.GONE.getStatusCode(), null);
+		SectionRestClient client = new SectionRestClientMock(204, null);
 		client.deleteSection(section.getUuid());
 	}
 
 	@Test
 	public void testDeleteSectionMissing() {
-		SectionRestClient client = new SectionRestClientMock(404, null);
+		SectionRestClient client = new SectionRestClientMock(204, null);
 		client.deleteSection(UUID);
 	}
 

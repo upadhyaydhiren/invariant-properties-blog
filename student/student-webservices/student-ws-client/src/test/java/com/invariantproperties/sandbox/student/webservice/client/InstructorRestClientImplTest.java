@@ -152,14 +152,13 @@ public class InstructorRestClientImplTest {
 	public void testDeleteInstructor() {
 		Instructor instructor = new Instructor();
 		instructor.setUuid(UUID);
-		InstructorRestClient client = new InstructorRestClientMock(
-				Response.Status.GONE.getStatusCode(), null);
+		InstructorRestClient client = new InstructorRestClientMock(204, null);
 		client.deleteInstructor(instructor.getUuid());
 	}
 
 	@Test
 	public void testDeleteInstructorMissing() {
-		InstructorRestClient client = new InstructorRestClientMock(404, null);
+		InstructorRestClient client = new InstructorRestClientMock(204, null);
 		client.deleteInstructor(UUID);
 	}
 
