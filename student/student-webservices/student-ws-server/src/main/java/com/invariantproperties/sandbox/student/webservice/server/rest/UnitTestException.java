@@ -20,16 +20,14 @@
  * 
  * Copyright (c) 2013 Bear Giles <bgiles@coyotesong.com>
  */
-package com.invariantproperties.sandbox.student.rest;
+package com.invariantproperties.sandbox.student.webservice.server.rest;
 
 /**
- * @author bgiles
+ * Exception thrown by unit tests. We use this to avoid cluttering up log with
+ * bogus stack traces during testing.
  * 
+ * @author Bear Giles <bgiles@coyotesong.com>
  */
-// @Path("")
-public class RootResource {
-    // @GET
-    public String get() {
-        return "foo";
-    }
+public class UnitTestException extends RuntimeException {
+	private static final long serialVersionUID = 1L;
 }

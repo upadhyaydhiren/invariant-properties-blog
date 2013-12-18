@@ -20,7 +20,7 @@
  * 
  * Copyright (c) 2013 Bear Giles <bgiles@coyotesong.com>
  */
-package com.invariantproperties.sandbox.student.rest;
+package com.invariantproperties.sandbox.student.webservice.server.rest;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
