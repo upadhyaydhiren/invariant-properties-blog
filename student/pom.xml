@@ -40,6 +40,7 @@
 		<module>student-common</module>
 		<module>student-persistence</module>
 		<module>student-api</module>
+        <module>student-business</module>
 		<module>student-webservices</module>
 		<module>student-webapp</module>
 	</modules>
