@@ -178,6 +178,11 @@
 				<artifactId>student-persistence</artifactId>
 				<version>${project.version}</version>
 			</dependency>
+            <dependency>
+                <groupId>com.invariantproperties.sandbox.student</groupId>
+                <artifactId>student-business</artifactId>
+                <version>${project.version}</version>
+            </dependency>
 			<dependency>
 				<groupId>com.invariantproperties.sandbox.student</groupId>
 				<artifactId>student-ws-server</artifactId>
