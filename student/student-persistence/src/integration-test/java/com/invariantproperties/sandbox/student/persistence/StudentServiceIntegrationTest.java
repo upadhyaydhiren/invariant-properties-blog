@@ -38,7 +38,8 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.transaction.TransactionConfiguration;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.invariantproperties.sandbox.student.config.TestPersistenceApplicationContext;
+import com.invariantproperties.sandbox.student.business.ObjectNotFoundException;
+import com.invariantproperties.sandbox.student.business.StudentService;
 import com.invariantproperties.sandbox.student.config.TestPersistenceJpaConfig;
 import com.invariantproperties.sandbox.student.domain.Student;
 
@@ -46,7 +47,7 @@ import com.invariantproperties.sandbox.student.domain.Student;
  * @author bgiles
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = { TestPersistenceJpaConfig.class, TestPersistenceApplicationContext.class })
+@ContextConfiguration(classes = { TestPersistenceJpaConfig.class })
 @Transactional
 @TransactionConfiguration(defaultRollback = true)
 public class StudentServiceIntegrationTest {
