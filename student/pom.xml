@@ -39,6 +39,7 @@
 	<modules>
 		<module>student-common</module>
 		<module>student-persistence</module>
+		<module>student-api</module>
 		<module>student-webservices</module>
 		<module>student-webapp</module>
 	</modules>
@@ -164,6 +165,11 @@
 			<dependency>
 				<groupId>com.invariantproperties.sandbox.student</groupId>
 				<artifactId>student-common</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.invariantproperties.sandbox.student</groupId>
+				<artifactId>student-api</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 			<dependency>
