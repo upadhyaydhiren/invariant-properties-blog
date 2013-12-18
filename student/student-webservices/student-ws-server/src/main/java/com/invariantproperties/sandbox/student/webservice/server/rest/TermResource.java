@@ -44,15 +44,15 @@ import javax.ws.rs.core.UriInfo;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Service;
 
-import com.invariantproperties.sandbox.student.business.CourseService;
 import com.invariantproperties.sandbox.student.business.ObjectNotFoundException;
-import com.invariantproperties.sandbox.student.domain.Course;
+import com.invariantproperties.sandbox.student.business.TermService;
+import com.invariantproperties.sandbox.student.domain.Term;
 
 @Service
-@Path("/course")
-public class CourseResource extends AbstractResource {
-    private static final Logger log = Logger.getLogger(CourseResource.class);
-    private static final Course[] EMPTY_COURSE_ARRAY = new Course[0];
+@Path("/term")
+public class TermResource extends AbstractResource {
+    private static final Logger log = Logger.getLogger(TermResource.class);
+    private static final Term[] EMPTY_TERM_ARRAY = new Term[0];
 
     @Context
     UriInfo uriInfo;
@@ -61,12 +61,12 @@ public class CourseResource extends AbstractResource {
     Request request;
 
     @Resource
-    private CourseService service;
+    private TermService service;
 
     /**
      * Default constructor.
      */
-    public CourseResource() {
+    public TermResource() {
 
     }
 
@@ -75,30 +75,30 @@ public class CourseResource extends AbstractResource {
      * 
      * @param service
      */
-    CourseResource(CourseService service) {
+    TermResource(TermService service) {
         this.service = service;
     }
 
     /**
-     * Get all Courses.
+     * Get all Terms.
      * 
      * @return
      */
     @GET
     @Produces({ MediaType.APPLICATION_JSON, MediaType.TEXT_XML })
-    public Response findAllCourses() {
-        log.debug("CourseResource: findAllCourses()");
+    public Response findAllTerms() {
+        log.debug("TermResource: findAllTerms()");
 
         Response response = null;
         try {
-            List<Course> courses = service.findAllCourses();
+            List<Term> terms = service.findAllTerms();
 
-            List<Course> results = new ArrayList<Course>(courses.size());
-            for (Course course : courses) {
-                results.add(scrubCourse(course));
+            List<Term> results = new ArrayList<Term>(terms.size());
+            for (Term term : terms) {
+                results.add(scrubTerm(term));
             }
 
-            response = Response.ok(results.toArray(EMPTY_COURSE_ARRAY)).build();
+            response = Response.ok(results.toArray(EMPTY_TERM_ARRAY)).build();
         } catch (Exception e) {
             if (!(e instanceof UnitTestException)) {
                 log.info("unhandled exception", e);
@@ -110,7 +110,7 @@ public class CourseResource extends AbstractResource {
     }
 
     /**
-     * Create a Course.
+     * Create a Term.
      * 
      * @param req
      * @return
@@ -118,8 +118,8 @@ public class CourseResource extends AbstractResource {
     @POST
     @Consumes({ MediaType.APPLICATION_JSON, MediaType.TEXT_XML })
     @Produces({ MediaType.APPLICATION_JSON, MediaType.TEXT_XML })
-    public Response createCourse(Name req) {
-        log.debug("CourseResource: createCourse()");
+    public Response createTerm(Name req) {
+        log.debug("TermResource: createTerm()");
 
         final String name = req.getName();
         if ((name == null) || name.isEmpty()) {
@@ -129,11 +129,11 @@ public class CourseResource extends AbstractResource {
         Response response = null;
 
         try {
-            Course course = service.createCourse(name);
-            if (course == null) {
+            Term term = service.createTerm(name);
+            if (term == null) {
                 response = Response.status(Status.INTERNAL_SERVER_ERROR).build();
             } else {
-                response = Response.created(URI.create(course.getUuid())).entity(scrubCourse(course)).build();
+                response = Response.created(URI.create(term.getUuid())).entity(scrubTerm(term)).build();
             }
         } catch (Exception e) {
             if (!(e instanceof UnitTestException)) {
@@ -146,21 +146,21 @@ public class CourseResource extends AbstractResource {
     }
 
     /**
-     * Get a specific Course.
+     * Get a specific Term.
      * 
      * @param uuid
      * @return
      */
-    @Path("/{courseId}")
+    @Path("/{termId}")
     @GET
     @Produces({ MediaType.APPLICATION_JSON, MediaType.TEXT_XML })
-    public Response getCourse(@PathParam("courseId") String id) {
-        log.debug("CourseResource: getCourse()");
+    public Response getTerm(@PathParam("termId") String id) {
+        log.debug("TermResource: getTerm()");
 
         Response response = null;
         try {
-            Course course = service.findCourseByUuid(id);
-            response = Response.ok(scrubCourse(course)).build();
+            Term term = service.findTermByUuid(id);
+            response = Response.ok(scrubTerm(term)).build();
         } catch (ObjectNotFoundException e) {
             response = Response.status(Status.NOT_FOUND).build();
         } catch (Exception e) {
@@ -174,7 +174,7 @@ public class CourseResource extends AbstractResource {
     }
 
     /**
-     * Update a Course.
+     * Update a Term.
      * 
      * FIXME: what about uniqueness violations?
      * 
@@ -182,12 +182,12 @@ public class CourseResource extends AbstractResource {
      * @param req
      * @return
      */
-    @Path("/{courseId}")
+    @Path("/{termId}")
     @POST
     @Consumes({ MediaType.APPLICATION_JSON, MediaType.TEXT_XML })
     @Produces({ MediaType.APPLICATION_JSON, MediaType.TEXT_XML })
-    public Response updateCourse(@PathParam("courseId") String id, Name req) {
-        log.debug("CourseResource: updateCourse()");
+    public Response updateTerm(@PathParam("termId") String id, Name req) {
+        log.debug("TermResource: updateTerm()");
 
         final String name = req.getName();
         if ((name == null) || name.isEmpty()) {
@@ -196,9 +196,9 @@ public class CourseResource extends AbstractResource {
 
         Response response = null;
         try {
-            final Course course = service.findCourseByUuid(id);
-            final Course updatedCourse = service.updateCourse(course, name);
-            response = Response.ok(scrubCourse(updatedCourse)).build();
+            final Term term = service.findTermByUuid(id);
+            final Term updatedTerm = service.updateTerm(term, name);
+            response = Response.ok(scrubTerm(updatedTerm)).build();
         } catch (ObjectNotFoundException exception) {
             response = Response.status(Status.NOT_FOUND).build();
         } catch (Exception e) {
@@ -212,19 +212,19 @@ public class CourseResource extends AbstractResource {
     }
 
     /**
-     * Delete a Course.
+     * Delete a Term.
      * 
      * @param id
      * @return
      */
-    @Path("/{courseId}")
+    @Path("/{termId}")
     @DELETE
-    public Response deleteCourse(@PathParam("courseId") String id) {
-        log.debug("CourseResource: deleteCourse()");
+    public Response deleteTerm(@PathParam("termId") String id) {
+        log.debug("TermResource: deleteTerm()");
 
         Response response = null;
         try {
-            service.deleteCourse(id);
+            service.deleteTerm(id);
             response = Response.noContent().build();
         } catch (ObjectNotFoundException exception) {
             response = Response.noContent().build();

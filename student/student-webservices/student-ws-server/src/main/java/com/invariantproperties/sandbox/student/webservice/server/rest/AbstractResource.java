@@ -22,17 +22,17 @@
  */
 package com.invariantproperties.sandbox.student.webservice.server.rest;
 
-import org.apache.log4j.Logger;
-
 import com.invariantproperties.sandbox.student.domain.Classroom;
 import com.invariantproperties.sandbox.student.domain.Course;
+import com.invariantproperties.sandbox.student.domain.Instructor;
+import com.invariantproperties.sandbox.student.domain.Section;
 import com.invariantproperties.sandbox.student.domain.Student;
+import com.invariantproperties.sandbox.student.domain.Term;
 
 /**
  * @author Bear Giles <bgiles@coyotesong.com>
  */
 public abstract class AbstractResource {
-    private static final Logger log = Logger.getLogger(AbstractResource.class);
 
     public Classroom scrubClassroom(final Classroom dirty) {
         final Classroom clean = new Classroom();
@@ -50,12 +50,36 @@ public abstract class AbstractResource {
         return clean;
     }
 
+    public Instructor scrubInstructor(final Instructor dirty) {
+        final Instructor clean = new Instructor();
+        clean.setUuid(dirty.getUuid());
+        clean.setName(dirty.getName());
+        clean.setEmailAddress(dirty.getEmailAddress());
+        // clean.setSelf("resource/" + dirty.getUuid());
+        return clean;
+    }
+
+    public Section scrubSection(final Section dirty) {
+        final Section clean = new Section();
+        clean.setUuid(dirty.getUuid());
+        clean.setName(dirty.getName());
+        // clean.setSelf("resource/" + dirty.getUuid());
+        return clean;
+    }
+
     public Student scrubStudent(final Student dirty) {
-        log.info("scrubbing student");
         final Student clean = new Student();
         clean.setUuid(dirty.getUuid());
         clean.setName(dirty.getName());
         clean.setEmailAddress(dirty.getEmailAddress());
+        // clean.setSelf("resource/" + dirty.getUuid());
+        return clean;
+    }
+
+    public Term scrubTerm(final Term dirty) {
+        final Term clean = new Term();
+        clean.setUuid(dirty.getUuid());
+        clean.setName(dirty.getName());
         // clean.setSelf("resource/" + dirty.getUuid());
         return clean;
     }

@@ -44,15 +44,15 @@ import javax.ws.rs.core.UriInfo;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Service;
 
-import com.invariantproperties.sandbox.student.business.CourseService;
+import com.invariantproperties.sandbox.student.business.InstructorService;
 import com.invariantproperties.sandbox.student.business.ObjectNotFoundException;
-import com.invariantproperties.sandbox.student.domain.Course;
+import com.invariantproperties.sandbox.student.domain.Instructor;
 
 @Service
-@Path("/course")
-public class CourseResource extends AbstractResource {
-    private static final Logger log = Logger.getLogger(CourseResource.class);
-    private static final Course[] EMPTY_COURSE_ARRAY = new Course[0];
+@Path("/instructor")
+public class InstructorResource extends AbstractResource {
+    private static final Logger log = Logger.getLogger(InstructorResource.class);
+    private static final Instructor[] EMPTY_INSTRUCTOR_ARRAY = new Instructor[0];
 
     @Context
     UriInfo uriInfo;
@@ -61,12 +61,12 @@ public class CourseResource extends AbstractResource {
     Request request;
 
     @Resource
-    private CourseService service;
+    private InstructorService service;
 
     /**
      * Default constructor.
      */
-    public CourseResource() {
+    public InstructorResource() {
 
     }
 
@@ -75,30 +75,30 @@ public class CourseResource extends AbstractResource {
      * 
      * @param service
      */
-    CourseResource(CourseService service) {
+    InstructorResource(InstructorService service) {
         this.service = service;
     }
 
     /**
-     * Get all Courses.
+     * Get all Instructors.
      * 
      * @return
      */
     @GET
     @Produces({ MediaType.APPLICATION_JSON, MediaType.TEXT_XML })
-    public Response findAllCourses() {
-        log.debug("CourseResource: findAllCourses()");
+    public Response findAllInstructors() {
+        log.debug("InstructorResource: findAllInstructors()");
 
         Response response = null;
         try {
-            List<Course> courses = service.findAllCourses();
+            List<Instructor> instructors = service.findAllInstructors();
 
-            List<Course> results = new ArrayList<Course>(courses.size());
-            for (Course course : courses) {
-                results.add(scrubCourse(course));
+            List<Instructor> results = new ArrayList<Instructor>(instructors.size());
+            for (Instructor instructor : instructors) {
+                results.add(scrubInstructor(instructor));
             }
 
-            response = Response.ok(results.toArray(EMPTY_COURSE_ARRAY)).build();
+            response = Response.ok(results.toArray(EMPTY_INSTRUCTOR_ARRAY)).build();
         } catch (Exception e) {
             if (!(e instanceof UnitTestException)) {
                 log.info("unhandled exception", e);
@@ -110,7 +110,7 @@ public class CourseResource extends AbstractResource {
     }
 
     /**
-     * Create a Course.
+     * Create a Instructor.
      * 
      * @param req
      * @return
@@ -118,22 +118,28 @@ public class CourseResource extends AbstractResource {
     @POST
     @Consumes({ MediaType.APPLICATION_JSON, MediaType.TEXT_XML })
     @Produces({ MediaType.APPLICATION_JSON, MediaType.TEXT_XML })
-    public Response createCourse(Name req) {
-        log.debug("CourseResource: createCourse()");
+    public Response createInstructor(NameAndEmailAddress req) {
+        log.debug("InstructorResource: createInstructor()");
 
         final String name = req.getName();
         if ((name == null) || name.isEmpty()) {
             return Response.status(Status.BAD_REQUEST).entity("'name' is required'").build();
         }
 
+        final String email = req.getEmailAddress();
+        if ((email == null) || email.isEmpty()) {
+            return Response.status(Status.BAD_REQUEST).entity("'email' is required'").build();
+        }
+
         Response response = null;
 
         try {
-            Course course = service.createCourse(name);
-            if (course == null) {
+            Instructor instructor = service.createInstructor(name, email);
+            if (instructor == null) {
                 response = Response.status(Status.INTERNAL_SERVER_ERROR).build();
             } else {
-                response = Response.created(URI.create(course.getUuid())).entity(scrubCourse(course)).build();
+                response = Response.created(URI.create(instructor.getUuid())).entity(scrubInstructor(instructor))
+                        .build();
             }
         } catch (Exception e) {
             if (!(e instanceof UnitTestException)) {
@@ -146,25 +152,25 @@ public class CourseResource extends AbstractResource {
     }
 
     /**
-     * Get a specific Course.
+     * Get a specific Instructor.
      * 
      * @param uuid
      * @return
      */
-    @Path("/{courseId}")
+    @Path("/{instructorId}")
     @GET
     @Produces({ MediaType.APPLICATION_JSON, MediaType.TEXT_XML })
-    public Response getCourse(@PathParam("courseId") String id) {
-        log.debug("CourseResource: getCourse()");
+    public Response getInstructor(@PathParam("instructorId") String id) {
+        log.debug("InstructorResource: getInstructor()");
 
         Response response = null;
         try {
-            Course course = service.findCourseByUuid(id);
-            response = Response.ok(scrubCourse(course)).build();
+            Instructor instructor = service.findInstructorByUuid(id);
+            response = Response.ok(scrubInstructor(instructor)).build();
         } catch (ObjectNotFoundException e) {
             response = Response.status(Status.NOT_FOUND).build();
         } catch (Exception e) {
-            if (!"[unit test]".equals(e.getMessage())) {
+            if (!(e instanceof UnitTestException)) {
                 log.info("unhandled exception", e);
             }
             response = Response.status(Status.INTERNAL_SERVER_ERROR).build();
@@ -174,7 +180,7 @@ public class CourseResource extends AbstractResource {
     }
 
     /**
-     * Update a Course.
+     * Update a Instructor.
      * 
      * FIXME: what about uniqueness violations?
      * 
@@ -182,23 +188,28 @@ public class CourseResource extends AbstractResource {
      * @param req
      * @return
      */
-    @Path("/{courseId}")
+    @Path("/{instructorId}")
     @POST
     @Consumes({ MediaType.APPLICATION_JSON, MediaType.TEXT_XML })
     @Produces({ MediaType.APPLICATION_JSON, MediaType.TEXT_XML })
-    public Response updateCourse(@PathParam("courseId") String id, Name req) {
-        log.debug("CourseResource: updateCourse()");
+    public Response updateInstructor(@PathParam("instructorId") String id, NameAndEmailAddress req) {
+        log.debug("InstructorResource: updateInstructor()");
 
         final String name = req.getName();
         if ((name == null) || name.isEmpty()) {
             return Response.status(Status.BAD_REQUEST).entity("'name' is required'").build();
         }
 
+        final String email = req.getEmailAddress();
+        if ((email == null) || email.isEmpty()) {
+            return Response.status(Status.BAD_REQUEST).entity("'email' is required'").build();
+        }
+
         Response response = null;
         try {
-            final Course course = service.findCourseByUuid(id);
-            final Course updatedCourse = service.updateCourse(course, name);
-            response = Response.ok(scrubCourse(updatedCourse)).build();
+            final Instructor instructor = service.findInstructorByUuid(id);
+            final Instructor updatedInstructor = service.updateInstructor(instructor, name, email);
+            response = Response.ok(scrubInstructor(updatedInstructor)).build();
         } catch (ObjectNotFoundException exception) {
             response = Response.status(Status.NOT_FOUND).build();
         } catch (Exception e) {
@@ -212,19 +223,19 @@ public class CourseResource extends AbstractResource {
     }
 
     /**
-     * Delete a Course.
+     * Delete a Instructor.
      * 
      * @param id
      * @return
      */
-    @Path("/{courseId}")
+    @Path("/{instructorId}")
     @DELETE
-    public Response deleteCourse(@PathParam("courseId") String id) {
-        log.debug("CourseResource: deleteCourse()");
+    public Response deleteInstructor(@PathParam("instructorId") String id) {
+        log.debug("InstructorResource: deleteInstructor()");
 
         Response response = null;
         try {
-            service.deleteCourse(id);
+            service.deleteInstructor(id);
             response = Response.noContent().build();
         } catch (ObjectNotFoundException exception) {
             response = Response.noContent().build();

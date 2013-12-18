@@ -98,12 +98,12 @@ public class StudentResource extends AbstractResource {
                 results.add(scrubStudent(student));
             }
 
-            response = Response.ok(results.toArray(EMPTY_STUDENT_ARRAY)).status(Status.OK).build();
+            response = Response.ok(results.toArray(EMPTY_STUDENT_ARRAY)).build();
         } catch (Exception e) {
             if (!(e instanceof UnitTestException)) {
                 log.info("unhandled exception", e);
             }
-            response = Response.noContent().status(Status.INTERNAL_SERVER_ERROR).build();
+            response = Response.status(Status.INTERNAL_SERVER_ERROR).build();
         }
 
         return response;
@@ -123,12 +123,12 @@ public class StudentResource extends AbstractResource {
 
         final String name = req.getName();
         if ((name == null) || name.isEmpty()) {
-            return Response.ok().status(Status.BAD_REQUEST).entity("'name' is required'").build();
+            return Response.status(Status.BAD_REQUEST).entity("'name' is required'").build();
         }
 
         final String email = req.getEmailAddress();
         if ((email == null) || email.isEmpty()) {
-            return Response.ok().status(Status.BAD_REQUEST).entity("'email' is required'").build();
+            return Response.status(Status.BAD_REQUEST).entity("'email' is required'").build();
         }
 
         Response response = null;
@@ -136,7 +136,7 @@ public class StudentResource extends AbstractResource {
         try {
             Student student = service.createStudent(name, email);
             if (student == null) {
-                response = Response.noContent().status(Status.INTERNAL_SERVER_ERROR).build();
+                response = Response.status(Status.INTERNAL_SERVER_ERROR).build();
             } else {
                 response = Response.created(URI.create(student.getUuid())).entity(scrubStudent(student)).build();
             }
@@ -144,7 +144,7 @@ public class StudentResource extends AbstractResource {
             if (!(e instanceof UnitTestException)) {
                 log.info("unhandled exception", e);
             }
-            response = Response.noContent().status(Status.INTERNAL_SERVER_ERROR).build();
+            response = Response.status(Status.INTERNAL_SERVER_ERROR).build();
         }
 
         return response;
@@ -165,14 +165,14 @@ public class StudentResource extends AbstractResource {
         Response response = null;
         try {
             Student student = service.findStudentByUuid(id);
-            response = Response.ok(scrubStudent(student)).status(Status.OK).build();
+            response = Response.ok(scrubStudent(student)).build();
         } catch (ObjectNotFoundException e) {
-            response = Response.noContent().status(Status.NOT_FOUND).build();
+            response = Response.status(Status.NOT_FOUND).build();
         } catch (Exception e) {
             if (!(e instanceof UnitTestException)) {
                 log.info("unhandled exception", e);
             }
-            response = Response.noContent().status(Status.INTERNAL_SERVER_ERROR).build();
+            response = Response.status(Status.INTERNAL_SERVER_ERROR).build();
         }
 
         return response;
@@ -196,26 +196,26 @@ public class StudentResource extends AbstractResource {
 
         final String name = req.getName();
         if ((name == null) || name.isEmpty()) {
-            return Response.ok().status(Status.BAD_REQUEST).entity("'name' is required'").build();
+            return Response.status(Status.BAD_REQUEST).entity("'name' is required'").build();
         }
 
         final String email = req.getEmailAddress();
         if ((email == null) || email.isEmpty()) {
-            return Response.ok().status(Status.BAD_REQUEST).entity("'email' is required'").build();
+            return Response.status(Status.BAD_REQUEST).entity("'email' is required'").build();
         }
 
         Response response = null;
         try {
             final Student student = service.findStudentByUuid(id);
             final Student updatedStudent = service.updateStudent(student, name, email);
-            response = Response.ok(scrubStudent(updatedStudent)).status(Status.OK).build();
+            response = Response.ok(scrubStudent(updatedStudent)).build();
         } catch (ObjectNotFoundException exception) {
-            response = Response.noContent().status(Status.NOT_FOUND).build();
+            response = Response.status(Status.NOT_FOUND).build();
         } catch (Exception e) {
             if (!(e instanceof UnitTestException)) {
                 log.info("unhandled exception", e);
             }
-            response = Response.noContent().status(Status.INTERNAL_SERVER_ERROR).build();
+            response = Response.status(Status.INTERNAL_SERVER_ERROR).build();
         }
 
         return response;
@@ -235,14 +235,14 @@ public class StudentResource extends AbstractResource {
         Response response = null;
         try {
             service.deleteStudent(id);
-            response = Response.noContent().status(Status.NO_CONTENT).build();
+            response = Response.noContent().build();
         } catch (ObjectNotFoundException exception) {
-            response = Response.noContent().status(Status.NO_CONTENT).build();
+            response = Response.noContent().build();
         } catch (Exception e) {
             if (!(e instanceof UnitTestException)) {
                 log.info("unhandled exception", e);
             }
-            response = Response.noContent().status(Status.INTERNAL_SERVER_ERROR).build();
+            response = Response.status(Status.INTERNAL_SERVER_ERROR).build();
         }
 
         return response;
