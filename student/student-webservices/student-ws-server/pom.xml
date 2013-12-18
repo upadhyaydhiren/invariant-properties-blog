@@ -24,6 +24,10 @@
 							Maven bug that prevents the requestLog from being set. -->
 						<append>true</append>
 					</requestLog>
+					<webAppConfig>
+						<!-- <contextPath>/nportal</contextPath> -->
+						<extraClasspath>${basedir}/target/test-classes/</extraClasspath>
+					</webAppConfig>
 				</configuration>
 			</plugin>
 		</plugins>
@@ -36,7 +40,11 @@
 		</dependency>
 		<dependency>
 			<groupId>com.invariantproperties.sandbox.student</groupId>
-			<artifactId>student-persistence</artifactId>
+			<artifactId>student-api</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.invariantproperties.sandbox.student</groupId>
+			<artifactId>student-ws-client</artifactId>
 		</dependency>
 
 		<dependency>
@@ -182,78 +190,9 @@
 			<!-- scope>runtime</scope> -->
 		</dependency>
 
-
-		<!-- persistence -->
 		<dependency>
-			<groupId>org.hibernate</groupId>
-			<artifactId>hibernate-core</artifactId>
-			<scope>runtime</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.hibernate</groupId>
-			<artifactId>hibernate-entitymanager</artifactId>
-			<!-- <scope>runtime</scope> -->
-		</dependency>
-		<dependency>
-			<groupId>org.jboss.logging</groupId>
-			<artifactId>jboss-logging</artifactId>
-			<scope>runtime</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.jboss.logging</groupId>
-			<artifactId>jboss-logging-log4j</artifactId>
-			<scope>runtime</scope>
-		</dependency>
-		<dependency>
-			<groupId>javax.transaction</groupId>
-			<artifactId>jta</artifactId>
-			<scope>runtime</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.hibernate.common</groupId>
-			<artifactId>hibernate-commons-annotations</artifactId>
-			<scope>runtime</scope>
-		</dependency>
-		<dependency>
-			<groupId>dom4j</groupId>
-			<artifactId>dom4j</artifactId>
-			<scope>runtime</scope>
-		</dependency>
-		<dependency>
-			<groupId>javassist</groupId>
-			<artifactId>javassist</artifactId>
-			<scope>runtime</scope>
-		</dependency>
-		<dependency>
-			<groupId>antlr</groupId>
-			<artifactId>antlr</artifactId>
-			<scope>runtime</scope>
-		</dependency>
-
-		<!-- in-memory database -->
-		<dependency>
-			<groupId>commons-dbcp</groupId>
-			<artifactId>commons-dbcp</artifactId>
-			<scope>runtime</scope>
-		</dependency>
-		<dependency>
-			<groupId>commons-pool</groupId>
-			<artifactId>commons-pool</artifactId>
-			<scope>runtime</scope>
-		</dependency>
-		<!--<dependency> <groupId>com.h2database</groupId> <artifactId>h2</artifactId> 
-			<scope>runtime</scope> </dependency> -->
-		<dependency>
-			<groupId>postgresql</groupId>
-			<artifactId>postgresql</artifactId>
-			<version>9.1-901.jdbc4</version>
-			<scope>runtime</scope>
-		</dependency>
-
-		<!-- in-memory database -->
-		<dependency>
-			<groupId>com.h2database</groupId>
-			<artifactId>h2</artifactId>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-core</artifactId>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>

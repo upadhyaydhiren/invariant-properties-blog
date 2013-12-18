@@ -20,17 +20,27 @@
  * 
  * Copyright (c) 2013 Bear Giles <bgiles@coyotesong.com>
  */
-package com.invariantproperties.sandbox.student.rest;
+package com.invariantproperties.sandbox.student.webservice.server.config;
 
-import com.invariantproperties.sandbox.student.domain.Student;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
-/**
- * @author Bear Giles <bgiles@coyotesong.com>
- */
-public abstract class AbstractResource {
-    public Student scrubStudent(final Student dirty) {
-        final Student clean = new Student();
-        clean.setUuid(dirty.getUuid());
-        return clean;
-    }
+import com.invariantproperties.sandbox.student.business.CourseService;
+import com.invariantproperties.sandbox.student.business.DummyCourseService;
+import com.invariantproperties.sandbox.student.business.DummyStudentService;
+import com.invariantproperties.sandbox.student.business.StudentService;
+
+@Configuration
+//@Profile("test")
+public class RestApplicationContextTest {
+	
+	@Bean
+	CourseService courseService() {
+		return new DummyCourseService();
+	}
+	
+	@Bean
+	StudentService studentService() {
+		return new DummyStudentService();
+	}
 }
