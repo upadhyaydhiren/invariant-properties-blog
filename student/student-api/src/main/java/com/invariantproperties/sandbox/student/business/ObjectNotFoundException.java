@@ -27,16 +27,16 @@ package com.invariantproperties.sandbox.student.business;
  * @author Bear Giles <bgiles@coyotesong.com>
  */
 public class ObjectNotFoundException extends RuntimeException {
-	private static final long serialVersionUID = 1L;
-	
-	private final String uuid;
-	
-	public ObjectNotFoundException(String uuid) {
-		super("object not found: [" + uuid + "]");
-		this.uuid = uuid;
-	}
-	
-	public String getUuid() {
-		return uuid;
-	}
+    private static final long serialVersionUID = 1L;
+
+    private final String uuid;
+
+    public ObjectNotFoundException(String uuid) {
+        super("object not found: [" + uuid + "]");
+        this.uuid = uuid;
+    }
+
+    public String getUuid() {
+        return uuid;
+    }
 }
