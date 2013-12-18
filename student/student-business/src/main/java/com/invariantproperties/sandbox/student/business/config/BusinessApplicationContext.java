@@ -43,6 +43,6 @@ import org.springframework.context.annotation.Configuration;
 // @PropertySource("classpath:application.properties")
 public class BusinessApplicationContext {
 
-    @Resource
-    private Environment environment;
+	@Resource
+	private Environment environment;
 }
