@@ -22,33 +22,38 @@
  */
 package com.invariantproperties.sandbox.student.business;
 
-/**
- * 
- * @author Bear Giles <bgiles@coyotesong.com>
- */
-public class ObjectNotFoundException extends RuntimeException {
-    private static final long serialVersionUID = 1L;
+public class PersistenceException extends RuntimeException {
+	private static final long serialVersionUID = 1L;
+	private final String uuid;
+	private final Integer id;
+	
+	public PersistenceException(String message, Throwable cause) {
+		super(message, cause);
+		this.uuid = null;
+		this.id = null;
+	}
+	
+	public PersistenceException(String message, Throwable cause, String uuid) {
+		super(message, cause);
+		this.uuid = uuid;
+		this.id = null;
+	}
+	
+	public PersistenceException(String message, Throwable cause, Integer id) {
+		super(message, cause);
+		this.uuid = null;
+		this.id = id;
+	}
 
-    private final String uuid;
-    private final Integer id;
+	public static long getSerialversionuid() {
+		return serialVersionUID;
+	}
 
-    public ObjectNotFoundException(String uuid) {
-        super("object not found: [" + uuid + "]");
-        this.uuid = uuid;
-        this.id = null;
-    }
+	public String getUuid() {
+		return uuid;
+	}
 
-    public ObjectNotFoundException(Integer id) {
-        super("object not found: [" + id + "]");
-        this.uuid = null;
-        this.id = id;
-    }
-
-    public String getUuid() {
-        return uuid;
-    }
-
-    public Integer getId() {
-        return id;
-    }
+	public Integer getId() {
+		return id;
+	}
 }
