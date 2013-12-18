@@ -25,14 +25,27 @@ package com.invariantproperties.sandbox.student.webservice.server.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import com.invariantproperties.sandbox.student.business.ClassroomService;
 import com.invariantproperties.sandbox.student.business.CourseService;
+import com.invariantproperties.sandbox.student.business.DummyClassroomService;
 import com.invariantproperties.sandbox.student.business.DummyCourseService;
+import com.invariantproperties.sandbox.student.business.DummyInstructorService;
+import com.invariantproperties.sandbox.student.business.DummySectionService;
 import com.invariantproperties.sandbox.student.business.DummyStudentService;
+import com.invariantproperties.sandbox.student.business.DummyTermService;
+import com.invariantproperties.sandbox.student.business.InstructorService;
+import com.invariantproperties.sandbox.student.business.SectionService;
 import com.invariantproperties.sandbox.student.business.StudentService;
+import com.invariantproperties.sandbox.student.business.TermService;
 
 @Configuration
 // @Profile("test")
 public class RestApplicationContextTest {
+
+    @Bean
+    ClassroomService classroomService() {
+        return new DummyClassroomService();
+    }
 
     @Bean
     CourseService courseService() {
@@ -40,7 +53,22 @@ public class RestApplicationContextTest {
     }
 
     @Bean
+    InstructorService instructorService() {
+        return new DummyInstructorService();
+    }
+
+    @Bean
+    SectionService sectionService() {
+        return new DummySectionService();
+    }
+
+    @Bean
     StudentService studentService() {
         return new DummyStudentService();
+    }
+
+    @Bean
+    TermService courseTerm() {
+        return new DummyTermService();
     }
 }

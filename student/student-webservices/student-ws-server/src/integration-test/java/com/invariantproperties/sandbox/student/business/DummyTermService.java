@@ -31,52 +31,52 @@ import java.util.UUID;
 
 import org.apache.log4j.Logger;
 
-import com.invariantproperties.sandbox.student.domain.Course;
+import com.invariantproperties.sandbox.student.domain.Term;
 
-public class DummyCourseService implements CourseService {
-    private static final Logger log = Logger.getLogger(DummyCourseService.class);
-    private Map<String, Course> cache = Collections.synchronizedMap(new HashMap<String, Course>());
+public class DummyTermService implements TermService {
+    private static final Logger log = Logger.getLogger(DummyTermService.class);
+    private Map<String, Term> cache = Collections.synchronizedMap(new HashMap<String, Term>());
 
-    public List<Course> findAllCourses() {
-        log.debug("CourseServer: findAllCourses()");
-        return new ArrayList<Course>(cache.values());
+    public List<Term> findAllTerms() {
+        log.debug("TermServer: findAllTerms()");
+        return new ArrayList<Term>(cache.values());
     }
 
-    public Course findCourseById(Integer id) {
+    public Term findTermById(Integer id) {
         throw new ObjectNotFoundException(null);
     }
 
-    public Course findCourseByUuid(String uuid) {
-        log.debug("CourseServer: findCourseByUuid()");
+    public Term findTermByUuid(String uuid) {
+        log.debug("TermServer: findTermByUuid()");
         if (!cache.containsKey(uuid)) {
             throw new ObjectNotFoundException(uuid);
         }
         return cache.get(uuid);
     }
 
-    public Course createCourse(String name) {
-        log.debug("CourseServer: createCourse()");
-        Course course = new Course();
-        course.setUuid(UUID.randomUUID().toString());
-        course.setName(name);
-        cache.put(course.getUuid(), course);
-        return course;
+    public Term createTerm(String name) {
+        log.debug("TermServer: createTerm()");
+        Term term = new Term();
+        term.setUuid(UUID.randomUUID().toString());
+        term.setName(name);
+        cache.put(term.getUuid(), term);
+        return term;
     }
 
-    public Course updateCourse(Course oldCourse, String name) {
-        log.debug("CourseServer: updateCourse()");
-        if (!cache.containsKey(oldCourse.getUuid())) {
-            throw new ObjectNotFoundException(oldCourse.getUuid());
+    public Term updateTerm(Term oldTerm, String name) {
+        log.debug("TermServer: updateTerm()");
+        if (!cache.containsKey(oldTerm.getUuid())) {
+            throw new ObjectNotFoundException(oldTerm.getUuid());
         }
 
-        Course course = cache.get(oldCourse.getUuid());
-        course.setUuid(UUID.randomUUID().toString());
-        course.setName(name);
-        return course;
+        Term term = cache.get(oldTerm.getUuid());
+        term.setUuid(UUID.randomUUID().toString());
+        term.setName(name);
+        return term;
     }
 
-    public void deleteCourse(String uuid) {
-        log.debug("CourseServer: deleteCourse()");
+    public void deleteTerm(String uuid) {
+        log.debug("TermServer: deleteTerm()");
         if (cache.containsKey(uuid)) {
             cache.remove(uuid);
         }

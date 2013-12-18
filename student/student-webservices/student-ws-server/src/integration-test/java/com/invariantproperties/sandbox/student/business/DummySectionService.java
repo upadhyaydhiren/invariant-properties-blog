@@ -31,52 +31,52 @@ import java.util.UUID;
 
 import org.apache.log4j.Logger;
 
-import com.invariantproperties.sandbox.student.domain.Course;
+import com.invariantproperties.sandbox.student.domain.Section;
 
-public class DummyCourseService implements CourseService {
-    private static final Logger log = Logger.getLogger(DummyCourseService.class);
-    private Map<String, Course> cache = Collections.synchronizedMap(new HashMap<String, Course>());
+public class DummySectionService implements SectionService {
+    private static final Logger log = Logger.getLogger(DummySectionService.class);
+    private Map<String, Section> cache = Collections.synchronizedMap(new HashMap<String, Section>());
 
-    public List<Course> findAllCourses() {
-        log.debug("CourseServer: findAllCourses()");
-        return new ArrayList<Course>(cache.values());
+    public List<Section> findAllSections() {
+        log.debug("SectionServer: findAllSections()");
+        return new ArrayList<Section>(cache.values());
     }
 
-    public Course findCourseById(Integer id) {
+    public Section findSectionById(Integer id) {
         throw new ObjectNotFoundException(null);
     }
 
-    public Course findCourseByUuid(String uuid) {
-        log.debug("CourseServer: findCourseByUuid()");
+    public Section findSectionByUuid(String uuid) {
+        log.debug("SectionServer: findSectionByUuid()");
         if (!cache.containsKey(uuid)) {
             throw new ObjectNotFoundException(uuid);
         }
         return cache.get(uuid);
     }
 
-    public Course createCourse(String name) {
-        log.debug("CourseServer: createCourse()");
-        Course course = new Course();
-        course.setUuid(UUID.randomUUID().toString());
-        course.setName(name);
-        cache.put(course.getUuid(), course);
-        return course;
+    public Section createSection(String name) {
+        log.debug("SectionServer: createSection()");
+        Section section = new Section();
+        section.setUuid(UUID.randomUUID().toString());
+        section.setName(name);
+        cache.put(section.getUuid(), section);
+        return section;
     }
 
-    public Course updateCourse(Course oldCourse, String name) {
-        log.debug("CourseServer: updateCourse()");
-        if (!cache.containsKey(oldCourse.getUuid())) {
-            throw new ObjectNotFoundException(oldCourse.getUuid());
+    public Section updateSection(Section oldSection, String name) {
+        log.debug("SectionServer: updateSection()");
+        if (!cache.containsKey(oldSection.getUuid())) {
+            throw new ObjectNotFoundException(oldSection.getUuid());
         }
 
-        Course course = cache.get(oldCourse.getUuid());
-        course.setUuid(UUID.randomUUID().toString());
-        course.setName(name);
-        return course;
+        Section section = cache.get(oldSection.getUuid());
+        section.setUuid(UUID.randomUUID().toString());
+        section.setName(name);
+        return section;
     }
 
-    public void deleteCourse(String uuid) {
-        log.debug("CourseServer: deleteCourse()");
+    public void deleteSection(String uuid) {
+        log.debug("SectionServer: deleteSection()");
         if (cache.containsKey(uuid)) {
             cache.remove(uuid);
         }

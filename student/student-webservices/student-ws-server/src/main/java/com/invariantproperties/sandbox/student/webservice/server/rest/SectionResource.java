@@ -44,15 +44,15 @@ import javax.ws.rs.core.UriInfo;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Service;
 
-import com.invariantproperties.sandbox.student.business.CourseService;
 import com.invariantproperties.sandbox.student.business.ObjectNotFoundException;
-import com.invariantproperties.sandbox.student.domain.Course;
+import com.invariantproperties.sandbox.student.business.SectionService;
+import com.invariantproperties.sandbox.student.domain.Section;
 
 @Service
-@Path("/course")
-public class CourseResource extends AbstractResource {
-    private static final Logger log = Logger.getLogger(CourseResource.class);
-    private static final Course[] EMPTY_COURSE_ARRAY = new Course[0];
+@Path("/section")
+public class SectionResource extends AbstractResource {
+    private static final Logger log = Logger.getLogger(SectionResource.class);
+    private static final Section[] EMPTY_SECTION_ARRAY = new Section[0];
 
     @Context
     UriInfo uriInfo;
@@ -61,12 +61,12 @@ public class CourseResource extends AbstractResource {
     Request request;
 
     @Resource
-    private CourseService service;
+    private SectionService service;
 
     /**
      * Default constructor.
      */
-    public CourseResource() {
+    public SectionResource() {
 
     }
 
@@ -75,30 +75,30 @@ public class CourseResource extends AbstractResource {
      * 
      * @param service
      */
-    CourseResource(CourseService service) {
+    SectionResource(SectionService service) {
         this.service = service;
     }
 
     /**
-     * Get all Courses.
+     * Get all Sections.
      * 
      * @return
      */
     @GET
     @Produces({ MediaType.APPLICATION_JSON, MediaType.TEXT_XML })
-    public Response findAllCourses() {
-        log.debug("CourseResource: findAllCourses()");
+    public Response findAllSections() {
+        log.debug("SectionResource: findAllSections()");
 
         Response response = null;
         try {
-            List<Course> courses = service.findAllCourses();
+            List<Section> sections = service.findAllSections();
 
-            List<Course> results = new ArrayList<Course>(courses.size());
-            for (Course course : courses) {
-                results.add(scrubCourse(course));
+            List<Section> results = new ArrayList<Section>(sections.size());
+            for (Section section : sections) {
+                results.add(scrubSection(section));
             }
 
-            response = Response.ok(results.toArray(EMPTY_COURSE_ARRAY)).build();
+            response = Response.ok(results.toArray(EMPTY_SECTION_ARRAY)).build();
         } catch (Exception e) {
             if (!(e instanceof UnitTestException)) {
                 log.info("unhandled exception", e);
@@ -110,7 +110,7 @@ public class CourseResource extends AbstractResource {
     }
 
     /**
-     * Create a Course.
+     * Create a Section.
      * 
      * @param req
      * @return
@@ -118,8 +118,8 @@ public class CourseResource extends AbstractResource {
     @POST
     @Consumes({ MediaType.APPLICATION_JSON, MediaType.TEXT_XML })
     @Produces({ MediaType.APPLICATION_JSON, MediaType.TEXT_XML })
-    public Response createCourse(Name req) {
-        log.debug("CourseResource: createCourse()");
+    public Response createSection(Name req) {
+        log.debug("SectionResource: createSection()");
 
         final String name = req.getName();
         if ((name == null) || name.isEmpty()) {
@@ -129,11 +129,11 @@ public class CourseResource extends AbstractResource {
         Response response = null;
 
         try {
-            Course course = service.createCourse(name);
-            if (course == null) {
+            Section section = service.createSection(name);
+            if (section == null) {
                 response = Response.status(Status.INTERNAL_SERVER_ERROR).build();
             } else {
-                response = Response.created(URI.create(course.getUuid())).entity(scrubCourse(course)).build();
+                response = Response.created(URI.create(section.getUuid())).entity(scrubSection(section)).build();
             }
         } catch (Exception e) {
             if (!(e instanceof UnitTestException)) {
@@ -146,21 +146,21 @@ public class CourseResource extends AbstractResource {
     }
 
     /**
-     * Get a specific Course.
+     * Get a specific Section.
      * 
      * @param uuid
      * @return
      */
-    @Path("/{courseId}")
+    @Path("/{sectionId}")
     @GET
     @Produces({ MediaType.APPLICATION_JSON, MediaType.TEXT_XML })
-    public Response getCourse(@PathParam("courseId") String id) {
-        log.debug("CourseResource: getCourse()");
+    public Response getSection(@PathParam("sectionId") String id) {
+        log.debug("SectionResource: getSection()");
 
         Response response = null;
         try {
-            Course course = service.findCourseByUuid(id);
-            response = Response.ok(scrubCourse(course)).build();
+            Section section = service.findSectionByUuid(id);
+            response = Response.ok(scrubSection(section)).build();
         } catch (ObjectNotFoundException e) {
             response = Response.status(Status.NOT_FOUND).build();
         } catch (Exception e) {
@@ -174,7 +174,7 @@ public class CourseResource extends AbstractResource {
     }
 
     /**
-     * Update a Course.
+     * Update a Section.
      * 
      * FIXME: what about uniqueness violations?
      * 
@@ -182,12 +182,12 @@ public class CourseResource extends AbstractResource {
      * @param req
      * @return
      */
-    @Path("/{courseId}")
+    @Path("/{sectionId}")
     @POST
     @Consumes({ MediaType.APPLICATION_JSON, MediaType.TEXT_XML })
     @Produces({ MediaType.APPLICATION_JSON, MediaType.TEXT_XML })
-    public Response updateCourse(@PathParam("courseId") String id, Name req) {
-        log.debug("CourseResource: updateCourse()");
+    public Response updateSection(@PathParam("sectionId") String id, Name req) {
+        log.debug("SectionResource: updateSection()");
 
         final String name = req.getName();
         if ((name == null) || name.isEmpty()) {
@@ -196,9 +196,9 @@ public class CourseResource extends AbstractResource {
 
         Response response = null;
         try {
-            final Course course = service.findCourseByUuid(id);
-            final Course updatedCourse = service.updateCourse(course, name);
-            response = Response.ok(scrubCourse(updatedCourse)).build();
+            final Section section = service.findSectionByUuid(id);
+            final Section updatedSection = service.updateSection(section, name);
+            response = Response.ok(scrubSection(updatedSection)).build();
         } catch (ObjectNotFoundException exception) {
             response = Response.status(Status.NOT_FOUND).build();
         } catch (Exception e) {
@@ -212,19 +212,19 @@ public class CourseResource extends AbstractResource {
     }
 
     /**
-     * Delete a Course.
+     * Delete a Section.
      * 
      * @param id
      * @return
      */
-    @Path("/{courseId}")
+    @Path("/{sectionId}")
     @DELETE
-    public Response deleteCourse(@PathParam("courseId") String id) {
-        log.debug("CourseResource: deleteCourse()");
+    public Response deleteSection(@PathParam("sectionId") String id) {
+        log.debug("SectionResource: deleteSection()");
 
         Response response = null;
         try {
-            service.deleteCourse(id);
+            service.deleteSection(id);
             response = Response.noContent().build();
         } catch (ObjectNotFoundException exception) {
             response = Response.noContent().build();
