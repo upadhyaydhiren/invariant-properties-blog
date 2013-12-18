@@ -29,6 +29,7 @@ import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
+ * Classroom bean.
  * 
  * @author Bear Giles <bgiles@coyotesong.com>
  */

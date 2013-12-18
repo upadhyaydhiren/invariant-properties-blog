@@ -29,12 +29,13 @@ import javax.persistence.AttributeOverride;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
+ * Student bean.
  * 
  * @author Bear Giles <bgiles@coyotesong.com>
- * 
  */
 @XmlRootElement
 @Entity
@@ -63,5 +64,14 @@ public class Student extends PersistentObject {
 
     public void setEmailAddress(String emailAddress) {
         this.emailAddress = emailAddress;
+    }
+
+    @Transient
+    public List<Section> getSections() {
+        return sections;
+    }
+
+    public void setSections(List<Section> sections) {
+        this.sections = sections;
     }
 }

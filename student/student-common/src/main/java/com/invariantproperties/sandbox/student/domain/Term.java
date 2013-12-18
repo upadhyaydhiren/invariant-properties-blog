@@ -29,6 +29,7 @@ import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
+ * Term bean.
  * 
  * @author Bear Giles <bgiles@coyotesong.com>
  */

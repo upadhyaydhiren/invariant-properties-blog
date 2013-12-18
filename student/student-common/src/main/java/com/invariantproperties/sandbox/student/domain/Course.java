@@ -28,12 +28,13 @@ import javax.persistence.AttributeOverride;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
+ * Course bean
  * 
  * @author Bear Giles <bgiles@coyotesong.com>
- * 
  */
 @XmlRootElement
 @Entity
@@ -52,5 +53,14 @@ public class Course extends PersistentObject {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    @Transient
+    public List<Section> getSections() {
+        return sections;
+    }
+
+    public void setSections(List<Section> sections) {
+        this.sections = sections;
     }
 }
