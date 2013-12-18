@@ -164,7 +164,7 @@ public class ClassroomResource extends AbstractResource {
         } catch (ObjectNotFoundException e) {
             response = Response.status(Status.NOT_FOUND).build();
         } catch (Exception e) {
-            if (!"[unit test]".equals(e.getMessage())) {
+            if (!(e instanceof UnitTestException)) {
                 log.info("unhandled exception", e);
             }
             response = Response.status(Status.INTERNAL_SERVER_ERROR).build();
