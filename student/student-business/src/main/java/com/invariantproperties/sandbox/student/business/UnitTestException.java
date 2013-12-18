@@ -20,29 +20,19 @@
  * 
  * Copyright (c) 2013 Bear Giles <bgiles@coyotesong.com>
  */
-package com.invariantproperties.sandbox.student.config;
+package com.invariantproperties.sandbox.student.business;
 
-import javax.annotation.Resource;
-
-import org.omg.CORBA.Environment;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.dao.DataAccessException;
 
 /**
- * An application context Java configuration class. The usage of Java
- * configuration requires Spring Framework 3.0 or higher.
+ * Exception used in unit testing.
  * 
- * See {@link http
- * ://www.petrikainulainen.net/programming/spring-framework/spring
- * -data-jpa-tutorial-part-one-configuration/}
- * 
- * @author @bgiles
+ * @author Bear Giles <bgiles@coyotesong.com>
  */
-@Configuration
-// @ComponentScan(basePackages = {
-// "com.invariantproperties.sandbox.student.business" })
-// @PropertySource("classpath:application.properties")
-public class BusinessApplicationContextTest {
+public class UnitTestException extends DataAccessException {
+	private static final long serialVersionUID = 1L;
 
-	@Resource
-	private Environment environment;
+	public UnitTestException() {
+		super("[unit test]", null);
+	}
 }
