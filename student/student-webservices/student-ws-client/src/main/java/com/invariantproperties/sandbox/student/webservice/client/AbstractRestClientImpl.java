@@ -36,165 +36,148 @@ import com.sun.jersey.api.client.WebResource;
  * @author Bear Giles <bgiles@coyotesong.com>
  */
 public class AbstractRestClientImpl<T extends PersistentObject> {
-	private final String resource;
-	private final Class<T> objectClass;
-	private final Class<T[]> objectArrayClass;
+    private final String resource;
+    private final Class<T> objectClass;
+    private final Class<T[]> objectArrayClass;
 
-	/**
-	 * Constructor.
-	 * 
-	 * @param resource
-	 */
-	public AbstractRestClientImpl(final String resource,
-			final Class<T> objectClass, final Class<T[]> objectArrayClass) {
-		this.resource = resource;
-		this.objectClass = objectClass;
-		this.objectArrayClass = objectArrayClass;
-	}
+    /**
+     * Constructor.
+     * 
+     * @param resource
+     */
+    public AbstractRestClientImpl(final String resource, final Class<T> objectClass, final Class<T[]> objectArrayClass) {
+        this.resource = resource;
+        this.objectClass = objectClass;
+        this.objectArrayClass = objectArrayClass;
+    }
 
-	/**
-	 * Helper method for testing.
-	 * 
-	 * @return
-	 */
-	Client createClient() {
-		return Client.create();
-	}
+    /**
+     * Helper method for testing.
+     * 
+     * @return
+     */
+    Client createClient() {
+        return Client.create();
+    }
 
-	/**
-	 * List all objects. This is a risky method since there's no attempt at
-	 * pagination.
-	 */
-	public T[] getAllObjects(final T[] emptyListClass) {
-		final Client client = createClient();
+    /**
+     * List all objects. This is a risky method since there's no attempt at
+     * pagination.
+     */
+    public T[] getAllObjects(final T[] emptyListClass) {
+        final Client client = createClient();
 
-		try {
-			final WebResource webResource = client.resource(resource);
-			final ClientResponse response = webResource.accept(
-					MediaType.APPLICATION_JSON).get(ClientResponse.class);
+        try {
+            final WebResource webResource = client.resource(resource);
+            final ClientResponse response = webResource.accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
 
-			if (response.getStatus() == Response.Status.OK.getStatusCode()) {
-				T[] entities = response.getEntity(objectArrayClass);
-				// for (T entity : entities) {
-				// entity.setSelf(resource + entity.getUuid());
-				// }
-				return entities;
-			} else {
-				throw new RestClientFailureException(resource, objectClass,
-						"<none>", response);
-			}
-		} finally {
-			client.destroy();
-		}
-	}
+            if (response.getStatus() == Response.Status.OK.getStatusCode()) {
+                T[] entities = response.getEntity(objectArrayClass);
+                // for (T entity : entities) {
+                // entity.setSelf(resource + entity.getUuid());
+                // }
+                return entities;
+            } else {
+                throw new RestClientFailureException(resource, objectClass, "<none>", response);
+            }
+        } finally {
+            client.destroy();
+        }
+    }
 
-	/**
-	 * Get a specific object.
-	 */
-	public T getObject(String uuid) {
-		final Client client = createClient();
+    /**
+     * Get a specific object.
+     */
+    public T getObject(String uuid) {
+        final Client client = createClient();
 
-		try {
-			final WebResource webResource = client.resource(resource + uuid);
-			final ClientResponse response = webResource.accept(
-					MediaType.APPLICATION_JSON).get(ClientResponse.class);
+        try {
+            final WebResource webResource = client.resource(resource + uuid);
+            final ClientResponse response = webResource.accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
 
-			if (response.getStatus() == Response.Status.OK.getStatusCode()) {
-				final T entity = response.getEntity(objectClass);
-				// entity.setSelf(resource + entity.getUuid());
-				return entity;
-			} else if (response.getStatus() == Response.Status.NOT_FOUND
-					.getStatusCode()) {
-				throw new ObjectNotFoundException(resource, objectClass, uuid);
-			} else {
-				throw new RestClientFailureException(resource, objectClass,
-						uuid, response);
-			}
-		} finally {
-			client.destroy();
-		}
-	}
+            if (response.getStatus() == Response.Status.OK.getStatusCode()) {
+                final T entity = response.getEntity(objectClass);
+                // entity.setSelf(resource + entity.getUuid());
+                return entity;
+            } else if (response.getStatus() == Response.Status.NOT_FOUND.getStatusCode()) {
+                throw new ObjectNotFoundException(resource, objectClass, uuid);
+            } else {
+                throw new RestClientFailureException(resource, objectClass, uuid, response);
+            }
+        } finally {
+            client.destroy();
+        }
+    }
 
-	/**
-	 * Create an object with the specified values.
-	 */
-	public T createObject(final String json) {
-		final Client client = createClient();
+    /**
+     * Create an object with the specified values.
+     */
+    public T createObject(final String json) {
+        final Client client = createClient();
 
-		try {
-			final WebResource webResource = client.resource(resource);
-			final ClientResponse response = webResource
-					.type(MediaType.APPLICATION_JSON)
-					.accept(MediaType.APPLICATION_JSON)
-					.post(ClientResponse.class, json);
+        try {
+            final WebResource webResource = client.resource(resource);
+            final ClientResponse response = webResource.type(MediaType.APPLICATION_JSON)
+                    .accept(MediaType.APPLICATION_JSON).post(ClientResponse.class, json);
 
-			if (response.getStatus() == Response.Status.CREATED.getStatusCode()) {
-				final T entity = response.getEntity(objectClass);
-				// entity.setSelf(resource + entity.getUuid());
-				return entity;
-			} else {
-				throw new RestClientFailureException(resource, objectClass, "("
-						+ json + ")", response);
-			}
-		} finally {
-			client.destroy();
-		}
-	}
+            if (response.getStatus() == Response.Status.CREATED.getStatusCode()) {
+                final T entity = response.getEntity(objectClass);
+                // entity.setSelf(resource + entity.getUuid());
+                return entity;
+            } else {
+                throw new RestClientFailureException(resource, objectClass, "(" + json + ")", response);
+            }
+        } finally {
+            client.destroy();
+        }
+    }
 
-	/**
-	 * Update an object with the specified json.
-	 */
-	public T updateObject(final String json, final String uuid) {
-		final Client client = createClient();
+    /**
+     * Update an object with the specified json.
+     */
+    public T updateObject(final String json, final String uuid) {
+        final Client client = createClient();
 
-		try {
-			final WebResource webResource = client.resource(resource + uuid);
-			final ClientResponse response = webResource
-					.type(MediaType.APPLICATION_JSON)
-					.accept(MediaType.APPLICATION_JSON)
-					.post(ClientResponse.class, json);
+        try {
+            final WebResource webResource = client.resource(resource + uuid);
+            final ClientResponse response = webResource.type(MediaType.APPLICATION_JSON)
+                    .accept(MediaType.APPLICATION_JSON).post(ClientResponse.class, json);
 
-			if (response.getStatus() == Response.Status.OK.getStatusCode()) {
-				final T entity = response.getEntity(objectClass);
-				// entity.setSelf(resource + entity.getUuid());
-				return entity;
-			} else if (response.getStatus() == Response.Status.NOT_FOUND
-					.getStatusCode()) {
-				throw new ObjectNotFoundException(resource, objectClass, uuid);
-			} else {
-				throw new RestClientFailureException(resource, objectClass,
-						uuid, response);
-			}
-		} finally {
-			client.destroy();
-		}
-	}
+            if (response.getStatus() == Response.Status.OK.getStatusCode()) {
+                final T entity = response.getEntity(objectClass);
+                // entity.setSelf(resource + entity.getUuid());
+                return entity;
+            } else if (response.getStatus() == Response.Status.NOT_FOUND.getStatusCode()) {
+                throw new ObjectNotFoundException(resource, objectClass, uuid);
+            } else {
+                throw new RestClientFailureException(resource, objectClass, uuid, response);
+            }
+        } finally {
+            client.destroy();
+        }
+    }
 
-	/**
-	 * Delete specified object.
-	 */
-	public void deleteObject(String uuid) {
-		final Client client = createClient();
+    /**
+     * Delete specified object.
+     */
+    public void deleteObject(String uuid) {
+        final Client client = createClient();
 
-		try {
-			final WebResource webResource = client.resource(resource + uuid);
-			final ClientResponse response = webResource.accept(
-					MediaType.APPLICATION_JSON).delete(ClientResponse.class);
+        try {
+            final WebResource webResource = client.resource(resource + uuid);
+            final ClientResponse response = webResource.accept(MediaType.APPLICATION_JSON).delete(ClientResponse.class);
 
-			if (response.getStatus() == Response.Status.OK.getStatusCode()) {
-				// do nothing
-			} else if (response.getStatus() == Response.Status.NO_CONTENT
-					.getStatusCode()) {
-				// do nothing
-			} else if (response.getStatus() == Response.Status.NOT_FOUND
-					.getStatusCode()) {
-				// do nothing - delete is idempotent
-			} else {
-				throw new RestClientFailureException(resource, objectClass,
-						uuid, response);
-			}
-		} finally {
-			client.destroy();
-		}
-	}
+            if (response.getStatus() == Response.Status.OK.getStatusCode()) {
+                // do nothing
+            } else if (response.getStatus() == Response.Status.NO_CONTENT.getStatusCode()) {
+                // do nothing
+            } else if (response.getStatus() == Response.Status.NOT_FOUND.getStatusCode()) {
+                // do nothing - delete is idempotent
+            } else {
+                throw new RestClientFailureException(resource, objectClass, uuid, response);
+            }
+        } finally {
+            client.destroy();
+        }
+    }
 }

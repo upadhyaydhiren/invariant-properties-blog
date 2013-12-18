@@ -31,37 +31,37 @@ import com.invariantproperties.sandbox.student.domain.Course;
  */
 public interface CourseRestClient {
 
-	/**
-	 * Get list of all courses.
-	 */
-	Course[] getAllCourses();
+    /**
+     * Get list of all courses.
+     */
+    Course[] getAllCourses();
 
-	/**
-	 * Get details for specific course.
-	 * 
-	 * @param uuid
-	 */
-	Course getCourse(String uuid);
+    /**
+     * Get details for specific course.
+     * 
+     * @param uuid
+     */
+    Course getCourse(String uuid);
 
-	/**
-	 * Create specific course.
-	 * 
-	 * @param name
-	 */
-	Course createCourse(String name);
+    /**
+     * Create specific course.
+     * 
+     * @param name
+     */
+    Course createCourse(String name);
 
-	/**
-	 * Update specific course.
-	 * 
-	 * @param uuid
-	 * @param name
-	 */
-	Course updateCourse(String uuid, String name);
+    /**
+     * Update specific course.
+     * 
+     * @param uuid
+     * @param name
+     */
+    Course updateCourse(String uuid, String name);
 
-	/**
-	 * Delete course.
-	 * 
-	 * @param uuid
-	 */
-	void deleteCourse(String uuid);
+    /**
+     * Delete course.
+     * 
+     * @param uuid
+     */
+    void deleteCourse(String uuid);
 }

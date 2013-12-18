@@ -31,54 +31,53 @@ import com.sun.jersey.api.client.ClientResponse;
  * @author Bear Giles <bgiles@coyotesong.com>
  */
 public class RestClientFailureException extends RestClientException {
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	private final String resource;
-	private final Class<? extends PersistentObject> objectClass;
-	private final String uuid;
-	private final int statusCode;
+    private final String resource;
+    private final Class<? extends PersistentObject> objectClass;
+    private final String uuid;
+    private final int statusCode;
 
-	/**
-	 * Constructor
-	 * 
-	 * @param resource
-	 * @param objectClass
-	 * @param uuid
-	 * @param response
-	 */
-	public RestClientFailureException(final String resource,
-			final Class<? extends PersistentObject> objectClass,
-			final String uuid, final ClientResponse response) {
-		super("rest client received error: " + resource + "[" + uuid + "]");
-		this.resource = resource;
-		this.objectClass = objectClass;
-		this.uuid = uuid;
-		this.statusCode = response.getStatus();
-	}
+    /**
+     * Constructor
+     * 
+     * @param resource
+     * @param objectClass
+     * @param uuid
+     * @param response
+     */
+    public RestClientFailureException(final String resource, final Class<? extends PersistentObject> objectClass,
+            final String uuid, final ClientResponse response) {
+        super("rest client received error: " + resource + "[" + uuid + "]");
+        this.resource = resource;
+        this.objectClass = objectClass;
+        this.uuid = uuid;
+        this.statusCode = response.getStatus();
+    }
 
-	public String getResource() {
-		return resource;
-	}
+    public String getResource() {
+        return resource;
+    }
 
-	public Class<? extends PersistentObject> getObjectClass() {
-		return objectClass;
-	}
+    public Class<? extends PersistentObject> getObjectClass() {
+        return objectClass;
+    }
 
-	/**
-	 * Get UUID, "<none>" (during listAllX()) or "(name)" (during createX())
-	 * 
-	 * @return
-	 */
-	public String getUuid() {
-		return uuid;
-	}
+    /**
+     * Get UUID, "<none>" (during listAllX()) or "(name)" (during createX())
+     * 
+     * @return
+     */
+    public String getUuid() {
+        return uuid;
+    }
 
-	/**
-	 * Get standard HTTP status code.
-	 * 
-	 * @return
-	 */
-	public int getStatusCode() {
-		return statusCode;
-	}
+    /**
+     * Get standard HTTP status code.
+     * 
+     * @return
+     */
+    public int getStatusCode() {
+        return statusCode;
+    }
 }

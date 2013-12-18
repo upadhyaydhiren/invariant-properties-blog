@@ -32,8 +32,8 @@ import com.invariantproperties.sandbox.student.domain.Student;
  * @author Bear Giles <bgiles@coyotesong.com>
  */
 public abstract class AbstractResource {
-	private static final Logger log = Logger.getLogger(AbstractResource.class);
-	
+    private static final Logger log = Logger.getLogger(AbstractResource.class);
+
     public Classroom scrubClassroom(final Classroom dirty) {
         final Classroom clean = new Classroom();
         clean.setUuid(dirty.getUuid());
@@ -41,7 +41,7 @@ public abstract class AbstractResource {
         // clean.setSelf("resource/" + dirty.getUuid());
         return clean;
     }
-	
+
     public Course scrubCourse(final Course dirty) {
         final Course clean = new Course();
         clean.setUuid(dirty.getUuid());
@@ -51,7 +51,7 @@ public abstract class AbstractResource {
     }
 
     public Student scrubStudent(final Student dirty) {
-    	log.info("scrubbing student");
+        log.info("scrubbing student");
         final Student clean = new Student();
         clean.setUuid(dirty.getUuid());
         clean.setName(dirty.getName());

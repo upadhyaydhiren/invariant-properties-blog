@@ -29,70 +29,69 @@ import com.invariantproperties.sandbox.student.domain.Term;
  * 
  * @author Bear Giles <bgiles@coyotesong.com>
  */
-public class TermRestClientImpl extends AbstractRestClientImpl<Term> implements
-		TermRestClient {
-	private static final Term[] EMPTY_TERM_ARRAY = new Term[0];
+public class TermRestClientImpl extends AbstractRestClientImpl<Term> implements TermRestClient {
+    private static final Term[] EMPTY_TERM_ARRAY = new Term[0];
 
-	/**
-	 * Constructor.
-	 * 
-	 * @param termResource
-	 */
-	public TermRestClientImpl(final String resource) {
-		super(resource, Term.class, Term[].class);
-	}
+    /**
+     * Constructor.
+     * 
+     * @param termResource
+     */
+    public TermRestClientImpl(final String resource) {
+        super(resource, Term.class, Term[].class);
+    }
 
-	/**
-	 * Create JSON string.
-	 * 
-	 * @param name
-	 * @return
-	 */
-	String createJson(final String name) {
-		return String.format("{ \"name\": \"%s\" }", name);
-	}
+    /**
+     * Create JSON string.
+     * 
+     * @param name
+     * @return
+     */
+    String createJson(final String name) {
+        return String.format("{ \"name\": \"%s\" }", name);
+    }
 
-	/**
-	 * @see com.invariantproperties.sandbox.student.webservice.client.TermRestClient#getAllTerms()
-	 */
-	public Term[] getAllTerms() {
-		return super.getAllObjects(EMPTY_TERM_ARRAY);
-	}
+    /**
+     * @see com.invariantproperties.sandbox.student.webservice.client.TermRestClient#getAllTerms()
+     */
+    public Term[] getAllTerms() {
+        return super.getAllObjects(EMPTY_TERM_ARRAY);
+    }
 
-	/**
-	 * @see com.invariantproperties.sandbox.student.webservice.client.TermRestClient#getTerm(java.lang.String)
-	 */
-	public Term getTerm(final String uuid) {
-		return super.getObject(uuid);
-	}
+    /**
+     * @see com.invariantproperties.sandbox.student.webservice.client.TermRestClient#getTerm(java.lang.String)
+     */
+    public Term getTerm(final String uuid) {
+        return super.getObject(uuid);
+    }
 
-	/**
-	 * @see com.invariantproperties.sandbox.student.webservice.client.TermRestClient#createTerm(java.lang.String)
-	 */
-	public Term createTerm(final String name) {
-		if (name == null || name.isEmpty()) {
-			throw new IllegalArgumentException("'name' is required");
-		}
+    /**
+     * @see com.invariantproperties.sandbox.student.webservice.client.TermRestClient#createTerm(java.lang.String)
+     */
+    public Term createTerm(final String name) {
+        if (name == null || name.isEmpty()) {
+            throw new IllegalArgumentException("'name' is required");
+        }
 
-		return createObject(createJson(name));
-	}
+        return createObject(createJson(name));
+    }
 
-	/**
-	 * @see com.invariantproperties.sandbox.student.webservice.client.TermRestClient#updateTerm(java.lang.String,
-	 *      java.lang.String)
-	 */
-	public Term updateTerm(final String uuid, final String name) {
-		if (name == null || name.isEmpty()) {
-			throw new IllegalArgumentException("'name' is required");
-		}
+    /**
+     * @see com.invariantproperties.sandbox.student.webservice.client.TermRestClient#updateTerm(java.lang.String,
+     *      java.lang.String)
+     */
+    public Term updateTerm(final String uuid, final String name) {
+        if (name == null || name.isEmpty()) {
+            throw new IllegalArgumentException("'name' is required");
+        }
 
-		return super.updateObject(createJson(name), uuid);
-	}
+        return super.updateObject(createJson(name), uuid);
+    }
 
-	/**
-	 * @see com.invariantproperties.sandbox.student.webservice.client.TermRestClient#deleteTerm(java.lang.String)
-	 */
-	public void deleteTerm(final String uuid) {
-		super.deleteObject(uuid);
-	}
+    /**
+     * @see com.invariantproperties.sandbox.student.webservice.client.TermRestClient#deleteTerm(java.lang.String)
+     */
+    public void deleteTerm(final String uuid) {
+        super.deleteObject(uuid);
+    }
 }

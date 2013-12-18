@@ -37,16 +37,16 @@ import javax.xml.bind.annotation.XmlRootElement;
 @Table(name = "classroom")
 @AttributeOverride(name = "id", column = @Column(name = "classroom_pkey"))
 public class Classroom extends PersistentObject {
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	private String name;
+    private String name;
 
-	@Column(length = 80, unique = false, updatable = true)
-	public String getName() {
-		return name;
-	}
+    @Column(length = 80, unique = false, updatable = true)
+    public String getName() {
+        return name;
+    }
 
-	public void setName(String name) {
-		this.name = name;
-	}
+    public void setName(String name) {
+        this.name = name;
+    }
 }

@@ -36,33 +36,33 @@ import com.invariantproperties.sandbox.student.domain.Term;
  * @author Bear Giles <bgiles@coyotesong.com>
  */
 public class TermEquality extends TypeSafeMatcher<Term> {
-	private final Term expected;
+    private final Term expected;
 
-	private TermEquality(Term expected) {
-		this.expected = expected;
-	}
+    private TermEquality(Term expected) {
+        this.expected = expected;
+    }
 
-	@Override
-	public boolean matchesSafely(Term actual) {
-		if (actual == null) {
-			return false;
-		}
+    @Override
+    public boolean matchesSafely(Term actual) {
+        if (actual == null) {
+            return false;
+        }
 
-		EqualsBuilder eq = new EqualsBuilder();
-		eq.append(expected.getId(), actual.getId());
-		eq.append(expected.getUuid(), actual.getUuid());
-		eq.append(expected.getName(), actual.getName());
-		eq.append(expected.getCreationDate(), actual.getCreationDate());
+        EqualsBuilder eq = new EqualsBuilder();
+        eq.append(expected.getId(), actual.getId());
+        eq.append(expected.getUuid(), actual.getUuid());
+        eq.append(expected.getName(), actual.getName());
+        eq.append(expected.getCreationDate(), actual.getCreationDate());
 
-		return eq.isEquals();
-	}
+        return eq.isEquals();
+    }
 
-	public void describeTo(Description description) {
-		description.appendText("Term comparison");
-	}
+    public void describeTo(Description description) {
+        description.appendText("Term comparison");
+    }
 
-	@Factory
-	public static <T> Matcher<Term> equalTo(Term term) {
-		return new TermEquality(term);
-	}
+    @Factory
+    public static <T> Matcher<Term> equalTo(Term term) {
+        return new TermEquality(term);
+    }
 }

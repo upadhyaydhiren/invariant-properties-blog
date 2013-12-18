@@ -29,5 +29,5 @@ package com.invariantproperties.sandbox.student.webservice.server.rest;
  * @author Bear Giles <bgiles@coyotesong.com>
  */
 public class UnitTestException extends RuntimeException {
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 }

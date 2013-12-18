@@ -36,33 +36,33 @@ import com.invariantproperties.sandbox.student.domain.Section;
  * @author Bear Giles <bgiles@coyotesong.com>
  */
 public class SectionEquality extends TypeSafeMatcher<Section> {
-	private final Section expected;
+    private final Section expected;
 
-	private SectionEquality(Section expected) {
-		this.expected = expected;
-	}
+    private SectionEquality(Section expected) {
+        this.expected = expected;
+    }
 
-	@Override
-	public boolean matchesSafely(Section actual) {
-		if (actual == null) {
-			return false;
-		}
+    @Override
+    public boolean matchesSafely(Section actual) {
+        if (actual == null) {
+            return false;
+        }
 
-		EqualsBuilder eq = new EqualsBuilder();
-		eq.append(expected.getId(), actual.getId());
-		eq.append(expected.getUuid(), actual.getUuid());
-		eq.append(expected.getName(), actual.getName());
-		eq.append(expected.getCreationDate(), actual.getCreationDate());
+        EqualsBuilder eq = new EqualsBuilder();
+        eq.append(expected.getId(), actual.getId());
+        eq.append(expected.getUuid(), actual.getUuid());
+        eq.append(expected.getName(), actual.getName());
+        eq.append(expected.getCreationDate(), actual.getCreationDate());
 
-		return eq.isEquals();
-	}
+        return eq.isEquals();
+    }
 
-	public void describeTo(Description description) {
-		description.appendText("Course comparison");
-	}
+    public void describeTo(Description description) {
+        description.appendText("Course comparison");
+    }
 
-	@Factory
-	public static <T> Matcher<Section> equalTo(Section section) {
-		return new SectionEquality(section);
-	}
+    @Factory
+    public static <T> Matcher<Section> equalTo(Section section) {
+        return new SectionEquality(section);
+    }
 }

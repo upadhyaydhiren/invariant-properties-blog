@@ -31,37 +31,37 @@ import com.invariantproperties.sandbox.student.domain.Classroom;
  */
 public interface ClassroomRestClient {
 
-	/**
-	 * Get list of all classrooms.
-	 */
-	Classroom[] getAllClassrooms();
+    /**
+     * Get list of all classrooms.
+     */
+    Classroom[] getAllClassrooms();
 
-	/**
-	 * Get details for specific classroom.
-	 * 
-	 * @param uuid
-	 */
-	Classroom getClassroom(String uuid);
+    /**
+     * Get details for specific classroom.
+     * 
+     * @param uuid
+     */
+    Classroom getClassroom(String uuid);
 
-	/**
-	 * Create specific classroom.
-	 * 
-	 * @param name
-	 */
-	Classroom createClassroom(String name);
+    /**
+     * Create specific classroom.
+     * 
+     * @param name
+     */
+    Classroom createClassroom(String name);
 
-	/**
-	 * Update specific classroom.
-	 * 
-	 * @param uuid
-	 * @param name
-	 */
-	Classroom updateClassroom(String uuid, String name);
+    /**
+     * Update specific classroom.
+     * 
+     * @param uuid
+     * @param name
+     */
+    Classroom updateClassroom(String uuid, String name);
 
-	/**
-	 * Delete classroom.
-	 * 
-	 * @param uuid
-	 */
-	void deleteClassroom(String uuid);
+    /**
+     * Delete classroom.
+     * 
+     * @param uuid
+     */
+    void deleteClassroom(String uuid);
 }

@@ -31,37 +31,37 @@ import com.invariantproperties.sandbox.student.domain.Section;
  */
 public interface SectionRestClient {
 
-	/**
-	 * Get list of all sections.
-	 */
-	Section[] getAllSections();
+    /**
+     * Get list of all sections.
+     */
+    Section[] getAllSections();
 
-	/**
-	 * Get details for specific section.
-	 * 
-	 * @param uuid
-	 */
-	Section getSection(String uuid);
+    /**
+     * Get details for specific section.
+     * 
+     * @param uuid
+     */
+    Section getSection(String uuid);
 
-	/**
-	 * Create specific section.
-	 * 
-	 * @param name
-	 */
-	Section createSection(String name);
+    /**
+     * Create specific section.
+     * 
+     * @param name
+     */
+    Section createSection(String name);
 
-	/**
-	 * Update specific section.
-	 * 
-	 * @param uuid
-	 * @param name
-	 */
-	Section updateSection(String uuid, String name);
+    /**
+     * Update specific section.
+     * 
+     * @param uuid
+     * @param name
+     */
+    Section updateSection(String uuid, String name);
 
-	/**
-	 * Delete section.
-	 * 
-	 * @param uuid
-	 */
-	void deleteSection(String uuid);
+    /**
+     * Delete section.
+     * 
+     * @param uuid
+     */
+    void deleteSection(String uuid);
 }

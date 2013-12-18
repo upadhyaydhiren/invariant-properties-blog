@@ -41,27 +41,27 @@ import javax.xml.bind.annotation.XmlRootElement;
 @Table(name = "instructor")
 @AttributeOverride(name = "id", column = @Column(name = "instructor_pkey"))
 public class Instructor extends PersistentObject {
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	private String name;
-	private String emailAddress;
-	private List<Section> sections = new ArrayList<Section>();
+    private String name;
+    private String emailAddress;
+    private List<Section> sections = new ArrayList<Section>();
 
-	@Column(length = 80, nullable = false, unique = false, updatable = true)
-	public String getName() {
-		return name;
-	}
+    @Column(length = 80, nullable = false, unique = false, updatable = true)
+    public String getName() {
+        return name;
+    }
 
-	public void setName(String name) {
-		this.name = name;
-	}
+    public void setName(String name) {
+        this.name = name;
+    }
 
-	@Column(length = 200, nullable = false, unique = true, updatable = true)
-	public String getEmailAddress() {
-		return emailAddress;
-	}
+    @Column(length = 200, nullable = false, unique = true, updatable = true)
+    public String getEmailAddress() {
+        return emailAddress;
+    }
 
-	public void setEmailAddress(String emailAddress) {
-		this.emailAddress = emailAddress;
-	}
+    public void setEmailAddress(String emailAddress) {
+        this.emailAddress = emailAddress;
+    }
 }

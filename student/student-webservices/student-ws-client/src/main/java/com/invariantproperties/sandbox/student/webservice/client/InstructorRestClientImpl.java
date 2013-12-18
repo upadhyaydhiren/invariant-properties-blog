@@ -29,82 +29,78 @@ import com.invariantproperties.sandbox.student.domain.Instructor;
  * 
  * @author Bear Giles <bgiles@coyotesong.com>
  */
-public class InstructorRestClientImpl extends
-		AbstractRestClientImpl<Instructor> implements InstructorRestClient {
-	private static final Instructor[] EMPTY_INSTRUCTOR_ARRAY = new Instructor[0];
+public class InstructorRestClientImpl extends AbstractRestClientImpl<Instructor> implements InstructorRestClient {
+    private static final Instructor[] EMPTY_INSTRUCTOR_ARRAY = new Instructor[0];
 
-	/**
-	 * Constructor.
-	 * 
-	 * @param instructorResource
-	 */
-	public InstructorRestClientImpl(final String resource) {
-		super(resource, Instructor.class, Instructor[].class);
-	}
+    /**
+     * Constructor.
+     * 
+     * @param instructorResource
+     */
+    public InstructorRestClientImpl(final String resource) {
+        super(resource, Instructor.class, Instructor[].class);
+    }
 
-	/**
-	 * Create JSON string.
-	 * 
-	 * @param name
-	 * @return
-	 */
-	String createJson(final String name, final String emailAddress) {
-		return String.format("{ \"name\": \"%s\", \"email\": \"%s\" }", name,
-				emailAddress);
-	}
+    /**
+     * Create JSON string.
+     * 
+     * @param name
+     * @return
+     */
+    String createJson(final String name, final String emailAddress) {
+        return String.format("{ \"name\": \"%s\", \"email\": \"%s\" }", name, emailAddress);
+    }
 
-	/**
-	 * @see com.invariantproperties.sandbox.student.webservice.client.InstructorRestClient#getAllInstructors()
-	 */
-	public Instructor[] getAllInstructors() {
-		return super.getAllObjects(EMPTY_INSTRUCTOR_ARRAY);
-	}
+    /**
+     * @see com.invariantproperties.sandbox.student.webservice.client.InstructorRestClient#getAllInstructors()
+     */
+    public Instructor[] getAllInstructors() {
+        return super.getAllObjects(EMPTY_INSTRUCTOR_ARRAY);
+    }
 
-	/**
-	 * @see com.invariantproperties.sandbox.student.webservice.client.InstructorRestClient#getInstructor(java.lang.String)
-	 */
-	public Instructor getInstructor(final String uuid) {
-		return super.getObject(uuid);
-	}
+    /**
+     * @see com.invariantproperties.sandbox.student.webservice.client.InstructorRestClient#getInstructor(java.lang.String)
+     */
+    public Instructor getInstructor(final String uuid) {
+        return super.getObject(uuid);
+    }
 
-	/**
-	 * @see com.invariantproperties.sandbox.student.webservice.client.InstructorRestClient#createInstructor(java.lang.String,
-	 *      java.lang.String)
-	 */
-	public Instructor createInstructor(final String name,
-			final String emailAddress) {
-		if (name == null || name.isEmpty()) {
-			throw new IllegalArgumentException("'name' is required");
-		}
+    /**
+     * @see com.invariantproperties.sandbox.student.webservice.client.InstructorRestClient#createInstructor(java.lang.String,
+     *      java.lang.String)
+     */
+    public Instructor createInstructor(final String name, final String emailAddress) {
+        if (name == null || name.isEmpty()) {
+            throw new IllegalArgumentException("'name' is required");
+        }
 
-		if (emailAddress == null || emailAddress.isEmpty()) {
-			throw new IllegalArgumentException("'emailAddress' is required");
-		}
+        if (emailAddress == null || emailAddress.isEmpty()) {
+            throw new IllegalArgumentException("'emailAddress' is required");
+        }
 
-		return createObject(createJson(name, emailAddress));
-	}
+        return createObject(createJson(name, emailAddress));
+    }
 
-	/**
-	 * @see com.invariantproperties.sandbox.student.webservice.client.InstructorRestClient#updateInstructor(java.lang.String,
-	 *      java.lang.String, java.lang.String)
-	 */
-	public Instructor updateInstructor(final String uuid, final String name,
-			final String emailAddress) {
-		if (name == null || name.isEmpty()) {
-			throw new IllegalArgumentException("'name' is required");
-		}
+    /**
+     * @see com.invariantproperties.sandbox.student.webservice.client.InstructorRestClient#updateInstructor(java.lang.String,
+     *      java.lang.String, java.lang.String)
+     */
+    public Instructor updateInstructor(final String uuid, final String name, final String emailAddress) {
+        if (name == null || name.isEmpty()) {
+            throw new IllegalArgumentException("'name' is required");
+        }
 
-		if (emailAddress == null || emailAddress.isEmpty()) {
-			throw new IllegalArgumentException("'emailAddress' is required");
-		}
+        if (emailAddress == null || emailAddress.isEmpty()) {
+            throw new IllegalArgumentException("'emailAddress' is required");
+        }
 
-		return super.updateObject(createJson(name, emailAddress), uuid);
-	}
+        return super.updateObject(createJson(name, emailAddress), uuid);
+    }
 
-	/**
-	 * @see com.invariantproperties.sandbox.student.webservice.client.InstructorRestClient#deleteInstructor(java.lang.String)
-	 */
-	public void deleteInstructor(final String uuid) {
-		super.deleteObject(uuid);
-	}
+    /**
+     * @see com.invariantproperties.sandbox.student.webservice.client.InstructorRestClient#deleteInstructor(java.lang.String)
+     */
+    public void deleteInstructor(final String uuid) {
+        super.deleteObject(uuid);
+    }
 }

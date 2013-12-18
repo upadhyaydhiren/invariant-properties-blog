@@ -31,16 +31,16 @@ import com.invariantproperties.sandbox.student.business.DummyStudentService;
 import com.invariantproperties.sandbox.student.business.StudentService;
 
 @Configuration
-//@Profile("test")
+// @Profile("test")
 public class RestApplicationContextTest {
-	
-	@Bean
-	CourseService courseService() {
-		return new DummyCourseService();
-	}
-	
-	@Bean
-	StudentService studentService() {
-		return new DummyStudentService();
-	}
+
+    @Bean
+    CourseService courseService() {
+        return new DummyCourseService();
+    }
+
+    @Bean
+    StudentService studentService() {
+        return new DummyStudentService();
+    }
 }

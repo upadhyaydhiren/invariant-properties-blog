@@ -31,39 +31,39 @@ import com.invariantproperties.sandbox.student.domain.Instructor;
  */
 public interface InstructorRestClient {
 
-	/**
-	 * Get list of all instructors.
-	 */
-	Instructor[] getAllInstructors();
+    /**
+     * Get list of all instructors.
+     */
+    Instructor[] getAllInstructors();
 
-	/**
-	 * Get details for specific instructor.
-	 * 
-	 * @param uuid
-	 */
-	Instructor getInstructor(String uuid);
+    /**
+     * Get details for specific instructor.
+     * 
+     * @param uuid
+     */
+    Instructor getInstructor(String uuid);
 
-	/**
-	 * Create specific instructor.
-	 * 
-	 * @param name
-	 * @param emailAddress
-	 */
-	Instructor createInstructor(String name, String emailAddress);
+    /**
+     * Create specific instructor.
+     * 
+     * @param name
+     * @param emailAddress
+     */
+    Instructor createInstructor(String name, String emailAddress);
 
-	/**
-	 * Update specific instructor.
-	 * 
-	 * @param uuid
-	 * @param name
-	 * @param emailAddress
-	 */
-	Instructor updateInstructor(String uuid, String name, String emailAddress);
+    /**
+     * Update specific instructor.
+     * 
+     * @param uuid
+     * @param name
+     * @param emailAddress
+     */
+    Instructor updateInstructor(String uuid, String name, String emailAddress);
 
-	/**
-	 * Delete instructor.
-	 * 
-	 * @param uuid
-	 */
-	void deleteInstructor(String uuid);
+    /**
+     * Delete instructor.
+     * 
+     * @param uuid
+     */
+    void deleteInstructor(String uuid);
 }

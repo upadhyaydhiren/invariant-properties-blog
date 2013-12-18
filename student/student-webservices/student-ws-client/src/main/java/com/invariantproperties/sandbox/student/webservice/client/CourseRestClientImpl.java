@@ -29,70 +29,69 @@ import com.invariantproperties.sandbox.student.domain.Course;
  * 
  * @author Bear Giles <bgiles@coyotesong.com>
  */
-public class CourseRestClientImpl extends AbstractRestClientImpl<Course>
-		implements CourseRestClient {
-	private static final Course[] EMPTY_COURSE_ARRAY = new Course[0];
+public class CourseRestClientImpl extends AbstractRestClientImpl<Course> implements CourseRestClient {
+    private static final Course[] EMPTY_COURSE_ARRAY = new Course[0];
 
-	/**
-	 * Constructor.
-	 * 
-	 * @param courseResource
-	 */
-	public CourseRestClientImpl(final String resource) {
-		super(resource, Course.class, Course[].class);
-	}
+    /**
+     * Constructor.
+     * 
+     * @param courseResource
+     */
+    public CourseRestClientImpl(final String resource) {
+        super(resource, Course.class, Course[].class);
+    }
 
-	/**
-	 * Create JSON string.
-	 * 
-	 * @param name
-	 * @return
-	 */
-	String createJson(final String name) {
-		return String.format("{ \"name\": \"%s\" }", name);
-	}
+    /**
+     * Create JSON string.
+     * 
+     * @param name
+     * @return
+     */
+    String createJson(final String name) {
+        return String.format("{ \"name\": \"%s\" }", name);
+    }
 
-	/**
-	 * @see com.invariantproperties.sandbox.student.webservice.client.CourseRestClient#getAllCourses()
-	 */
-	public Course[] getAllCourses() {
-		return super.getAllObjects(EMPTY_COURSE_ARRAY);
-	}
+    /**
+     * @see com.invariantproperties.sandbox.student.webservice.client.CourseRestClient#getAllCourses()
+     */
+    public Course[] getAllCourses() {
+        return super.getAllObjects(EMPTY_COURSE_ARRAY);
+    }
 
-	/**
-	 * @see com.invariantproperties.sandbox.student.webservice.client.CourseRestClient#getCourse(java.lang.String)
-	 */
-	public Course getCourse(final String uuid) {
-		return super.getObject(uuid);
-	}
+    /**
+     * @see com.invariantproperties.sandbox.student.webservice.client.CourseRestClient#getCourse(java.lang.String)
+     */
+    public Course getCourse(final String uuid) {
+        return super.getObject(uuid);
+    }
 
-	/**
-	 * @see com.invariantproperties.sandbox.student.webservice.client.CourseRestClient#createCourse(java.lang.String)
-	 */
-	public Course createCourse(final String name) {
-		if (name == null || name.isEmpty()) {
-			throw new IllegalArgumentException("'name' is required");
-		}
+    /**
+     * @see com.invariantproperties.sandbox.student.webservice.client.CourseRestClient#createCourse(java.lang.String)
+     */
+    public Course createCourse(final String name) {
+        if (name == null || name.isEmpty()) {
+            throw new IllegalArgumentException("'name' is required");
+        }
 
-		return createObject(createJson(name));
-	}
+        return createObject(createJson(name));
+    }
 
-	/**
-	 * @see com.invariantproperties.sandbox.student.webservice.client.CourseRestClient#updateCourse(java.lang.String,
-	 *      java.lang.String)
-	 */
-	public Course updateCourse(final String uuid, final String name) {
-		if (name == null || name.isEmpty()) {
-			throw new IllegalArgumentException("'name' is required");
-		}
+    /**
+     * @see com.invariantproperties.sandbox.student.webservice.client.CourseRestClient#updateCourse(java.lang.String,
+     *      java.lang.String)
+     */
+    public Course updateCourse(final String uuid, final String name) {
+        if (name == null || name.isEmpty()) {
+            throw new IllegalArgumentException("'name' is required");
+        }
 
-		return super.updateObject(createJson(name), uuid);
-	}
+        return super.updateObject(createJson(name), uuid);
+    }
 
-	/**
-	 * @see com.invariantproperties.sandbox.student.webservice.client.CourseRestClient#deleteCourse(java.lang.String)
-	 */
-	public void deleteCourse(final String uuid) {
-		super.deleteObject(uuid);
-	}
+    /**
+     * @see com.invariantproperties.sandbox.student.webservice.client.CourseRestClient#deleteCourse(java.lang.String)
+     */
+    public void deleteCourse(final String uuid) {
+        super.deleteObject(uuid);
+    }
 }
