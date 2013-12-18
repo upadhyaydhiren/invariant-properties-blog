@@ -184,6 +184,8 @@ class StudentRestClientMock extends StudentRestClientImpl {
      * will handle basic CRUD operations, more advanced functionality will
      * require inspecting JSON payload of POST call.
      */
+    @SuppressWarnings("unchecked")
+    @Override
     Client createClient() {
         client = Mockito.mock(Client.class);
         webResource = Mockito.mock(WebResource.class);
