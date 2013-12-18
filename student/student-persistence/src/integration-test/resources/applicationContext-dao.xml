@@ -11,9 +11,4 @@
        http://www.springframework.org/schema/data/repository
 http://www.springframework.org/schema/data/repository/spring-repository-1.5.xsd">
 
-<bean id="courseListener" class="com.invariantproperties.sandbox.student.listener.CourseListener"/>
-
-<bean id="poListener" class="com.invariantproperties.sandbox.student.listener.HibernateListenersAdapter"/>
-<bean id="awListener" class="com.invariantproperties.sandbox.student.listener.HibernateListenersAutowire"/>
-
 </beans>
