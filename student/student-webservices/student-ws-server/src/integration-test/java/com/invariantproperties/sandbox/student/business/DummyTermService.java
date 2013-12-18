@@ -43,7 +43,7 @@ public class DummyTermService implements TermService {
     }
 
     public Term findTermById(Integer id) {
-        throw new ObjectNotFoundException(null);
+        throw new ObjectNotFoundException(id);
     }
 
     public Term findTermByUuid(String uuid) {

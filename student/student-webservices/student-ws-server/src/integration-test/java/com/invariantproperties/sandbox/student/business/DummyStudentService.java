@@ -39,7 +39,7 @@ public class DummyStudentService implements StudentService {
     }
 
     public Student findStudentById(Integer id) {
-        throw new ObjectNotFoundException(null);
+        throw new ObjectNotFoundException(id);
     }
 
     public Student findStudentByUuid(String uuid) {
@@ -50,7 +50,7 @@ public class DummyStudentService implements StudentService {
     }
 
     public Student findStudentByEmailAddress(String emailAddress) {
-        throw new ObjectNotFoundException(null);
+        throw new ObjectNotFoundException("[email]");
     }
 
     public Student createStudent(String name, String emailAddress) {

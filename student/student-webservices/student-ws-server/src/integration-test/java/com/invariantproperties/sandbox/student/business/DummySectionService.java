@@ -43,7 +43,7 @@ public class DummySectionService implements SectionService {
     }
 
     public Section findSectionById(Integer id) {
-        throw new ObjectNotFoundException(null);
+        throw new ObjectNotFoundException(id);
     }
 
     public Section findSectionByUuid(String uuid) {

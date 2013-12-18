@@ -43,7 +43,7 @@ public class DummyCourseService implements CourseService {
     }
 
     public Course findCourseById(Integer id) {
-        throw new ObjectNotFoundException(null);
+        throw new ObjectNotFoundException(id);
     }
 
     public Course findCourseByUuid(String uuid) {
