@@ -44,125 +44,120 @@ import com.sun.jersey.api.client.WebResource;
  * @author Bear Giles <bgiles@coyotesong.com>
  */
 public class StudentRestClientImplTest {
-	private static final String UUID = "uuid";
-	private static final String NAME = "name";
-	private static final String EMAIL = "email address";
+    private static final String UUID = "uuid";
+    private static final String NAME = "name";
+    private static final String EMAIL = "email address";
 
-	@Test
-	public void testGetAllStudentsEmpty() {
-		StudentRestClient client = new StudentRestClientMock(200,
-				new Student[0]);
-		Student[] results = client.getAllStudents();
-		assertEquals(0, results.length);
-	}
+    @Test
+    public void testGetAllStudentsEmpty() {
+        StudentRestClient client = new StudentRestClientMock(200, new Student[0]);
+        Student[] results = client.getAllStudents();
+        assertEquals(0, results.length);
+    }
 
-	@Test
-	public void testGetAllStudentsNonEmpty() {
-		Student student = new Student();
-		student.setUuid(UUID);
-		StudentRestClient client = new StudentRestClientMock(200,
-				new Student[] { student });
-		Student[] results = client.getAllStudents();
-		assertEquals(1, results.length);
-	}
+    @Test
+    public void testGetAllStudentsNonEmpty() {
+        Student student = new Student();
+        student.setUuid(UUID);
+        StudentRestClient client = new StudentRestClientMock(200, new Student[] { student });
+        Student[] results = client.getAllStudents();
+        assertEquals(1, results.length);
+    }
 
-	@Test(expected = RestClientFailureException.class)
-	public void testGetAllStudentsError() {
-		StudentRestClient client = new StudentRestClientMock(500, null);
-		client.getAllStudents();
-	}
+    @Test(expected = RestClientFailureException.class)
+    public void testGetAllStudentsError() {
+        StudentRestClient client = new StudentRestClientMock(500, null);
+        client.getAllStudents();
+    }
 
-	@Test
-	public void testGetStudent() {
-		Student expected = new Student();
-		expected.setUuid(UUID);
-		StudentRestClient client = new StudentRestClientMock(200, expected);
-		Student actual = client.getStudent(expected.getUuid());
-		assertEquals(expected.getUuid(), actual.getUuid());
-		// assertEquals(StudentRestClientMock.RESOURCE + student.getUuid(),
-		// results.getSelf());
-	}
+    @Test
+    public void testGetStudent() {
+        Student expected = new Student();
+        expected.setUuid(UUID);
+        StudentRestClient client = new StudentRestClientMock(200, expected);
+        Student actual = client.getStudent(expected.getUuid());
+        assertEquals(expected.getUuid(), actual.getUuid());
+        // assertEquals(StudentRestClientMock.RESOURCE + student.getUuid(),
+        // results.getSelf());
+    }
 
-	@Test(expected = ObjectNotFoundException.class)
-	public void testGetStudentMissing() {
-		StudentRestClient client = new StudentRestClientMock(404, null);
-		client.getStudent(UUID);
-	}
+    @Test(expected = ObjectNotFoundException.class)
+    public void testGetStudentMissing() {
+        StudentRestClient client = new StudentRestClientMock(404, null);
+        client.getStudent(UUID);
+    }
 
-	@Test(expected = RestClientFailureException.class)
-	public void testGetStudentError() {
-		StudentRestClient client = new StudentRestClientMock(500, null);
-		client.getStudent(UUID);
-	}
+    @Test(expected = RestClientFailureException.class)
+    public void testGetStudentError() {
+        StudentRestClient client = new StudentRestClientMock(500, null);
+        client.getStudent(UUID);
+    }
 
-	@Test
-	public void testCreateStudent() {
-		Student expected = new Student();
-		expected.setName(NAME);
-		expected.setEmailAddress(EMAIL);
-		StudentRestClient client = new StudentRestClientMock(
-				Response.Status.CREATED.getStatusCode(), expected);
-		Student actual = client.createStudent(expected.getName(),
-				expected.getEmailAddress());
-		assertEquals(expected.getName(), actual.getName());
-		assertEquals(expected.getEmailAddress(), actual.getEmailAddress());
-		// assertEquals(StudentRestClientMock.RESOURCE + results.getUuid(),
-		// results.getSelf());
-	}
+    @Test
+    public void testCreateStudent() {
+        Student expected = new Student();
+        expected.setName(NAME);
+        expected.setEmailAddress(EMAIL);
+        StudentRestClient client = new StudentRestClientMock(Response.Status.CREATED.getStatusCode(), expected);
+        Student actual = client.createStudent(expected.getName(), expected.getEmailAddress());
+        assertEquals(expected.getName(), actual.getName());
+        assertEquals(expected.getEmailAddress(), actual.getEmailAddress());
+        // assertEquals(StudentRestClientMock.RESOURCE + results.getUuid(),
+        // results.getSelf());
+    }
 
-	@Test(expected = RestClientFailureException.class)
-	public void testCreateStudentError() {
-		StudentRestClient client = new StudentRestClientMock(500, null);
-		client.createStudent(UUID, EMAIL);
-	}
+    @Test(expected = RestClientFailureException.class)
+    public void testCreateStudentError() {
+        StudentRestClient client = new StudentRestClientMock(500, null);
+        client.createStudent(UUID, EMAIL);
+    }
 
-	@Test
-	public void testUpdateStudent() {
-		Student expected = new Student();
-		expected.setUuid(UUID);
-		expected.setName(NAME);
-		expected.setEmailAddress(EMAIL);
-		StudentRestClient client = new StudentRestClientMock(200, expected);
-		Student actual = client.updateStudent(expected.getUuid(),
-				expected.getName(), expected.getEmailAddress());
-		assertEquals(expected.getUuid(), actual.getUuid());
-		assertEquals(expected.getName(), actual.getName());
-		assertEquals(expected.getEmailAddress(), actual.getEmailAddress());
-		// assertEquals(StudentRestClientMock.RESOURCE + student.getUuid(),
-		// actual.getSelf());
-	}
+    @Test
+    public void testUpdateStudent() {
+        Student expected = new Student();
+        expected.setUuid(UUID);
+        expected.setName(NAME);
+        expected.setEmailAddress(EMAIL);
+        StudentRestClient client = new StudentRestClientMock(200, expected);
+        Student actual = client.updateStudent(expected.getUuid(), expected.getName(), expected.getEmailAddress());
+        assertEquals(expected.getUuid(), actual.getUuid());
+        assertEquals(expected.getName(), actual.getName());
+        assertEquals(expected.getEmailAddress(), actual.getEmailAddress());
+        // assertEquals(StudentRestClientMock.RESOURCE + student.getUuid(),
+        // actual.getSelf());
+    }
 
-	@Test(expected = ObjectNotFoundException.class)
-	public void testUpdateStudentMissing() {
-		StudentRestClient client = new StudentRestClientMock(404, null);
-		client.updateStudent(UUID, NAME, EMAIL);
-	}
+    @Test(expected = ObjectNotFoundException.class)
+    public void testUpdateStudentMissing() {
+        StudentRestClient client = new StudentRestClientMock(404, null);
+        client.updateStudent(UUID, NAME, EMAIL);
+    }
 
-	@Test(expected = RestClientFailureException.class)
-	public void testUpdateStudentError() {
-		StudentRestClient client = new StudentRestClientMock(500, null);
-		client.updateStudent(UUID, NAME, EMAIL);
-	}
+    @Test(expected = RestClientFailureException.class)
+    public void testUpdateStudentError() {
+        StudentRestClient client = new StudentRestClientMock(500, null);
+        client.updateStudent(UUID, NAME, EMAIL);
+    }
 
-	@Test
-	public void testDeleteStudent() {
-		Student student = new Student();
-		student.setUuid(UUID);
-		StudentRestClient client = new StudentRestClientMock(204, null);
-		client.deleteStudent(student.getUuid());
-	}
+    @Test
+    public void testDeleteStudent() {
+        Student student = new Student();
+        student.setUuid(UUID);
+        StudentRestClient client = new StudentRestClientMock(204, null);
+        client.deleteStudent(student.getUuid());
+    }
 
-	@Test
-	public void testDeleteStudentMissing() {
-		StudentRestClient client = new StudentRestClientMock(204, null);
-		client.deleteStudent(UUID);
-	}
+    @Test
+    public void testDeleteStudentMissing() {
+        StudentRestClient client = new StudentRestClientMock(204, null);
+        client.deleteStudent(UUID);
+    }
 
-	@Test(expected = RestClientFailureException.class)
-	public void testDeleteStudentError() {
-		StudentRestClient client = new StudentRestClientMock(500, null);
-		client.deleteStudent(UUID);
-	}
+    @Test(expected = RestClientFailureException.class)
+    public void testDeleteStudentError() {
+        StudentRestClient client = new StudentRestClientMock(500, null);
+        client.deleteStudent(UUID);
+    }
 }
 
 /**
@@ -170,51 +165,41 @@ public class StudentRestClientImplTest {
  * implementation details.
  */
 class StudentRestClientMock extends StudentRestClientImpl {
-	static final String RESOURCE = "test://rest/student/";
-	private Client client;
-	private WebResource webResource;
-	private WebResource.Builder webResourceBuilder;
-	private ClientResponse response;
-	private final int status;
-	private final Object results;
+    static final String RESOURCE = "test://rest/student/";
+    private Client client;
+    private WebResource webResource;
+    private WebResource.Builder webResourceBuilder;
+    private ClientResponse response;
+    private final int status;
+    private final Object results;
 
-	StudentRestClientMock(int status, Object results) {
-		super(RESOURCE);
-		this.status = status;
-		this.results = results;
-	}
+    StudentRestClientMock(int status, Object results) {
+        super(RESOURCE);
+        this.status = status;
+        this.results = results;
+    }
 
-	/**
-	 * Override createClient() so it returns mocked object. These expectations
-	 * will handle basic CRUD operations, more advanced functionality will
-	 * require inspecting JSON payload of POST call.
-	 */
-	Client createClient() {
-		client = Mockito.mock(Client.class);
-		webResource = Mockito.mock(WebResource.class);
-		webResourceBuilder = Mockito.mock(WebResource.Builder.class);
-		response = Mockito.mock(ClientResponse.class);
-		when(client.resource(any(String.class))).thenReturn(webResource);
-		when(webResource.accept(any(String.class))).thenReturn(
-				webResourceBuilder);
-		when(webResource.type(any(String.class)))
-				.thenReturn(webResourceBuilder);
-		when(webResourceBuilder.accept(any(String.class))).thenReturn(
-				webResourceBuilder);
-		when(webResourceBuilder.type(any(String.class))).thenReturn(
-				webResourceBuilder);
-		when(webResourceBuilder.get(eq(ClientResponse.class))).thenReturn(
-				response);
-		when(
-				webResourceBuilder.post(eq(ClientResponse.class),
-						any(String.class))).thenReturn(response);
-		when(
-				webResourceBuilder.put(eq(ClientResponse.class),
-						any(String.class))).thenReturn(response);
-		when(webResourceBuilder.delete(eq(ClientResponse.class))).thenReturn(
-				response);
-		when(response.getStatus()).thenReturn(status);
-		when(response.getEntity(any(Class.class))).thenReturn(results);
-		return client;
-	}
+    /**
+     * Override createClient() so it returns mocked object. These expectations
+     * will handle basic CRUD operations, more advanced functionality will
+     * require inspecting JSON payload of POST call.
+     */
+    Client createClient() {
+        client = Mockito.mock(Client.class);
+        webResource = Mockito.mock(WebResource.class);
+        webResourceBuilder = Mockito.mock(WebResource.Builder.class);
+        response = Mockito.mock(ClientResponse.class);
+        when(client.resource(any(String.class))).thenReturn(webResource);
+        when(webResource.accept(any(String.class))).thenReturn(webResourceBuilder);
+        when(webResource.type(any(String.class))).thenReturn(webResourceBuilder);
+        when(webResourceBuilder.accept(any(String.class))).thenReturn(webResourceBuilder);
+        when(webResourceBuilder.type(any(String.class))).thenReturn(webResourceBuilder);
+        when(webResourceBuilder.get(eq(ClientResponse.class))).thenReturn(response);
+        when(webResourceBuilder.post(eq(ClientResponse.class), any(String.class))).thenReturn(response);
+        when(webResourceBuilder.put(eq(ClientResponse.class), any(String.class))).thenReturn(response);
+        when(webResourceBuilder.delete(eq(ClientResponse.class))).thenReturn(response);
+        when(response.getStatus()).thenReturn(status);
+        when(response.getEntity(any(Class.class))).thenReturn(results);
+        return client;
+    }
 }

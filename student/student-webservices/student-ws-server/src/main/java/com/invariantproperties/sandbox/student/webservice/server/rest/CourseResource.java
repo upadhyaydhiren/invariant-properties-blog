@@ -51,202 +51,190 @@ import com.invariantproperties.sandbox.student.domain.Course;
 @Service
 @Path("/course")
 public class CourseResource extends AbstractResource {
-	private static final Logger log = Logger.getLogger(CourseResource.class);
-	private static final Course[] EMPTY_COURSE_ARRAY = new Course[0];
+    private static final Logger log = Logger.getLogger(CourseResource.class);
+    private static final Course[] EMPTY_COURSE_ARRAY = new Course[0];
 
-	@Context
-	UriInfo uriInfo;
+    @Context
+    UriInfo uriInfo;
 
-	@Context
-	Request request;
+    @Context
+    Request request;
 
-	@Resource
-	private CourseService service;
+    @Resource
+    private CourseService service;
 
-	/**
-	 * Default constructor.
-	 */
-	public CourseResource() {
+    /**
+     * Default constructor.
+     */
+    public CourseResource() {
 
-	}
+    }
 
-	/**
-	 * Unit test constructor.
-	 * 
-	 * @param service
-	 */
-	CourseResource(CourseService service) {
-		this.service = service;
-	}
+    /**
+     * Unit test constructor.
+     * 
+     * @param service
+     */
+    CourseResource(CourseService service) {
+        this.service = service;
+    }
 
-	/**
-	 * Get all Courses.
-	 * 
-	 * @return
-	 */
-	@GET
-	@Produces({ MediaType.APPLICATION_JSON, MediaType.TEXT_XML })
-	public Response findAllCourses() {
-		log.debug("CourseResource: findAllCourses()");
+    /**
+     * Get all Courses.
+     * 
+     * @return
+     */
+    @GET
+    @Produces({ MediaType.APPLICATION_JSON, MediaType.TEXT_XML })
+    public Response findAllCourses() {
+        log.debug("CourseResource: findAllCourses()");
 
-		Response response = null;
-		try {
-			List<Course> courses = service.findAllCourses();
+        Response response = null;
+        try {
+            List<Course> courses = service.findAllCourses();
 
-			List<Course> results = new ArrayList<Course>(courses.size());
-			for (Course course : courses) {
-				results.add(scrubCourse(course));
-			}
+            List<Course> results = new ArrayList<Course>(courses.size());
+            for (Course course : courses) {
+                results.add(scrubCourse(course));
+            }
 
-			response = Response.ok(results.toArray(EMPTY_COURSE_ARRAY))
-					.status(Status.OK).build();
-		} catch (Exception e) {
-			if (!(e instanceof UnitTestException)) {
-				log.info("unhandled exception", e);
-			}
-			response = Response.noContent()
-					.status(Status.INTERNAL_SERVER_ERROR).build();
-		}
+            response = Response.ok(results.toArray(EMPTY_COURSE_ARRAY)).status(Status.OK).build();
+        } catch (Exception e) {
+            if (!(e instanceof UnitTestException)) {
+                log.info("unhandled exception", e);
+            }
+            response = Response.noContent().status(Status.INTERNAL_SERVER_ERROR).build();
+        }
 
-		return response;
-	}
+        return response;
+    }
 
-	/**
-	 * Create a Course.
-	 * 
-	 * @param req
-	 * @return
-	 */
-	@POST
-	@Consumes({ MediaType.APPLICATION_JSON, MediaType.TEXT_XML })
-	@Produces({ MediaType.APPLICATION_JSON, MediaType.TEXT_XML })
-	public Response createCourse(Name req) {
-		log.debug("CourseResource: createCourse()");
+    /**
+     * Create a Course.
+     * 
+     * @param req
+     * @return
+     */
+    @POST
+    @Consumes({ MediaType.APPLICATION_JSON, MediaType.TEXT_XML })
+    @Produces({ MediaType.APPLICATION_JSON, MediaType.TEXT_XML })
+    public Response createCourse(Name req) {
+        log.debug("CourseResource: createCourse()");
 
-		final String name = req.getName();
-		if ((name == null) || name.isEmpty()) {
-			return Response.ok().status(Status.BAD_REQUEST)
-					.entity("'name' is required'").build();
-		}
+        final String name = req.getName();
+        if ((name == null) || name.isEmpty()) {
+            return Response.ok().status(Status.BAD_REQUEST).entity("'name' is required'").build();
+        }
 
-		Response response = null;
+        Response response = null;
 
-		try {
-			Course course = service.createCourse(name);
-			if (course == null) {
-				response = Response.noContent()
-						.status(Status.INTERNAL_SERVER_ERROR).build();
-			} else {
-				response = Response.created(URI.create(course.getUuid()))
-						.entity(scrubCourse(course)).build();
-			}
-		} catch (Exception e) {
-			if (!(e instanceof UnitTestException)) {
-				log.info("unhandled exception", e);
-			}
-			response = Response.noContent()
-					.status(Status.INTERNAL_SERVER_ERROR).build();
-		}
+        try {
+            Course course = service.createCourse(name);
+            if (course == null) {
+                response = Response.noContent().status(Status.INTERNAL_SERVER_ERROR).build();
+            } else {
+                response = Response.created(URI.create(course.getUuid())).entity(scrubCourse(course)).build();
+            }
+        } catch (Exception e) {
+            if (!(e instanceof UnitTestException)) {
+                log.info("unhandled exception", e);
+            }
+            response = Response.noContent().status(Status.INTERNAL_SERVER_ERROR).build();
+        }
 
-		return response;
-	}
+        return response;
+    }
 
-	/**
-	 * Get a specific Course.
-	 * 
-	 * @param uuid
-	 * @return
-	 */
-	@Path("/{courseId}")
-	@GET
-	@Produces({ MediaType.APPLICATION_JSON, MediaType.TEXT_XML })
-	public Response getCourse(@PathParam("courseId") String id) {
-		log.debug("CourseResource: getCourse()");
+    /**
+     * Get a specific Course.
+     * 
+     * @param uuid
+     * @return
+     */
+    @Path("/{courseId}")
+    @GET
+    @Produces({ MediaType.APPLICATION_JSON, MediaType.TEXT_XML })
+    public Response getCourse(@PathParam("courseId") String id) {
+        log.debug("CourseResource: getCourse()");
 
-		Response response = null;
-		try {
-			Course course = service.findCourseByUuid(id);
-			response = Response.ok(scrubCourse(course)).status(Status.OK)
-					.build();
-		} catch (ObjectNotFoundException e) {
-			response = Response.noContent().status(Status.NOT_FOUND).build();
-		} catch (Exception e) {
-			if (!"[unit test]".equals(e.getMessage())) {
-				log.info("unhandled exception", e);
-			}
-			response = Response.noContent()
-					.status(Status.INTERNAL_SERVER_ERROR).build();
-		}
+        Response response = null;
+        try {
+            Course course = service.findCourseByUuid(id);
+            response = Response.ok(scrubCourse(course)).status(Status.OK).build();
+        } catch (ObjectNotFoundException e) {
+            response = Response.noContent().status(Status.NOT_FOUND).build();
+        } catch (Exception e) {
+            if (!"[unit test]".equals(e.getMessage())) {
+                log.info("unhandled exception", e);
+            }
+            response = Response.noContent().status(Status.INTERNAL_SERVER_ERROR).build();
+        }
 
-		return response;
-	}
+        return response;
+    }
 
-	/**
-	 * Update a Course.
-	 * 
-	 * FIXME: what about uniqueness violations?
-	 * 
-	 * @param id
-	 * @param req
-	 * @return
-	 */
-	@Path("/{courseId}")
-	@POST
-	@Consumes({ MediaType.APPLICATION_JSON, MediaType.TEXT_XML })
-	@Produces({ MediaType.APPLICATION_JSON, MediaType.TEXT_XML })
-	public Response updateCourse(@PathParam("courseId") String id, Name req) {
-		log.debug("CourseResource: updateCourse()");
+    /**
+     * Update a Course.
+     * 
+     * FIXME: what about uniqueness violations?
+     * 
+     * @param id
+     * @param req
+     * @return
+     */
+    @Path("/{courseId}")
+    @POST
+    @Consumes({ MediaType.APPLICATION_JSON, MediaType.TEXT_XML })
+    @Produces({ MediaType.APPLICATION_JSON, MediaType.TEXT_XML })
+    public Response updateCourse(@PathParam("courseId") String id, Name req) {
+        log.debug("CourseResource: updateCourse()");
 
-		final String name = req.getName();
-		if ((name == null) || name.isEmpty()) {
-			return Response.ok().status(Status.BAD_REQUEST)
-					.entity("'name' is required'").build();
-		}
+        final String name = req.getName();
+        if ((name == null) || name.isEmpty()) {
+            return Response.ok().status(Status.BAD_REQUEST).entity("'name' is required'").build();
+        }
 
-		Response response = null;
-		try {
-			final Course course = service.findCourseByUuid(id);
-			final Course updatedCourse = service.updateCourse(course, name);
-			response = Response.ok(scrubCourse(updatedCourse))
-					.status(Status.OK).build();
-		} catch (ObjectNotFoundException exception) {
-			response = Response.noContent().status(Status.NOT_FOUND).build();
-		} catch (Exception e) {
-			if (!(e instanceof UnitTestException)) {
-				log.info("unhandled exception", e);
-			}
-			response = Response.noContent()
-					.status(Status.INTERNAL_SERVER_ERROR).build();
-		}
+        Response response = null;
+        try {
+            final Course course = service.findCourseByUuid(id);
+            final Course updatedCourse = service.updateCourse(course, name);
+            response = Response.ok(scrubCourse(updatedCourse)).status(Status.OK).build();
+        } catch (ObjectNotFoundException exception) {
+            response = Response.noContent().status(Status.NOT_FOUND).build();
+        } catch (Exception e) {
+            if (!(e instanceof UnitTestException)) {
+                log.info("unhandled exception", e);
+            }
+            response = Response.noContent().status(Status.INTERNAL_SERVER_ERROR).build();
+        }
 
-		return response;
-	}
+        return response;
+    }
 
-	/**
-	 * Delete a Course.
-	 * 
-	 * @param id
-	 * @return
-	 */
-	@Path("/{courseId}")
-	@DELETE
-	public Response deleteCourse(@PathParam("courseId") String id) {
-		log.debug("CourseResource: deleteCourse()");
+    /**
+     * Delete a Course.
+     * 
+     * @param id
+     * @return
+     */
+    @Path("/{courseId}")
+    @DELETE
+    public Response deleteCourse(@PathParam("courseId") String id) {
+        log.debug("CourseResource: deleteCourse()");
 
-		Response response = null;
-		try {
-			service.deleteCourse(id);
-			response = Response.noContent().status(Status.NO_CONTENT).build();
-		} catch (ObjectNotFoundException exception) {
-			response = Response.noContent().status(Status.NO_CONTENT).build();
-		} catch (Exception e) {
-			if (!(e instanceof UnitTestException)) {
-				log.info("unhandled exception", e);
-			}
-			response = Response.noContent()
-					.status(Status.INTERNAL_SERVER_ERROR).build();
-		}
+        Response response = null;
+        try {
+            service.deleteCourse(id);
+            response = Response.noContent().status(Status.NO_CONTENT).build();
+        } catch (ObjectNotFoundException exception) {
+            response = Response.noContent().status(Status.NO_CONTENT).build();
+        } catch (Exception e) {
+            if (!(e instanceof UnitTestException)) {
+                log.info("unhandled exception", e);
+            }
+            response = Response.noContent().status(Status.INTERNAL_SERVER_ERROR).build();
+        }
 
-		return response;
-	}
+        return response;
+    }
 }

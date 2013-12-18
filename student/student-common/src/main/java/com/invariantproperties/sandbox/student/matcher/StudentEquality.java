@@ -36,34 +36,34 @@ import com.invariantproperties.sandbox.student.domain.Student;
  * @author Bear Giles <bgiles@coyotesong.com>
  */
 public class StudentEquality extends TypeSafeMatcher<Student> {
-	private final Student expected;
+    private final Student expected;
 
-	private StudentEquality(Student expected) {
-		this.expected = expected;
-	}
+    private StudentEquality(Student expected) {
+        this.expected = expected;
+    }
 
-	@Override
-	public boolean matchesSafely(Student actual) {
-		if (actual == null) {
-			return false;
-		}
+    @Override
+    public boolean matchesSafely(Student actual) {
+        if (actual == null) {
+            return false;
+        }
 
-		EqualsBuilder eq = new EqualsBuilder();
-		eq.append(expected.getId(), actual.getId());
-		eq.append(expected.getUuid(), actual.getUuid());
-		eq.append(expected.getName(), actual.getName());
-		eq.append(expected.getEmailAddress(), actual.getEmailAddress());
-		eq.append(expected.getCreationDate(), actual.getCreationDate());
+        EqualsBuilder eq = new EqualsBuilder();
+        eq.append(expected.getId(), actual.getId());
+        eq.append(expected.getUuid(), actual.getUuid());
+        eq.append(expected.getName(), actual.getName());
+        eq.append(expected.getEmailAddress(), actual.getEmailAddress());
+        eq.append(expected.getCreationDate(), actual.getCreationDate());
 
-		return eq.isEquals();
-	}
+        return eq.isEquals();
+    }
 
-	public void describeTo(Description description) {
-		description.appendText("student comparison");
-	}
+    public void describeTo(Description description) {
+        description.appendText("student comparison");
+    }
 
-	@Factory
-	public static <T> Matcher<Student> equalTo(Student student) {
-		return new StudentEquality(student);
-	}
+    @Factory
+    public static <T> Matcher<Student> equalTo(Student student) {
+        return new StudentEquality(student);
+    }
 }

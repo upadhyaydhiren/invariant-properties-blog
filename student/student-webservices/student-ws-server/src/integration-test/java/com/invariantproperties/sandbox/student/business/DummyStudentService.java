@@ -29,56 +29,54 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import com.invariantproperties.sandbox.student.business.ObjectNotFoundException;
-import com.invariantproperties.sandbox.student.business.StudentService;
 import com.invariantproperties.sandbox.student.domain.Student;
 
 public class DummyStudentService implements StudentService {
-	private Map<String, Student> cache = Collections.synchronizedMap(new HashMap<String, Student>());
+    private Map<String, Student> cache = Collections.synchronizedMap(new HashMap<String, Student>());
 
-	public List<Student> findAllStudents() {
-		return new ArrayList<Student>(cache.values());
+    public List<Student> findAllStudents() {
+        return new ArrayList<Student>(cache.values());
     }
 
     public Student findStudentById(Integer id) {
-    	throw new ObjectNotFoundException(null);    	
+        throw new ObjectNotFoundException(null);
     }
 
     public Student findStudentByUuid(String uuid) {
-    	if (!cache.containsKey(uuid)) {
-        	throw new ObjectNotFoundException(uuid);    	
-    	}
-		return cache.get(uuid);
+        if (!cache.containsKey(uuid)) {
+            throw new ObjectNotFoundException(uuid);
+        }
+        return cache.get(uuid);
     }
 
     public Student findStudentByEmailAddress(String emailAddress) {
-    	throw new ObjectNotFoundException(null);    	
+        throw new ObjectNotFoundException(null);
     }
 
     public Student createStudent(String name, String emailAddress) {
-    	Student student = new Student();
-    	student.setUuid(UUID.randomUUID().toString());
-    	student.setName(name);
-    	student.setEmailAddress(emailAddress);
-    	cache.put(student.getUuid(), student);
-    	return student;
+        Student student = new Student();
+        student.setUuid(UUID.randomUUID().toString());
+        student.setName(name);
+        student.setEmailAddress(emailAddress);
+        cache.put(student.getUuid(), student);
+        return student;
     }
 
     public Student updateStudent(Student oldStudent, String name, String emailAddress) {
-    	if (!cache.containsKey(oldStudent.getUuid())) {
-        	throw new ObjectNotFoundException(oldStudent.getUuid());    	    		
-    	}
-    	
-    	Student student = cache.get(oldStudent.getUuid());
-    	student.setUuid(UUID.randomUUID().toString());
-    	student.setName(name);
-    	student.setEmailAddress(emailAddress);
-    	return student;    	
+        if (!cache.containsKey(oldStudent.getUuid())) {
+            throw new ObjectNotFoundException(oldStudent.getUuid());
+        }
+
+        Student student = cache.get(oldStudent.getUuid());
+        student.setUuid(UUID.randomUUID().toString());
+        student.setName(name);
+        student.setEmailAddress(emailAddress);
+        return student;
     }
 
     public void deleteStudent(String uuid) {
-    	if (cache.containsKey(uuid)) {
-    		cache.remove(uuid);
-    	}
+        if (cache.containsKey(uuid)) {
+            cache.remove(uuid);
+        }
     }
 }

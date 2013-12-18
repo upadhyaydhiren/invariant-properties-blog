@@ -31,39 +31,39 @@ import com.invariantproperties.sandbox.student.domain.Student;
  */
 public interface StudentRestClient {
 
-	/**
-	 * Get list of all students.
-	 */
-	Student[] getAllStudents();
+    /**
+     * Get list of all students.
+     */
+    Student[] getAllStudents();
 
-	/**
-	 * Get details for specific student.
-	 * 
-	 * @param uuid
-	 */
-	Student getStudent(String uuid);
+    /**
+     * Get details for specific student.
+     * 
+     * @param uuid
+     */
+    Student getStudent(String uuid);
 
-	/**
-	 * Create specific student.
-	 * 
-	 * @param name
-	 * @param emailAddress
-	 */
-	Student createStudent(String name, String emailAddress);
+    /**
+     * Create specific student.
+     * 
+     * @param name
+     * @param emailAddress
+     */
+    Student createStudent(String name, String emailAddress);
 
-	/**
-	 * Update specific student.
-	 * 
-	 * @param uuid
-	 * @param name
-	 * @param emailAddress
-	 */
-	Student updateStudent(String uuid, String name, String emailAddress);
+    /**
+     * Update specific student.
+     * 
+     * @param uuid
+     * @param name
+     * @param emailAddress
+     */
+    Student updateStudent(String uuid, String name, String emailAddress);
 
-	/**
-	 * Delete student.
-	 * 
-	 * @param uuid
-	 */
-	void deleteStudent(String uuid);
+    /**
+     * Delete student.
+     * 
+     * @param uuid
+     */
+    void deleteStudent(String uuid);
 }

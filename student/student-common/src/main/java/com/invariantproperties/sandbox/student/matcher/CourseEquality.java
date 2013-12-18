@@ -36,33 +36,33 @@ import com.invariantproperties.sandbox.student.domain.Course;
  * @author Bear Giles <bgiles@coyotesong.com>
  */
 public class CourseEquality extends TypeSafeMatcher<Course> {
-	private final Course expected;
+    private final Course expected;
 
-	private CourseEquality(Course expected) {
-		this.expected = expected;
-	}
+    private CourseEquality(Course expected) {
+        this.expected = expected;
+    }
 
-	@Override
-	public boolean matchesSafely(Course actual) {
-		if (actual == null) {
-			return false;
-		}
+    @Override
+    public boolean matchesSafely(Course actual) {
+        if (actual == null) {
+            return false;
+        }
 
-		EqualsBuilder eq = new EqualsBuilder();
-		eq.append(expected.getId(), actual.getId());
-		eq.append(expected.getUuid(), actual.getUuid());
-		eq.append(expected.getName(), actual.getName());
-		eq.append(expected.getCreationDate(), actual.getCreationDate());
+        EqualsBuilder eq = new EqualsBuilder();
+        eq.append(expected.getId(), actual.getId());
+        eq.append(expected.getUuid(), actual.getUuid());
+        eq.append(expected.getName(), actual.getName());
+        eq.append(expected.getCreationDate(), actual.getCreationDate());
 
-		return eq.isEquals();
-	}
+        return eq.isEquals();
+    }
 
-	public void describeTo(Description description) {
-		description.appendText("Course comparison");
-	}
+    public void describeTo(Description description) {
+        description.appendText("Course comparison");
+    }
 
-	@Factory
-	public static <T> Matcher<Course> equalTo(Course course) {
-		return new CourseEquality(course);
-	}
+    @Factory
+    public static <T> Matcher<Course> equalTo(Course course) {
+        return new CourseEquality(course);
+    }
 }

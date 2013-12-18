@@ -29,70 +29,69 @@ import com.invariantproperties.sandbox.student.domain.Section;
  * 
  * @author Bear Giles <bgiles@coyotesong.com>
  */
-public class SectionRestClientImpl extends AbstractRestClientImpl<Section>
-		implements SectionRestClient {
-	private static final Section[] EMPTY_COURSE_ARRAY = new Section[0];
+public class SectionRestClientImpl extends AbstractRestClientImpl<Section> implements SectionRestClient {
+    private static final Section[] EMPTY_COURSE_ARRAY = new Section[0];
 
-	/**
-	 * Constructor.
-	 * 
-	 * @param sectionResource
-	 */
-	public SectionRestClientImpl(final String resource) {
-		super(resource, Section.class, Section[].class);
-	}
+    /**
+     * Constructor.
+     * 
+     * @param sectionResource
+     */
+    public SectionRestClientImpl(final String resource) {
+        super(resource, Section.class, Section[].class);
+    }
 
-	/**
-	 * Create JSON string.
-	 * 
-	 * @param name
-	 * @return
-	 */
-	String createJson(final String name) {
-		return String.format("{ \"name\": \"%s\" }", name);
-	}
+    /**
+     * Create JSON string.
+     * 
+     * @param name
+     * @return
+     */
+    String createJson(final String name) {
+        return String.format("{ \"name\": \"%s\" }", name);
+    }
 
-	/**
-	 * @see com.invariantproperties.sandbox.student.webservice.client.SectionRestClient#getAllSections()
-	 */
-	public Section[] getAllSections() {
-		return super.getAllObjects(EMPTY_COURSE_ARRAY);
-	}
+    /**
+     * @see com.invariantproperties.sandbox.student.webservice.client.SectionRestClient#getAllSections()
+     */
+    public Section[] getAllSections() {
+        return super.getAllObjects(EMPTY_COURSE_ARRAY);
+    }
 
-	/**
-	 * @see com.invariantproperties.sandbox.student.webservice.client.SectionRestClient#getSection(java.lang.String)
-	 */
-	public Section getSection(final String uuid) {
-		return super.getObject(uuid);
-	}
+    /**
+     * @see com.invariantproperties.sandbox.student.webservice.client.SectionRestClient#getSection(java.lang.String)
+     */
+    public Section getSection(final String uuid) {
+        return super.getObject(uuid);
+    }
 
-	/**
-	 * @see com.invariantproperties.sandbox.student.webservice.client.SectionRestClient#createSection(java.lang.String)
-	 */
-	public Section createSection(final String name) {
-		if (name == null || name.isEmpty()) {
-			throw new IllegalArgumentException("'name' is required");
-		}
+    /**
+     * @see com.invariantproperties.sandbox.student.webservice.client.SectionRestClient#createSection(java.lang.String)
+     */
+    public Section createSection(final String name) {
+        if (name == null || name.isEmpty()) {
+            throw new IllegalArgumentException("'name' is required");
+        }
 
-		return createObject(createJson(name));
-	}
+        return createObject(createJson(name));
+    }
 
-	/**
-	 * @see com.invariantproperties.sandbox.student.webservice.client.SectionRestClient#updateSection(java.lang.String,
-	 *      java.lang.String)
-	 */
-	public Section updateSection(final String uuid, final String name) {
-		if (name == null || name.isEmpty()) {
-			throw new IllegalArgumentException("'name' is required");
-		}
+    /**
+     * @see com.invariantproperties.sandbox.student.webservice.client.SectionRestClient#updateSection(java.lang.String,
+     *      java.lang.String)
+     */
+    public Section updateSection(final String uuid, final String name) {
+        if (name == null || name.isEmpty()) {
+            throw new IllegalArgumentException("'name' is required");
+        }
 
-		return super.updateObject(createJson(name), uuid);
-	}
+        return super.updateObject(createJson(name), uuid);
+    }
 
-	/**
-	 * @see com.invariantproperties.sandbox.student.webservice.client.SectionRestClient#deleteSection(java.lang.String)
-	 */
-	public void deleteSection(final String uuid) {
-		super.deleteObject(uuid);
-	}
+    /**
+     * @see com.invariantproperties.sandbox.student.webservice.client.SectionRestClient#deleteSection(java.lang.String)
+     */
+    public void deleteSection(final String uuid) {
+        super.deleteObject(uuid);
+    }
 }

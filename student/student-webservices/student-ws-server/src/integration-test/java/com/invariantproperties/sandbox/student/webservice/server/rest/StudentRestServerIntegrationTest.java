@@ -43,48 +43,46 @@ import com.invariantproperties.sandbox.student.webservice.client.StudentRestClie
  */
 public class StudentRestServerIntegrationTest {
 
-	final StudentRestClient client = new StudentRestClientImpl(
-			"http://localhost:8080/rest/student/");
+    final StudentRestClient client = new StudentRestClientImpl("http://localhost:8080/rest/student/");
 
-	@Test
-	public void testGetAll() throws IOException {
-		final Student[] students = client.getAllStudents();
-		assertNotNull(students);
-	}
+    @Test
+    public void testGetAll() throws IOException {
+        final Student[] students = client.getAllStudents();
+        assertNotNull(students);
+    }
 
-	@Test(expected = ObjectNotFoundException.class)
-	public void testUnknownStudent() throws IOException {
-		client.getStudent("missing");
-	}
+    @Test(expected = ObjectNotFoundException.class)
+    public void testUnknownStudent() throws IOException {
+        client.getStudent("missing");
+    }
 
-	@Test
-	public void testLifecycle() throws IOException {
-		final String davidName = "David";
-		final String davidEmail = "david@example.com";
-		final Student expected = client.createStudent(davidName, davidEmail);
-		assertEquals(davidName, expected.getName());
-		assertEquals(davidEmail, expected.getEmailAddress());
+    @Test
+    public void testLifecycle() throws IOException {
+        final String davidName = "David";
+        final String davidEmail = "david@example.com";
+        final Student expected = client.createStudent(davidName, davidEmail);
+        assertEquals(davidName, expected.getName());
+        assertEquals(davidEmail, expected.getEmailAddress());
 
-		final Student actual1 = client.getStudent(expected.getUuid());
-		assertEquals(davidName, actual1.getName());
-		assertEquals(davidEmail, actual1.getEmailAddress());
+        final Student actual1 = client.getStudent(expected.getUuid());
+        assertEquals(davidName, actual1.getName());
+        assertEquals(davidEmail, actual1.getEmailAddress());
 
-		final Student[] students = client.getAllStudents();
-		assertTrue(students.length > 0);
+        final Student[] students = client.getAllStudents();
+        assertTrue(students.length > 0);
 
-		final String edithName = "Edith";
-		final String edithEmail = "edith@example.com";
-		final Student actual2 = client.updateStudent(actual1.getUuid(),
-				edithName, edithEmail);
-		assertEquals(edithName, actual2.getName());
-		assertEquals(edithEmail, actual2.getEmailAddress());
+        final String edithName = "Edith";
+        final String edithEmail = "edith@example.com";
+        final Student actual2 = client.updateStudent(actual1.getUuid(), edithName, edithEmail);
+        assertEquals(edithName, actual2.getName());
+        assertEquals(edithEmail, actual2.getEmailAddress());
 
-		client.deleteStudent(actual1.getUuid());
-		try {
-			client.getStudent(expected.getUuid());
-			fail("should have thrown exception");
-		} catch (ObjectNotFoundException e) {
-			// do nothing
-		}
-	}
+        client.deleteStudent(actual1.getUuid());
+        try {
+            client.getStudent(expected.getUuid());
+            fail("should have thrown exception");
+        } catch (ObjectNotFoundException e) {
+            // do nothing
+        }
+    }
 }

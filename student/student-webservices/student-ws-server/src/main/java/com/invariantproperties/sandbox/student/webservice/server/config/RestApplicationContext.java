@@ -40,6 +40,6 @@ import org.springframework.core.env.Environment;
 // @PropertySource("classpath:application.properties")
 public class RestApplicationContext {
 
-	@Resource
-	private Environment environment;
+    @Resource
+    private Environment environment;
 }

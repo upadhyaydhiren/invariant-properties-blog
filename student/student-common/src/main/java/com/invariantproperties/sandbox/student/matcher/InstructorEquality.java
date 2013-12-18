@@ -36,34 +36,34 @@ import com.invariantproperties.sandbox.student.domain.Instructor;
  * @author Bear Giles <bgiles@coyotesong.com>
  */
 public class InstructorEquality extends TypeSafeMatcher<Instructor> {
-	private final Instructor expected;
+    private final Instructor expected;
 
-	private InstructorEquality(Instructor expected) {
-		this.expected = expected;
-	}
+    private InstructorEquality(Instructor expected) {
+        this.expected = expected;
+    }
 
-	@Override
-	public boolean matchesSafely(Instructor actual) {
-		if (actual == null) {
-			return false;
-		}
+    @Override
+    public boolean matchesSafely(Instructor actual) {
+        if (actual == null) {
+            return false;
+        }
 
-		EqualsBuilder eq = new EqualsBuilder();
-		eq.append(expected.getId(), actual.getId());
-		eq.append(expected.getUuid(), actual.getUuid());
-		eq.append(expected.getName(), actual.getName());
-		eq.append(expected.getEmailAddress(), actual.getEmailAddress());
-		eq.append(expected.getCreationDate(), actual.getCreationDate());
+        EqualsBuilder eq = new EqualsBuilder();
+        eq.append(expected.getId(), actual.getId());
+        eq.append(expected.getUuid(), actual.getUuid());
+        eq.append(expected.getName(), actual.getName());
+        eq.append(expected.getEmailAddress(), actual.getEmailAddress());
+        eq.append(expected.getCreationDate(), actual.getCreationDate());
 
-		return eq.isEquals();
-	}
+        return eq.isEquals();
+    }
 
-	public void describeTo(Description description) {
-		description.appendText("student comparison");
-	}
+    public void describeTo(Description description) {
+        description.appendText("student comparison");
+    }
 
-	@Factory
-	public static <T> Matcher<Instructor> equalTo(Instructor instructor) {
-		return new InstructorEquality(instructor);
-	}
+    @Factory
+    public static <T> Matcher<Instructor> equalTo(Instructor instructor) {
+        return new InstructorEquality(instructor);
+    }
 }

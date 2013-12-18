@@ -43,43 +43,41 @@ import com.invariantproperties.sandbox.student.webservice.client.ObjectNotFoundE
  */
 public class CourseRestServerIntegrationTest {
 
-	private final CourseRestClient client = new CourseRestClientImpl(
-			"http://localhost:8080/rest/course/");
+    private final CourseRestClient client = new CourseRestClientImpl("http://localhost:8080/rest/course/");
 
-	@Test
-	public void testGetAll() throws IOException {
-		final Course[] courses = client.getAllCourses();
-		assertNotNull(courses);
-	}
+    @Test
+    public void testGetAll() throws IOException {
+        final Course[] courses = client.getAllCourses();
+        assertNotNull(courses);
+    }
 
-	@Test(expected = ObjectNotFoundException.class)
-	public void testUnknownCourse() throws IOException {
-		client.getCourse("missing");
-	}
+    @Test(expected = ObjectNotFoundException.class)
+    public void testUnknownCourse() throws IOException {
+        client.getCourse("missing");
+    }
 
-	@Test
-	public void testLifecycle() throws IOException {
-		final String physicsName = "Physics 201";
-		final Course expected = client.createCourse(physicsName);
-		assertEquals(physicsName, expected.getName());
+    @Test
+    public void testLifecycle() throws IOException {
+        final String physicsName = "Physics 201";
+        final Course expected = client.createCourse(physicsName);
+        assertEquals(physicsName, expected.getName());
 
-		final Course actual1 = client.getCourse(expected.getUuid());
-		assertEquals(physicsName, actual1.getName());
+        final Course actual1 = client.getCourse(expected.getUuid());
+        assertEquals(physicsName, actual1.getName());
 
-		final Course[] courses = client.getAllCourses();
-		assertTrue(courses.length > 0);
+        final Course[] courses = client.getAllCourses();
+        assertTrue(courses.length > 0);
 
-		final String mechanicsName = "Newtonian Mechanics 201";
-		final Course actual2 = client.updateCourse(actual1.getUuid(),
-				mechanicsName);
-		assertEquals(mechanicsName, actual2.getName());
+        final String mechanicsName = "Newtonian Mechanics 201";
+        final Course actual2 = client.updateCourse(actual1.getUuid(), mechanicsName);
+        assertEquals(mechanicsName, actual2.getName());
 
-		client.deleteCourse(actual1.getUuid());
-		try {
-			client.getCourse(expected.getUuid());
-			fail("should have thrown exception");
-		} catch (ObjectNotFoundException e) {
-			// do nothing
-		}
-	}
+        client.deleteCourse(actual1.getUuid());
+        try {
+            client.getCourse(expected.getUuid());
+            fail("should have thrown exception");
+        } catch (ObjectNotFoundException e) {
+            // do nothing
+        }
+    }
 }

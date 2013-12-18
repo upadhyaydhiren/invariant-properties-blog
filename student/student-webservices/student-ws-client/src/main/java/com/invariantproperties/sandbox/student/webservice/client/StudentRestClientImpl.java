@@ -29,82 +29,79 @@ import com.invariantproperties.sandbox.student.domain.Student;
  * 
  * @author Bear Giles <bgiles@coyotesong.com>
  */
-public class StudentRestClientImpl extends AbstractRestClientImpl<Student>
-		implements StudentRestClient {
-	private static final Student[] EMPTY_STUDENT_ARRAY = new Student[0];
+public class StudentRestClientImpl extends AbstractRestClientImpl<Student> implements StudentRestClient {
+    private static final Student[] EMPTY_STUDENT_ARRAY = new Student[0];
 
-	/**
-	 * Constructor.
-	 * 
-	 * @param studentResource
-	 */
-	public StudentRestClientImpl(final String resource) {
-		super(resource, Student.class, Student[].class);
-	}
+    /**
+     * Constructor.
+     * 
+     * @param studentResource
+     */
+    public StudentRestClientImpl(final String resource) {
+        super(resource, Student.class, Student[].class);
+    }
 
-	/**
-	 * Create JSON string.
-	 * 
-	 * @param name
-	 * @param emailAddress
-	 * @return
-	 */
-	String createJson(final String name, final String emailAddress) {
-		return String.format("{ \"name\": \"%s\", \"emailAddress\": \"%s\" }",
-				name, emailAddress);
-	}
+    /**
+     * Create JSON string.
+     * 
+     * @param name
+     * @param emailAddress
+     * @return
+     */
+    String createJson(final String name, final String emailAddress) {
+        return String.format("{ \"name\": \"%s\", \"emailAddress\": \"%s\" }", name, emailAddress);
+    }
 
-	/**
-	 * @see com.invariantproperties.sandbox.student.webservice.client.StudentRestClient#getAllStudents()
-	 */
-	public Student[] getAllStudents() {
-		return super.getAllObjects(EMPTY_STUDENT_ARRAY);
-	}
+    /**
+     * @see com.invariantproperties.sandbox.student.webservice.client.StudentRestClient#getAllStudents()
+     */
+    public Student[] getAllStudents() {
+        return super.getAllObjects(EMPTY_STUDENT_ARRAY);
+    }
 
-	/**
-	 * @see com.invariantproperties.sandbox.student.webservice.client.StudentRestClient#getStudent(java.lang.String)
-	 */
-	public Student getStudent(final String uuid) {
-		return super.getObject(uuid);
-	}
+    /**
+     * @see com.invariantproperties.sandbox.student.webservice.client.StudentRestClient#getStudent(java.lang.String)
+     */
+    public Student getStudent(final String uuid) {
+        return super.getObject(uuid);
+    }
 
-	/**
-	 * @see com.invariantproperties.sandbox.student.webservice.client.StudentRestClient#createStudent(java.lang.String,
-	 *      java.lang.String)
-	 */
-	public Student createStudent(final String name, final String emailAddress) {
-		if (name == null || name.isEmpty()) {
-			throw new IllegalArgumentException("'name' is required");
-		}
+    /**
+     * @see com.invariantproperties.sandbox.student.webservice.client.StudentRestClient#createStudent(java.lang.String,
+     *      java.lang.String)
+     */
+    public Student createStudent(final String name, final String emailAddress) {
+        if (name == null || name.isEmpty()) {
+            throw new IllegalArgumentException("'name' is required");
+        }
 
-		if (emailAddress == null || emailAddress.isEmpty()) {
-			throw new IllegalArgumentException("'emailAddress' is required");
-		}
+        if (emailAddress == null || emailAddress.isEmpty()) {
+            throw new IllegalArgumentException("'emailAddress' is required");
+        }
 
-		return createObject(createJson(name, emailAddress));
-	}
+        return createObject(createJson(name, emailAddress));
+    }
 
-	/**
-	 * @see com.invariantproperties.sandbox.student.webservice.client.StudentRestClient#updateStudent(java.lang.String,
-	 *      java.lang.String, java.lang.String)
-	 */
-	public Student updateStudent(final String uuid, final String name,
-			final String emailAddress) {
-		if (name == null || name.isEmpty()) {
-			throw new IllegalArgumentException("'name' is required");
-		}
+    /**
+     * @see com.invariantproperties.sandbox.student.webservice.client.StudentRestClient#updateStudent(java.lang.String,
+     *      java.lang.String, java.lang.String)
+     */
+    public Student updateStudent(final String uuid, final String name, final String emailAddress) {
+        if (name == null || name.isEmpty()) {
+            throw new IllegalArgumentException("'name' is required");
+        }
 
-		if (emailAddress == null || emailAddress.isEmpty()) {
-			throw new IllegalArgumentException("'emailAddress' is required");
-		}
+        if (emailAddress == null || emailAddress.isEmpty()) {
+            throw new IllegalArgumentException("'emailAddress' is required");
+        }
 
-		return super.updateObject(createJson(name, emailAddress), uuid);
-	}
+        return super.updateObject(createJson(name, emailAddress), uuid);
+    }
 
-	/**
-	 * @see com.invariantproperties.sandbox.student.webservice.client.StudentRestClient#deleteStudent(java.lang.String)
-	 */
-	public void deleteStudent(final String uuid) {
-		super.deleteObject(uuid);
-	}
+    /**
+     * @see com.invariantproperties.sandbox.student.webservice.client.StudentRestClient#deleteStudent(java.lang.String)
+     */
+    public void deleteStudent(final String uuid) {
+        super.deleteObject(uuid);
+    }
 }

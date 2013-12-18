@@ -41,19 +41,19 @@ import javax.xml.bind.annotation.XmlRootElement;
 @Table(name = "section")
 @AttributeOverride(name = "id", column = @Column(name = "section_pkey"))
 public class Section extends PersistentObject {
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	private String name;
-	private Course course;
-	private List<Student> students = new ArrayList<Student>();
-	private List<Classroom> classrooms = new ArrayList<Classroom>();
+    private String name;
+    private Course course;
+    private List<Student> students = new ArrayList<Student>();
+    private List<Classroom> classrooms = new ArrayList<Classroom>();
 
-	@Column(length = 80, unique = false, updatable = true)
-	public String getName() {
-		return name;
-	}
+    @Column(length = 80, unique = false, updatable = true)
+    public String getName() {
+        return name;
+    }
 
-	public void setName(String name) {
-		this.name = name;
-	}
+    public void setName(String name) {
+        this.name = name;
+    }
 }

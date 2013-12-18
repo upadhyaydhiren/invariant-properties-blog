@@ -36,33 +36,33 @@ import com.invariantproperties.sandbox.student.domain.Classroom;
  * @author Bear Giles <bgiles@coyotesong.com>
  */
 public class ClassroomEquality extends TypeSafeMatcher<Classroom> {
-	private final Classroom expected;
+    private final Classroom expected;
 
-	private ClassroomEquality(Classroom expected) {
-		this.expected = expected;
-	}
+    private ClassroomEquality(Classroom expected) {
+        this.expected = expected;
+    }
 
-	@Override
-	public boolean matchesSafely(Classroom actual) {
-		if (actual == null) {
-			return false;
-		}
+    @Override
+    public boolean matchesSafely(Classroom actual) {
+        if (actual == null) {
+            return false;
+        }
 
-		EqualsBuilder eq = new EqualsBuilder();
-		eq.append(expected.getId(), actual.getId());
-		eq.append(expected.getUuid(), actual.getUuid());
-		eq.append(expected.getName(), actual.getName());
-		eq.append(expected.getCreationDate(), actual.getCreationDate());
+        EqualsBuilder eq = new EqualsBuilder();
+        eq.append(expected.getId(), actual.getId());
+        eq.append(expected.getUuid(), actual.getUuid());
+        eq.append(expected.getName(), actual.getName());
+        eq.append(expected.getCreationDate(), actual.getCreationDate());
 
-		return eq.isEquals();
-	}
+        return eq.isEquals();
+    }
 
-	public void describeTo(Description description) {
-		description.appendText("Course comparison");
-	}
+    public void describeTo(Description description) {
+        description.appendText("Course comparison");
+    }
 
-	@Factory
-	public static <T> Matcher<Classroom> equalTo(Classroom classroom) {
-		return new ClassroomEquality(classroom);
-	}
+    @Factory
+    public static <T> Matcher<Classroom> equalTo(Classroom classroom) {
+        return new ClassroomEquality(classroom);
+    }
 }

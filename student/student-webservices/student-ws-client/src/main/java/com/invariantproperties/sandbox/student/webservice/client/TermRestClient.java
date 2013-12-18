@@ -31,37 +31,37 @@ import com.invariantproperties.sandbox.student.domain.Term;
  */
 public interface TermRestClient {
 
-	/**
-	 * Get list of all terms.
-	 */
-	Term[] getAllTerms();
+    /**
+     * Get list of all terms.
+     */
+    Term[] getAllTerms();
 
-	/**
-	 * Get details for specific term.
-	 * 
-	 * @param uuid
-	 */
-	Term getTerm(String uuid);
+    /**
+     * Get details for specific term.
+     * 
+     * @param uuid
+     */
+    Term getTerm(String uuid);
 
-	/**
-	 * Create specific term.
-	 * 
-	 * @param name
-	 */
-	Term createTerm(String name);
+    /**
+     * Create specific term.
+     * 
+     * @param name
+     */
+    Term createTerm(String name);
 
-	/**
-	 * Update specific term.
-	 * 
-	 * @param uuid
-	 * @param name
-	 */
-	Term updateTerm(String uuid, String name);
+    /**
+     * Update specific term.
+     * 
+     * @param uuid
+     * @param name
+     */
+    Term updateTerm(String uuid, String name);
 
-	/**
-	 * Delete term.
-	 * 
-	 * @param uuid
-	 */
-	void deleteTerm(String uuid);
+    /**
+     * Delete term.
+     * 
+     * @param uuid
+     */
+    void deleteTerm(String uuid);
 }

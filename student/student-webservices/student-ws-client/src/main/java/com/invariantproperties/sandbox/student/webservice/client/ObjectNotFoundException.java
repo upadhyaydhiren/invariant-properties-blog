@@ -30,37 +30,36 @@ import com.invariantproperties.sandbox.student.domain.PersistentObject;
  * @author Bear Giles <bgiles@coyotesong.com>
  */
 public class ObjectNotFoundException extends RestClientException {
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	private final Class<? extends PersistentObject> objectClass;
-	private final String resource;
-	private final String uuid;
+    private final Class<? extends PersistentObject> objectClass;
+    private final String resource;
+    private final String uuid;
 
-	/**
-	 * Constructor
-	 * 
-	 * @param resource
-	 * @param objectClass
-	 * @param uuid
-	 */
-	public ObjectNotFoundException(final String resource,
-			final Class<? extends PersistentObject> objectClass,
-			final String uuid) {
-		super("object not found: " + resource + "[" + uuid + "]");
-		this.resource = resource;
-		this.objectClass = objectClass;
-		this.uuid = uuid;
-	}
+    /**
+     * Constructor
+     * 
+     * @param resource
+     * @param objectClass
+     * @param uuid
+     */
+    public ObjectNotFoundException(final String resource, final Class<? extends PersistentObject> objectClass,
+            final String uuid) {
+        super("object not found: " + resource + "[" + uuid + "]");
+        this.resource = resource;
+        this.objectClass = objectClass;
+        this.uuid = uuid;
+    }
 
-	public String getResource() {
-		return resource;
-	}
+    public String getResource() {
+        return resource;
+    }
 
-	public Class<? extends PersistentObject> getObjectClass() {
-		return objectClass;
-	}
+    public Class<? extends PersistentObject> getObjectClass() {
+        return objectClass;
+    }
 
-	public String getUuid() {
-		return uuid;
-	}
+    public String getUuid() {
+        return uuid;
+    }
 }
