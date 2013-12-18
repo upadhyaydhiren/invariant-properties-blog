@@ -139,14 +139,13 @@ public class TermRestClientImplTest {
 	public void testDeleteTerm() {
 		Term term = new Term();
 		term.setUuid(UUID);
-		TermRestClient client = new TermRestClientMock(
-				Response.Status.GONE.getStatusCode(), null);
+		TermRestClient client = new TermRestClientMock(204, null);
 		client.deleteTerm(term.getUuid());
 	}
 
 	@Test
 	public void testDeleteTermMissing() {
-		TermRestClient client = new TermRestClientMock(404, null);
+		TermRestClient client = new TermRestClientMock(204, null);
 		client.deleteTerm(UUID);
 	}
 

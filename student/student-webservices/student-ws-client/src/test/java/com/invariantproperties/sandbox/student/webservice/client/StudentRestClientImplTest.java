@@ -148,14 +148,13 @@ public class StudentRestClientImplTest {
 	public void testDeleteStudent() {
 		Student student = new Student();
 		student.setUuid(UUID);
-		StudentRestClient client = new StudentRestClientMock(
-				Response.Status.GONE.getStatusCode(), null);
+		StudentRestClient client = new StudentRestClientMock(204, null);
 		client.deleteStudent(student.getUuid());
 	}
 
 	@Test
 	public void testDeleteStudentMissing() {
-		StudentRestClient client = new StudentRestClientMock(404, null);
+		StudentRestClient client = new StudentRestClientMock(204, null);
 		client.deleteStudent(UUID);
 	}
 

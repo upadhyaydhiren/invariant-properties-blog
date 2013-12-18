@@ -141,14 +141,13 @@ public class CourseRestClientImplTest {
 	public void testDeleteCourse() {
 		Course course = new Course();
 		course.setUuid(UUID);
-		CourseRestClient client = new CourseRestClientMock(
-				Response.Status.GONE.getStatusCode(), null);
+		CourseRestClient client = new CourseRestClientMock(204, null);
 		client.deleteCourse(course.getUuid());
 	}
 
 	@Test
 	public void testDeleteCourseMissing() {
-		CourseRestClient client = new CourseRestClientMock(404, null);
+		CourseRestClient client = new CourseRestClientMock(204, null);
 		client.deleteCourse(UUID);
 	}
 

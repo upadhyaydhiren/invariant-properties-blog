@@ -181,7 +181,10 @@ public class AbstractRestClientImpl<T extends PersistentObject> {
 			final ClientResponse response = webResource.accept(
 					MediaType.APPLICATION_JSON).delete(ClientResponse.class);
 
-			if (response.getStatus() == Response.Status.GONE.getStatusCode()) {
+			if (response.getStatus() == Response.Status.OK.getStatusCode()) {
+				// do nothing
+			} else if (response.getStatus() == Response.Status.NO_CONTENT
+					.getStatusCode()) {
 				// do nothing
 			} else if (response.getStatus() == Response.Status.NOT_FOUND
 					.getStatusCode()) {
