@@ -48,7 +48,7 @@ public class RestClientFailureException extends RestClientException {
      */
     public RestClientFailureException(final String resource, final Class<? extends PersistentObject> objectClass,
             final String uuid, final ClientResponse response) {
-        super("rest client received error: " + resource + "[" + uuid + "]");
+        super("rest client received error (" + response.getStatus() + "): " + resource + "[" + uuid + "]");
         this.resource = resource;
         this.objectClass = objectClass;
         this.uuid = uuid;

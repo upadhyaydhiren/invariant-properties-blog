@@ -48,7 +48,7 @@ public class InstructorRestClientImpl extends AbstractRestClientImpl<Instructor>
      * @return
      */
     String createJson(final String name, final String emailAddress) {
-        return String.format("{ \"name\": \"%s\", \"email\": \"%s\" }", name, emailAddress);
+        return String.format("{ \"name\": \"%s\", \"emailAddress\": \"%s\" }", name, emailAddress);
     }
 
     /**
