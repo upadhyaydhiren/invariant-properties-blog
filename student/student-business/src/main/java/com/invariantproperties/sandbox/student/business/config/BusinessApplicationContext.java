@@ -24,9 +24,9 @@ package com.invariantproperties.sandbox.student.business.config;
 
 import javax.annotation.Resource;
 
-import org.omg.CORBA.Environment;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
 
 /**
  * An application context Java configuration class. The usage of Java
@@ -43,6 +43,6 @@ import org.springframework.context.annotation.Configuration;
 // @PropertySource("classpath:application.properties")
 public class BusinessApplicationContext {
 
-    // @Resource
-    // private Environment environment;
+    @Resource
+    private Environment environment;
 }
