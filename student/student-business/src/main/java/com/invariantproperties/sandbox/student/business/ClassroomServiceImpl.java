@@ -151,6 +151,8 @@ public class ClassroomServiceImpl implements ClassroomService {
      *      updateClassroom(com.invariantproperties.sandbox.classroom.domain.Classroom,
      *      java.lang.String)
      */
+    @Transactional
+    @Override
     public Classroom updateClassroom(Classroom classroom, String name) {
         Classroom updated = null;
         try {
