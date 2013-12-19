@@ -35,175 +35,175 @@ import com.invariantproperties.sandbox.student.domain.Section;
 import com.invariantproperties.sandbox.student.repository.SectionRepository;
 
 public class SectionServiceImpl implements SectionService {
-	private static final Logger log = LoggerFactory
-	        .getLogger(SectionServiceImpl.class);
+    private static final Logger log = LoggerFactory
+            .getLogger(SectionServiceImpl.class);
 
-	@Resource
-	private SectionRepository sectionRepository;
+    @Resource
+    private SectionRepository sectionRepository;
 
-	/**
-	 * Default constructor
-	 */
-	public SectionServiceImpl() {
+    /**
+     * Default constructor
+     */
+    public SectionServiceImpl() {
 
-	}
+    }
 
-	/**
-	 * Constructor used in unit tests
-	 */
-	SectionServiceImpl(SectionRepository sectionRepository) {
-		this.sectionRepository = sectionRepository;
-	}
+    /**
+     * Constructor used in unit tests
+     */
+    SectionServiceImpl(SectionRepository sectionRepository) {
+        this.sectionRepository = sectionRepository;
+    }
 
-	/**
-	 * @see com.invariantproperties.sandbox.student.business.SectionService#
-	 *      findAllSections()
-	 */
-	@Transactional(readOnly = true)
-	@Override
-	public List<Section> findAllSections() {
-		List<Section> sections = null;
+    /**
+     * @see com.invariantproperties.sandbox.student.business.SectionService#
+     *      findAllSections()
+     */
+    @Transactional(readOnly = true)
+    @Override
+    public List<Section> findAllSections() {
+        List<Section> sections = null;
 
-		try {
-			sections = sectionRepository.findAll();
-		} catch (DataAccessException e) {
-			if (!(e instanceof UnitTestException)) {
-				log.info("error loading list of sections: " + e.getMessage(), e);
-			}
-			throw new PersistenceException("unable to get list of sections.", e);
-		}
+        try {
+            sections = sectionRepository.findAll();
+        } catch (DataAccessException e) {
+            if (!(e instanceof UnitTestException)) {
+                log.info("error loading list of sections: " + e.getMessage(), e);
+            }
+            throw new PersistenceException("unable to get list of sections.", e);
+        }
 
-		return sections;
-	}
+        return sections;
+    }
 
-	/**
-	 * @see com.invariantproperties.sandbox.student.business.SectionService#
-	 *      findSectionById(java.lang.Integer)
-	 */
-	@Transactional(readOnly = true)
-	@Override
-	public Section findSectionById(Integer id) {
-		Section section = null;
-		try {
-			section = sectionRepository.findOne(id);
-		} catch (DataAccessException e) {
-			if (!(e instanceof UnitTestException)) {
-				log.info("internal error retrieving section: " + id, e);
-			}
-			throw new PersistenceException("unable to find section by id", e,
-			        id);
-		}
+    /**
+     * @see com.invariantproperties.sandbox.student.business.SectionService#
+     *      findSectionById(java.lang.Integer)
+     */
+    @Transactional(readOnly = true)
+    @Override
+    public Section findSectionById(Integer id) {
+        Section section = null;
+        try {
+            section = sectionRepository.findOne(id);
+        } catch (DataAccessException e) {
+            if (!(e instanceof UnitTestException)) {
+                log.info("internal error retrieving section: " + id, e);
+            }
+            throw new PersistenceException("unable to find section by id", e,
+                    id);
+        }
 
-		if (section == null) {
-			throw new ObjectNotFoundException(id);
-		}
+        if (section == null) {
+            throw new ObjectNotFoundException(id);
+        }
 
-		return section;
-	}
+        return section;
+    }
 
-	/**
-	 * @see com.invariantproperties.sandbox.student.business.SectionService#
-	 *      findSectionByUuid(java.lang.String)
-	 */
-	@Transactional(readOnly = true)
-	@Override
-	public Section findSectionByUuid(String uuid) {
-		Section section = null;
-		try {
-			section = sectionRepository.findSectionByUuid(uuid);
-		} catch (DataAccessException e) {
-			if (!(e instanceof UnitTestException)) {
-				log.info("internal error retrieving section: " + uuid, e);
-			}
-			throw new PersistenceException("unable to find section by uuid", e,
-			        uuid);
-		}
+    /**
+     * @see com.invariantproperties.sandbox.student.business.SectionService#
+     *      findSectionByUuid(java.lang.String)
+     */
+    @Transactional(readOnly = true)
+    @Override
+    public Section findSectionByUuid(String uuid) {
+        Section section = null;
+        try {
+            section = sectionRepository.findSectionByUuid(uuid);
+        } catch (DataAccessException e) {
+            if (!(e instanceof UnitTestException)) {
+                log.info("internal error retrieving section: " + uuid, e);
+            }
+            throw new PersistenceException("unable to find section by uuid", e,
+                    uuid);
+        }
 
-		if (section == null) {
-			throw new ObjectNotFoundException(uuid);
-		}
+        if (section == null) {
+            throw new ObjectNotFoundException(uuid);
+        }
 
-		return section;
-	}
+        return section;
+    }
 
-	/**
-	 * @see com.invariantproperties.sandbox.student.business.SectionService#
-	 *      createSection(java.lang.String)
-	 */
-	@Transactional
-	@Override
-	public Section createSection(String name) {
-		final Section section = new Section();
-		section.setName(name);
+    /**
+     * @see com.invariantproperties.sandbox.student.business.SectionService#
+     *      createSection(java.lang.String)
+     */
+    @Transactional
+    @Override
+    public Section createSection(String name) {
+        final Section section = new Section();
+        section.setName(name);
 
-		Section actual = null;
-		try {
-			actual = sectionRepository.saveAndFlush(section);
-		} catch (DataAccessException e) {
-			if (!(e instanceof UnitTestException)) {
-				log.info("internal error retrieving section: " + name, e);
-			}
-			throw new PersistenceException("unable to create section", e);
-		}
+        Section actual = null;
+        try {
+            actual = sectionRepository.saveAndFlush(section);
+        } catch (DataAccessException e) {
+            if (!(e instanceof UnitTestException)) {
+                log.info("internal error retrieving section: " + name, e);
+            }
+            throw new PersistenceException("unable to create section", e);
+        }
 
-		return actual;
-	}
+        return actual;
+    }
 
-	/**
-	 * @see com.invariantproperties.sandbox.section.persistence.SectionService#
-	 *      updateSection(com.invariantproperties.sandbox.section.domain.Section,
-	 *      java.lang.String)
-	 */
-	public Section updateSection(Section section, String name) {
-		Section updated = null;
-		try {
-			final Section actual = sectionRepository.findSectionByUuid(section
-			        .getUuid());
+    /**
+     * @see com.invariantproperties.sandbox.section.persistence.SectionService#
+     *      updateSection(com.invariantproperties.sandbox.section.domain.Section,
+     *      java.lang.String)
+     */
+    public Section updateSection(Section section, String name) {
+        Section updated = null;
+        try {
+            final Section actual = sectionRepository.findSectionByUuid(section
+                    .getUuid());
 
-			if (actual == null) {
-				log.debug("did not find section: " + section.getUuid());
-				throw new ObjectNotFoundException(section.getUuid());
-			}
+            if (actual == null) {
+                log.debug("did not find section: " + section.getUuid());
+                throw new ObjectNotFoundException(section.getUuid());
+            }
 
-			actual.setName(name);
-			updated = sectionRepository.saveAndFlush(actual);
-			section.setName(name);
+            actual.setName(name);
+            updated = sectionRepository.saveAndFlush(actual);
+            section.setName(name);
 
-		} catch (DataAccessException e) {
-			if (!(e instanceof UnitTestException)) {
-				log.info(
-				        "internal error deleting section: " + section.getUuid(),
-				        e);
-			}
-			throw new PersistenceException("unable to delete section", e,
-			        section.getUuid());
-		}
+        } catch (DataAccessException e) {
+            if (!(e instanceof UnitTestException)) {
+                log.info(
+                        "internal error deleting section: " + section.getUuid(),
+                        e);
+            }
+            throw new PersistenceException("unable to delete section", e,
+                    section.getUuid());
+        }
 
-		return updated;
-	}
+        return updated;
+    }
 
-	/**
-	 * @see com.invariantproperties.sandbox.student.business.SectionService#
-	 *      deleteSection(java.lang.String)
-	 */
-	@Transactional
-	@Override
-	public void deleteSection(String uuid) {
-		Section section = null;
-		try {
-			section = sectionRepository.findSectionByUuid(uuid);
+    /**
+     * @see com.invariantproperties.sandbox.student.business.SectionService#
+     *      deleteSection(java.lang.String)
+     */
+    @Transactional
+    @Override
+    public void deleteSection(String uuid) {
+        Section section = null;
+        try {
+            section = sectionRepository.findSectionByUuid(uuid);
 
-			if (section == null) {
-				log.debug("did not find section: " + uuid);
-				throw new ObjectNotFoundException(uuid);
-			}
-			sectionRepository.delete(section);
+            if (section == null) {
+                log.debug("did not find section: " + uuid);
+                throw new ObjectNotFoundException(uuid);
+            }
+            sectionRepository.delete(section);
 
-		} catch (DataAccessException e) {
-			if (!(e instanceof UnitTestException)) {
-				log.info("internal error deleting section: " + uuid, e);
-			}
-			throw new PersistenceException("unable to delete section", e, uuid);
-		}
-	}
+        } catch (DataAccessException e) {
+            if (!(e instanceof UnitTestException)) {
+                log.info("internal error deleting section: " + uuid, e);
+            }
+            throw new PersistenceException("unable to delete section", e, uuid);
+        }
+    }
 }

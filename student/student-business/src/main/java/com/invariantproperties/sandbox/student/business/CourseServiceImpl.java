@@ -34,174 +34,179 @@ import org.springframework.transaction.annotation.Transactional;
 import com.invariantproperties.sandbox.student.domain.Course;
 import com.invariantproperties.sandbox.student.repository.CourseRepository;
 
+/**
+ * Implementation of CourseService.
+ * 
+ * @author Bear Giles <bgiles@coyotesong.com>
+ */
 public class CourseServiceImpl implements CourseService {
-	private static final Logger log = LoggerFactory
-	        .getLogger(CourseServiceImpl.class);
+    private static final Logger log = LoggerFactory
+            .getLogger(CourseServiceImpl.class);
 
-	@Resource
-	private CourseRepository courseRepository;
+    @Resource
+    private CourseRepository courseRepository;
 
-	/**
-	 * Default constructor
-	 */
-	public CourseServiceImpl() {
+    /**
+     * Default constructor
+     */
+    public CourseServiceImpl() {
 
-	}
+    }
 
-	/**
-	 * Constructor used in unit tests
-	 */
-	CourseServiceImpl(CourseRepository courseRepository) {
-		this.courseRepository = courseRepository;
-	}
+    /**
+     * Constructor used in unit tests
+     */
+    CourseServiceImpl(CourseRepository courseRepository) {
+        this.courseRepository = courseRepository;
+    }
 
-	/**
-	 * @see com.invariantproperties.sandbox.student.business.CourseService#
-	 *      findAllCourses()
-	 */
-	@Transactional(readOnly = true)
-	@Override
-	public List<Course> findAllCourses() {
-		List<Course> courses = null;
+    /**
+     * @see com.invariantproperties.sandbox.student.business.CourseService#
+     *      findAllCourses()
+     */
+    @Transactional(readOnly = true)
+    @Override
+    public List<Course> findAllCourses() {
+        List<Course> courses = null;
 
-		try {
-			courses = courseRepository.findAll();
-		} catch (DataAccessException e) {
-			if (!(e instanceof UnitTestException)) {
-				log.info("error loading list of courses: " + e.getMessage(), e);
-			}
-			throw new PersistenceException("unable to get list of courses.", e);
-		}
+        try {
+            courses = courseRepository.findAll();
+        } catch (DataAccessException e) {
+            if (!(e instanceof UnitTestException)) {
+                log.info("error loading list of courses: " + e.getMessage(), e);
+            }
+            throw new PersistenceException("unable to get list of courses.", e);
+        }
 
-		return courses;
-	}
+        return courses;
+    }
 
-	/**
-	 * @see com.invariantproperties.sandbox.student.business.CourseService#
-	 *      findCourseById(java.lang.Integer)
-	 */
-	@Transactional(readOnly = true)
-	@Override
-	public Course findCourseById(Integer id) {
-		Course course = null;
-		try {
-			course = courseRepository.findOne(id);
-		} catch (DataAccessException e) {
-			if (!(e instanceof UnitTestException)) {
-				log.info("internal error retrieving course: " + id, e);
-			}
-			throw new PersistenceException("unable to find course by id", e, id);
-		}
+    /**
+     * @see com.invariantproperties.sandbox.student.business.CourseService#
+     *      findCourseById(java.lang.Integer)
+     */
+    @Transactional(readOnly = true)
+    @Override
+    public Course findCourseById(Integer id) {
+        Course course = null;
+        try {
+            course = courseRepository.findOne(id);
+        } catch (DataAccessException e) {
+            if (!(e instanceof UnitTestException)) {
+                log.info("internal error retrieving course: " + id, e);
+            }
+            throw new PersistenceException("unable to find course by id", e, id);
+        }
 
-		if (course == null) {
-			throw new ObjectNotFoundException(id);
-		}
+        if (course == null) {
+            throw new ObjectNotFoundException(id);
+        }
 
-		return course;
-	}
+        return course;
+    }
 
-	/**
-	 * @see com.invariantproperties.sandbox.student.business.CourseService#
-	 *      findCourseByUuid(java.lang.String)
-	 */
-	@Transactional(readOnly = true)
-	@Override
-	public Course findCourseByUuid(String uuid) {
-		Course course = null;
-		try {
-			course = courseRepository.findCourseByUuid(uuid);
-		} catch (DataAccessException e) {
-			if (!(e instanceof UnitTestException)) {
-				log.info("internal error retrieving course: " + uuid, e);
-			}
-			throw new PersistenceException("unable to find course by uuid", e,
-			        uuid);
-		}
+    /**
+     * @see com.invariantproperties.sandbox.student.business.CourseService#
+     *      findCourseByUuid(java.lang.String)
+     */
+    @Transactional(readOnly = true)
+    @Override
+    public Course findCourseByUuid(String uuid) {
+        Course course = null;
+        try {
+            course = courseRepository.findCourseByUuid(uuid);
+        } catch (DataAccessException e) {
+            if (!(e instanceof UnitTestException)) {
+                log.info("internal error retrieving course: " + uuid, e);
+            }
+            throw new PersistenceException("unable to find course by uuid", e,
+                    uuid);
+        }
 
-		if (course == null) {
-			throw new ObjectNotFoundException(uuid);
-		}
+        if (course == null) {
+            throw new ObjectNotFoundException(uuid);
+        }
 
-		return course;
-	}
+        return course;
+    }
 
-	/**
-	 * @see com.invariantproperties.sandbox.student.business.CourseService#
-	 *      createCourse(java.lang.String)
-	 */
-	@Transactional
-	@Override
-	public Course createCourse(String name) {
-		final Course course = new Course();
-		course.setName(name);
+    /**
+     * @see com.invariantproperties.sandbox.student.business.CourseService#
+     *      createCourse(java.lang.String)
+     */
+    @Transactional
+    @Override
+    public Course createCourse(String name) {
+        final Course course = new Course();
+        course.setName(name);
 
-		Course actual = null;
-		try {
-			actual = courseRepository.saveAndFlush(course);
-		} catch (DataAccessException e) {
-			if (!(e instanceof UnitTestException)) {
-				log.info("internal error retrieving course: " + name, e);
-			}
-			throw new PersistenceException("unable to create course", e);
-		}
+        Course actual = null;
+        try {
+            actual = courseRepository.saveAndFlush(course);
+        } catch (DataAccessException e) {
+            if (!(e instanceof UnitTestException)) {
+                log.info("internal error retrieving course: " + name, e);
+            }
+            throw new PersistenceException("unable to create course", e);
+        }
 
-		return actual;
-	}
+        return actual;
+    }
 
-	/**
-	 * @see com.invariantproperties.sandbox.course.persistence.CourseService#
-	 *      updateCourse(com.invariantproperties.sandbox.course.domain.Course,
-	 *      java.lang.String)
-	 */
-	public Course updateCourse(Course course, String name) {
-		Course updated = null;
-		try {
-			final Course actual = courseRepository.findCourseByUuid(course
-			        .getUuid());
+    /**
+     * @see com.invariantproperties.sandbox.course.persistence.CourseService#
+     *      updateCourse(com.invariantproperties.sandbox.course.domain.Course,
+     *      java.lang.String)
+     */
+    public Course updateCourse(Course course, String name) {
+        Course updated = null;
+        try {
+            final Course actual = courseRepository.findCourseByUuid(course
+                    .getUuid());
 
-			if (actual == null) {
-				log.debug("did not find course: " + course.getUuid());
-				throw new ObjectNotFoundException(course.getUuid());
-			}
+            if (actual == null) {
+                log.debug("did not find course: " + course.getUuid());
+                throw new ObjectNotFoundException(course.getUuid());
+            }
 
-			actual.setName(name);
-			updated = courseRepository.saveAndFlush(actual);
-			course.setName(name);
+            actual.setName(name);
+            updated = courseRepository.saveAndFlush(actual);
+            course.setName(name);
 
-		} catch (DataAccessException e) {
-			if (!(e instanceof UnitTestException)) {
-				log.info("internal error deleting course: " + course.getUuid(),
-				        e);
-			}
-			throw new PersistenceException("unable to delete course", e,
-			        course.getUuid());
-		}
+        } catch (DataAccessException e) {
+            if (!(e instanceof UnitTestException)) {
+                log.info("internal error deleting course: " + course.getUuid(),
+                        e);
+            }
+            throw new PersistenceException("unable to delete course", e,
+                    course.getUuid());
+        }
 
-		return updated;
-	}
+        return updated;
+    }
 
-	/**
-	 * @see com.invariantproperties.sandbox.student.business.CourseService#
-	 *      deleteCourse(java.lang.String)
-	 */
-	@Transactional
-	@Override
-	public void deleteCourse(String uuid) {
-		Course course = null;
-		try {
-			course = courseRepository.findCourseByUuid(uuid);
+    /**
+     * @see com.invariantproperties.sandbox.student.business.CourseService#
+     *      deleteCourse(java.lang.String)
+     */
+    @Transactional
+    @Override
+    public void deleteCourse(String uuid) {
+        Course course = null;
+        try {
+            course = courseRepository.findCourseByUuid(uuid);
 
-			if (course == null) {
-				log.debug("did not find course: " + uuid);
-				throw new ObjectNotFoundException(uuid);
-			}
-			courseRepository.delete(course);
+            if (course == null) {
+                log.debug("did not find course: " + uuid);
+                throw new ObjectNotFoundException(uuid);
+            }
+            courseRepository.delete(course);
 
-		} catch (DataAccessException e) {
-			if (!(e instanceof UnitTestException)) {
-				log.info("internal error deleting course: " + uuid, e);
-			}
-			throw new PersistenceException("unable to delete course", e, uuid);
-		}
-	}
+        } catch (DataAccessException e) {
+            if (!(e instanceof UnitTestException)) {
+                log.info("internal error deleting course: " + uuid, e);
+            }
+            throw new PersistenceException("unable to delete course", e, uuid);
+        }
+    }
 }

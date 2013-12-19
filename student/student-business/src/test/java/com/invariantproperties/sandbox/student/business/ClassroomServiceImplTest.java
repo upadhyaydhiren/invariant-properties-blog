@@ -39,217 +39,217 @@ import com.invariantproperties.sandbox.student.repository.CourseRepository;
 
 public class ClassroomServiceImplTest {
 
-	@Test
-	public void testFindAllCourses() {
-		final List<Course> expected = Collections.emptyList();
+    @Test
+    public void testFindAllCourses() {
+        final List<Course> expected = Collections.emptyList();
 
-		final CourseRepository repository = Mockito
-		        .mock(CourseRepository.class);
-		when(repository.findAll()).thenReturn(expected);
+        final CourseRepository repository = Mockito
+                .mock(CourseRepository.class);
+        when(repository.findAll()).thenReturn(expected);
 
-		final CourseService service = new CourseServiceImpl(repository);
-		final List<Course> actual = service.findAllCourses();
+        final CourseService service = new CourseServiceImpl(repository);
+        final List<Course> actual = service.findAllCourses();
 
-		assertEquals(expected, actual);
-	}
+        assertEquals(expected, actual);
+    }
 
-	@Test(expected = PersistenceException.class)
-	public void testFindAllCoursesError() {
-		final List<Course> expected = Collections.emptyList();
+    @Test(expected = PersistenceException.class)
+    public void testFindAllCoursesError() {
+        final List<Course> expected = Collections.emptyList();
 
-		final CourseRepository repository = Mockito
-		        .mock(CourseRepository.class);
-		when(repository.findAll()).thenThrow(new UnitTestException());
+        final CourseRepository repository = Mockito
+                .mock(CourseRepository.class);
+        when(repository.findAll()).thenThrow(new UnitTestException());
 
-		final CourseService service = new CourseServiceImpl(repository);
-		final List<Course> actual = service.findAllCourses();
+        final CourseService service = new CourseServiceImpl(repository);
+        final List<Course> actual = service.findAllCourses();
 
-		assertEquals(expected, actual);
-	}
+        assertEquals(expected, actual);
+    }
 
-	@Test
-	public void testFindCourseById() {
-		final Course expected = new Course();
-		expected.setId(1);
+    @Test
+    public void testFindCourseById() {
+        final Course expected = new Course();
+        expected.setId(1);
 
-		final CourseRepository repository = Mockito
-		        .mock(CourseRepository.class);
-		when(repository.findOne(any(Integer.class))).thenReturn(expected);
+        final CourseRepository repository = Mockito
+                .mock(CourseRepository.class);
+        when(repository.findOne(any(Integer.class))).thenReturn(expected);
 
-		final CourseService service = new CourseServiceImpl(repository);
-		final Course actual = service.findCourseById(expected.getId());
+        final CourseService service = new CourseServiceImpl(repository);
+        final Course actual = service.findCourseById(expected.getId());
 
-		assertEquals(expected, actual);
-	}
+        assertEquals(expected, actual);
+    }
 
-	@Test(expected = ObjectNotFoundException.class)
-	public void testFindCourseByIdMissing() {
-		final CourseRepository repository = Mockito
-		        .mock(CourseRepository.class);
-		when(repository.findOne(any(Integer.class))).thenReturn(null);
+    @Test(expected = ObjectNotFoundException.class)
+    public void testFindCourseByIdMissing() {
+        final CourseRepository repository = Mockito
+                .mock(CourseRepository.class);
+        when(repository.findOne(any(Integer.class))).thenReturn(null);
 
-		final CourseService service = new CourseServiceImpl(repository);
-		service.findCourseById(1);
-	}
+        final CourseService service = new CourseServiceImpl(repository);
+        service.findCourseById(1);
+    }
 
-	@Test(expected = PersistenceException.class)
-	public void testFindCourseByIdError() {
-		final CourseRepository repository = Mockito
-		        .mock(CourseRepository.class);
-		when(repository.findOne(any(Integer.class))).thenThrow(
-		        new UnitTestException());
+    @Test(expected = PersistenceException.class)
+    public void testFindCourseByIdError() {
+        final CourseRepository repository = Mockito
+                .mock(CourseRepository.class);
+        when(repository.findOne(any(Integer.class))).thenThrow(
+                new UnitTestException());
 
-		final CourseService service = new CourseServiceImpl(repository);
-		service.findCourseById(1);
-	}
+        final CourseService service = new CourseServiceImpl(repository);
+        service.findCourseById(1);
+    }
 
-	@Test
-	public void testFindCourseByUuid() {
-		final Course expected = new Course();
-		expected.setUuid("[uuid]");
+    @Test
+    public void testFindCourseByUuid() {
+        final Course expected = new Course();
+        expected.setUuid("[uuid]");
 
-		final CourseRepository repository = Mockito
-		        .mock(CourseRepository.class);
-		when(repository.findCourseByUuid(any(String.class))).thenReturn(
-		        expected);
+        final CourseRepository repository = Mockito
+                .mock(CourseRepository.class);
+        when(repository.findCourseByUuid(any(String.class))).thenReturn(
+                expected);
 
-		final CourseService service = new CourseServiceImpl(repository);
-		final Course actual = service.findCourseByUuid(expected.getUuid());
+        final CourseService service = new CourseServiceImpl(repository);
+        final Course actual = service.findCourseByUuid(expected.getUuid());
 
-		assertEquals(expected, actual);
-	}
+        assertEquals(expected, actual);
+    }
 
-	@Test(expected = ObjectNotFoundException.class)
-	public void testFindCourseByUuidMissing() {
-		final CourseRepository repository = Mockito
-		        .mock(CourseRepository.class);
-		when(repository.findCourseByUuid(any(String.class))).thenReturn(null);
+    @Test(expected = ObjectNotFoundException.class)
+    public void testFindCourseByUuidMissing() {
+        final CourseRepository repository = Mockito
+                .mock(CourseRepository.class);
+        when(repository.findCourseByUuid(any(String.class))).thenReturn(null);
 
-		final CourseService service = new CourseServiceImpl(repository);
-		service.findCourseByUuid("[uuid]");
-	}
+        final CourseService service = new CourseServiceImpl(repository);
+        service.findCourseByUuid("[uuid]");
+    }
 
-	@Test(expected = PersistenceException.class)
-	public void testFindCourseByUuidError() {
-		final CourseRepository repository = Mockito
-		        .mock(CourseRepository.class);
-		when(repository.findCourseByUuid(any(String.class))).thenThrow(
-		        new UnitTestException());
+    @Test(expected = PersistenceException.class)
+    public void testFindCourseByUuidError() {
+        final CourseRepository repository = Mockito
+                .mock(CourseRepository.class);
+        when(repository.findCourseByUuid(any(String.class))).thenThrow(
+                new UnitTestException());
 
-		final CourseService service = new CourseServiceImpl(repository);
-		service.findCourseByUuid("[uuid]");
-	}
+        final CourseService service = new CourseServiceImpl(repository);
+        service.findCourseByUuid("[uuid]");
+    }
 
-	@Test
-	public void testCreateCourse() {
-		final Course expected = new Course();
-		expected.setName("name");
-		expected.setUuid("[uuid]");
+    @Test
+    public void testCreateCourse() {
+        final Course expected = new Course();
+        expected.setName("name");
+        expected.setUuid("[uuid]");
 
-		final CourseRepository repository = Mockito
-		        .mock(CourseRepository.class);
-		when(repository.saveAndFlush(any(Course.class))).thenReturn(expected);
+        final CourseRepository repository = Mockito
+                .mock(CourseRepository.class);
+        when(repository.saveAndFlush(any(Course.class))).thenReturn(expected);
 
-		final CourseService service = new CourseServiceImpl(repository);
-		final Course actual = service.createCourse(expected.getName());
+        final CourseService service = new CourseServiceImpl(repository);
+        final Course actual = service.createCourse(expected.getName());
 
-		assertEquals(expected, actual);
-	}
+        assertEquals(expected, actual);
+    }
 
-	@Test(expected = PersistenceException.class)
-	public void testCreateCourseError() {
-		final CourseRepository repository = Mockito
-		        .mock(CourseRepository.class);
-		when(repository.saveAndFlush(any(Course.class))).thenThrow(
-		        new UnitTestException());
+    @Test(expected = PersistenceException.class)
+    public void testCreateCourseError() {
+        final CourseRepository repository = Mockito
+                .mock(CourseRepository.class);
+        when(repository.saveAndFlush(any(Course.class))).thenThrow(
+                new UnitTestException());
 
-		final CourseService service = new CourseServiceImpl(repository);
-		service.createCourse("name");
-	}
+        final CourseService service = new CourseServiceImpl(repository);
+        service.createCourse("name");
+    }
 
-	@Test
-	public void testUpdateCourse() {
-		final Course expected = new Course();
-		expected.setName("Eng 201");
-		expected.setUuid("[uuid]");
+    @Test
+    public void testUpdateCourse() {
+        final Course expected = new Course();
+        expected.setName("Eng 201");
+        expected.setUuid("[uuid]");
 
-		final CourseRepository repository = Mockito
-		        .mock(CourseRepository.class);
-		when(repository.findCourseByUuid(any(String.class))).thenReturn(
-		        expected);
-		when(repository.saveAndFlush(any(Course.class))).thenReturn(expected);
+        final CourseRepository repository = Mockito
+                .mock(CourseRepository.class);
+        when(repository.findCourseByUuid(any(String.class))).thenReturn(
+                expected);
+        when(repository.saveAndFlush(any(Course.class))).thenReturn(expected);
 
-		final CourseService service = new CourseServiceImpl(repository);
-		final Course actual = service.updateCourse(expected, "Eng 202");
+        final CourseService service = new CourseServiceImpl(repository);
+        final Course actual = service.updateCourse(expected, "Eng 202");
 
-		assertEquals("Eng 202", actual.getName());
-	}
+        assertEquals("Eng 202", actual.getName());
+    }
 
-	@Test(expected = ObjectNotFoundException.class)
-	public void testUpdateCourseMissing() {
-		final Course expected = new Course();
-		final CourseRepository repository = Mockito
-		        .mock(CourseRepository.class);
-		when(repository.findCourseByUuid(any(String.class))).thenReturn(null);
+    @Test(expected = ObjectNotFoundException.class)
+    public void testUpdateCourseMissing() {
+        final Course expected = new Course();
+        final CourseRepository repository = Mockito
+                .mock(CourseRepository.class);
+        when(repository.findCourseByUuid(any(String.class))).thenReturn(null);
 
-		final CourseService service = new CourseServiceImpl(repository);
-		service.updateCourse(expected, "Eng 202");
-	}
+        final CourseService service = new CourseServiceImpl(repository);
+        service.updateCourse(expected, "Eng 202");
+    }
 
-	@Test(expected = PersistenceException.class)
-	public void testUpdateCourseError() {
-		final Course expected = new Course();
-		expected.setUuid("[uuid]");
+    @Test(expected = PersistenceException.class)
+    public void testUpdateCourseError() {
+        final Course expected = new Course();
+        expected.setUuid("[uuid]");
 
-		final CourseRepository repository = Mockito
-		        .mock(CourseRepository.class);
-		when(repository.findCourseByUuid(any(String.class))).thenReturn(
-		        expected);
-		doThrow(new UnitTestException()).when(repository).saveAndFlush(
-		        any(Course.class));
+        final CourseRepository repository = Mockito
+                .mock(CourseRepository.class);
+        when(repository.findCourseByUuid(any(String.class))).thenReturn(
+                expected);
+        doThrow(new UnitTestException()).when(repository).saveAndFlush(
+                any(Course.class));
 
-		final CourseService service = new CourseServiceImpl(repository);
-		service.updateCourse(expected, "Eng 202");
-	}
+        final CourseService service = new CourseServiceImpl(repository);
+        service.updateCourse(expected, "Eng 202");
+    }
 
-	@Test
-	public void testDeleteCourse() {
-		final Course expected = new Course();
-		expected.setUuid("[uuid]");
+    @Test
+    public void testDeleteCourse() {
+        final Course expected = new Course();
+        expected.setUuid("[uuid]");
 
-		final CourseRepository repository = Mockito
-		        .mock(CourseRepository.class);
-		when(repository.findCourseByUuid(any(String.class))).thenReturn(
-		        expected);
-		doNothing().when(repository).delete(any(Course.class));
+        final CourseRepository repository = Mockito
+                .mock(CourseRepository.class);
+        when(repository.findCourseByUuid(any(String.class))).thenReturn(
+                expected);
+        doNothing().when(repository).delete(any(Course.class));
 
-		final CourseService service = new CourseServiceImpl(repository);
-		service.deleteCourse(expected.getUuid());
-	}
+        final CourseService service = new CourseServiceImpl(repository);
+        service.deleteCourse(expected.getUuid());
+    }
 
-	@Test(expected = ObjectNotFoundException.class)
-	public void testDeleteCourseMissing() {
-		final CourseRepository repository = Mockito
-		        .mock(CourseRepository.class);
-		when(repository.findCourseByUuid(any(String.class))).thenReturn(null);
+    @Test(expected = ObjectNotFoundException.class)
+    public void testDeleteCourseMissing() {
+        final CourseRepository repository = Mockito
+                .mock(CourseRepository.class);
+        when(repository.findCourseByUuid(any(String.class))).thenReturn(null);
 
-		final CourseService service = new CourseServiceImpl(repository);
-		service.deleteCourse("[uuid]");
-	}
+        final CourseService service = new CourseServiceImpl(repository);
+        service.deleteCourse("[uuid]");
+    }
 
-	@Test(expected = PersistenceException.class)
-	public void testDeleteCourseError() {
-		final Course expected = new Course();
-		expected.setUuid("[uuid]");
+    @Test(expected = PersistenceException.class)
+    public void testDeleteCourseError() {
+        final Course expected = new Course();
+        expected.setUuid("[uuid]");
 
-		final CourseRepository repository = Mockito
-		        .mock(CourseRepository.class);
-		when(repository.findCourseByUuid(any(String.class))).thenReturn(
-		        expected);
-		doThrow(new UnitTestException()).when(repository).delete(
-		        any(Course.class));
+        final CourseRepository repository = Mockito
+                .mock(CourseRepository.class);
+        when(repository.findCourseByUuid(any(String.class))).thenReturn(
+                expected);
+        doThrow(new UnitTestException()).when(repository).delete(
+                any(Course.class));
 
-		final CourseService service = new CourseServiceImpl(repository);
-		service.deleteCourse(expected.getUuid());
-	}
+        final CourseService service = new CourseServiceImpl(repository);
+        service.deleteCourse(expected.getUuid());
+    }
 }

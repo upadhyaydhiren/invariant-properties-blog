@@ -35,178 +35,178 @@ import com.invariantproperties.sandbox.student.domain.Classroom;
 import com.invariantproperties.sandbox.student.repository.ClassroomRepository;
 
 public class ClassroomServiceImpl implements ClassroomService {
-	private static final Logger log = LoggerFactory
-	        .getLogger(ClassroomServiceImpl.class);
+    private static final Logger log = LoggerFactory
+            .getLogger(ClassroomServiceImpl.class);
 
-	@Resource
-	private ClassroomRepository classroomRepository;
+    @Resource
+    private ClassroomRepository classroomRepository;
 
-	/**
-	 * Default constructor
-	 */
-	public ClassroomServiceImpl() {
+    /**
+     * Default constructor
+     */
+    public ClassroomServiceImpl() {
 
-	}
+    }
 
-	/**
-	 * Constructor used in unit tests
-	 */
-	ClassroomServiceImpl(ClassroomRepository classroomRepository) {
-		this.classroomRepository = classroomRepository;
-	}
+    /**
+     * Constructor used in unit tests
+     */
+    ClassroomServiceImpl(ClassroomRepository classroomRepository) {
+        this.classroomRepository = classroomRepository;
+    }
 
-	/**
-	 * @see com.invariantproperties.sandbox.student.business.ClassroomService#
-	 *      findAllClassrooms()
-	 */
-	@Transactional(readOnly = true)
-	@Override
-	public List<Classroom> findAllClassrooms() {
-		List<Classroom> classrooms = null;
+    /**
+     * @see com.invariantproperties.sandbox.student.business.ClassroomService#
+     *      findAllClassrooms()
+     */
+    @Transactional(readOnly = true)
+    @Override
+    public List<Classroom> findAllClassrooms() {
+        List<Classroom> classrooms = null;
 
-		try {
-			classrooms = classroomRepository.findAll();
-		} catch (DataAccessException e) {
-			if (!(e instanceof UnitTestException)) {
-				log.info("error loading list of classrooms: " + e.getMessage(),
-				        e);
-			}
-			throw new PersistenceException("unable to get list of classrooms.",
-			        e);
-		}
+        try {
+            classrooms = classroomRepository.findAll();
+        } catch (DataAccessException e) {
+            if (!(e instanceof UnitTestException)) {
+                log.info("error loading list of classrooms: " + e.getMessage(),
+                        e);
+            }
+            throw new PersistenceException("unable to get list of classrooms.",
+                    e);
+        }
 
-		return classrooms;
-	}
+        return classrooms;
+    }
 
-	/**
-	 * @see com.invariantproperties.sandbox.student.business.ClassroomService#
-	 *      findClassroomById(java.lang.Integer)
-	 */
-	@Transactional(readOnly = true)
-	@Override
-	public Classroom findClassroomById(Integer id) {
-		Classroom classroom = null;
-		try {
-			classroom = classroomRepository.findOne(id);
-		} catch (DataAccessException e) {
-			if (!(e instanceof UnitTestException)) {
-				log.info("internal error retrieving classroom: " + id, e);
-			}
-			throw new PersistenceException("unable to find classroom by id", e,
-			        id);
-		}
+    /**
+     * @see com.invariantproperties.sandbox.student.business.ClassroomService#
+     *      findClassroomById(java.lang.Integer)
+     */
+    @Transactional(readOnly = true)
+    @Override
+    public Classroom findClassroomById(Integer id) {
+        Classroom classroom = null;
+        try {
+            classroom = classroomRepository.findOne(id);
+        } catch (DataAccessException e) {
+            if (!(e instanceof UnitTestException)) {
+                log.info("internal error retrieving classroom: " + id, e);
+            }
+            throw new PersistenceException("unable to find classroom by id", e,
+                    id);
+        }
 
-		if (classroom == null) {
-			throw new ObjectNotFoundException(id);
-		}
+        if (classroom == null) {
+            throw new ObjectNotFoundException(id);
+        }
 
-		return classroom;
-	}
+        return classroom;
+    }
 
-	/**
-	 * @see com.invariantproperties.sandbox.student.business.ClassroomService#
-	 *      findClassroomByUuid(java.lang.String)
-	 */
-	@Transactional(readOnly = true)
-	@Override
-	public Classroom findClassroomByUuid(String uuid) {
-		Classroom classroom = null;
-		try {
-			classroom = classroomRepository.findClassroomByUuid(uuid);
-		} catch (DataAccessException e) {
-			if (!(e instanceof UnitTestException)) {
-				log.info("internal error retrieving classroom: " + uuid, e);
-			}
-			throw new PersistenceException("unable to find classroom by uuid",
-			        e, uuid);
-		}
+    /**
+     * @see com.invariantproperties.sandbox.student.business.ClassroomService#
+     *      findClassroomByUuid(java.lang.String)
+     */
+    @Transactional(readOnly = true)
+    @Override
+    public Classroom findClassroomByUuid(String uuid) {
+        Classroom classroom = null;
+        try {
+            classroom = classroomRepository.findClassroomByUuid(uuid);
+        } catch (DataAccessException e) {
+            if (!(e instanceof UnitTestException)) {
+                log.info("internal error retrieving classroom: " + uuid, e);
+            }
+            throw new PersistenceException("unable to find classroom by uuid",
+                    e, uuid);
+        }
 
-		if (classroom == null) {
-			throw new ObjectNotFoundException(uuid);
-		}
+        if (classroom == null) {
+            throw new ObjectNotFoundException(uuid);
+        }
 
-		return classroom;
-	}
+        return classroom;
+    }
 
-	/**
-	 * @see com.invariantproperties.sandbox.student.business.ClassroomService#
-	 *      createClassroom(java.lang.String)
-	 */
-	@Transactional
-	@Override
-	public Classroom createClassroom(String name) {
-		final Classroom classroom = new Classroom();
-		classroom.setName(name);
+    /**
+     * @see com.invariantproperties.sandbox.student.business.ClassroomService#
+     *      createClassroom(java.lang.String)
+     */
+    @Transactional
+    @Override
+    public Classroom createClassroom(String name) {
+        final Classroom classroom = new Classroom();
+        classroom.setName(name);
 
-		Classroom actual = null;
-		try {
-			actual = classroomRepository.saveAndFlush(classroom);
-		} catch (DataAccessException e) {
-			if (!(e instanceof UnitTestException)) {
-				log.info("internal error retrieving classroom: " + name, e);
-			}
-			throw new PersistenceException("unable to create classroom", e);
-		}
+        Classroom actual = null;
+        try {
+            actual = classroomRepository.saveAndFlush(classroom);
+        } catch (DataAccessException e) {
+            if (!(e instanceof UnitTestException)) {
+                log.info("internal error retrieving classroom: " + name, e);
+            }
+            throw new PersistenceException("unable to create classroom", e);
+        }
 
-		return actual;
-	}
+        return actual;
+    }
 
-	/**
-	 * @see com.invariantproperties.sandbox.classroom.persistence.ClassroomService#
-	 *      updateClassroom(com.invariantproperties.sandbox.classroom.domain.Classroom,
-	 *      java.lang.String)
-	 */
-	public Classroom updateClassroom(Classroom classroom, String name) {
-		Classroom updated = null;
-		try {
-			final Classroom actual = classroomRepository
-			        .findClassroomByUuid(classroom.getUuid());
+    /**
+     * @see com.invariantproperties.sandbox.classroom.persistence.ClassroomService#
+     *      updateClassroom(com.invariantproperties.sandbox.classroom.domain.Classroom,
+     *      java.lang.String)
+     */
+    public Classroom updateClassroom(Classroom classroom, String name) {
+        Classroom updated = null;
+        try {
+            final Classroom actual = classroomRepository
+                    .findClassroomByUuid(classroom.getUuid());
 
-			if (actual == null) {
-				log.debug("did not find classroom: " + classroom.getUuid());
-				throw new ObjectNotFoundException(classroom.getUuid());
-			}
+            if (actual == null) {
+                log.debug("did not find classroom: " + classroom.getUuid());
+                throw new ObjectNotFoundException(classroom.getUuid());
+            }
 
-			actual.setName(name);
-			updated = classroomRepository.saveAndFlush(actual);
-			classroom.setName(name);
+            actual.setName(name);
+            updated = classroomRepository.saveAndFlush(actual);
+            classroom.setName(name);
 
-		} catch (DataAccessException e) {
-			if (!(e instanceof UnitTestException)) {
-				log.info(
-				        "internal error deleting classroom: "
-				                + classroom.getUuid(), e);
-			}
-			throw new PersistenceException("unable to delete classroom", e,
-			        classroom.getUuid());
-		}
+        } catch (DataAccessException e) {
+            if (!(e instanceof UnitTestException)) {
+                log.info(
+                        "internal error deleting classroom: "
+                                + classroom.getUuid(), e);
+            }
+            throw new PersistenceException("unable to delete classroom", e,
+                    classroom.getUuid());
+        }
 
-		return updated;
-	}
+        return updated;
+    }
 
-	/**
-	 * @see com.invariantproperties.sandbox.student.business.ClassroomService#
-	 *      deleteClassroom(java.lang.String)
-	 */
-	@Transactional
-	@Override
-	public void deleteClassroom(String uuid) {
-		Classroom classroom = null;
-		try {
-			classroom = classroomRepository.findClassroomByUuid(uuid);
+    /**
+     * @see com.invariantproperties.sandbox.student.business.ClassroomService#
+     *      deleteClassroom(java.lang.String)
+     */
+    @Transactional
+    @Override
+    public void deleteClassroom(String uuid) {
+        Classroom classroom = null;
+        try {
+            classroom = classroomRepository.findClassroomByUuid(uuid);
 
-			if (classroom == null) {
-				log.debug("did not find classroom: " + uuid);
-				throw new ObjectNotFoundException(uuid);
-			}
-			classroomRepository.delete(classroom);
+            if (classroom == null) {
+                log.debug("did not find classroom: " + uuid);
+                throw new ObjectNotFoundException(uuid);
+            }
+            classroomRepository.delete(classroom);
 
-		} catch (DataAccessException e) {
-			if (!(e instanceof UnitTestException)) {
-				log.info("internal error deleting classroom: " + uuid, e);
-			}
-			throw new PersistenceException("unable to delete classroom", e,
-			        uuid);
-		}
-	}
+        } catch (DataAccessException e) {
+            if (!(e instanceof UnitTestException)) {
+                log.info("internal error deleting classroom: " + uuid, e);
+            }
+            throw new PersistenceException("unable to delete classroom", e,
+                    uuid);
+        }
+    }
 }
