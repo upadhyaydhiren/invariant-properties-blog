@@ -23,37 +23,37 @@
 package com.invariantproperties.sandbox.student.business;
 
 public class PersistenceException extends RuntimeException {
-	private static final long serialVersionUID = 1L;
-	private final String uuid;
-	private final Integer id;
-	
-	public PersistenceException(String message, Throwable cause) {
-		super(message, cause);
-		this.uuid = null;
-		this.id = null;
-	}
-	
-	public PersistenceException(String message, Throwable cause, String uuid) {
-		super(message, cause);
-		this.uuid = uuid;
-		this.id = null;
-	}
-	
-	public PersistenceException(String message, Throwable cause, Integer id) {
-		super(message, cause);
-		this.uuid = null;
-		this.id = id;
-	}
+    private static final long serialVersionUID = 1L;
+    private final String uuid;
+    private final Integer id;
 
-	public static long getSerialversionuid() {
-		return serialVersionUID;
-	}
+    public PersistenceException(String message, Throwable cause) {
+        super(message, cause);
+        this.uuid = null;
+        this.id = null;
+    }
 
-	public String getUuid() {
-		return uuid;
-	}
+    public PersistenceException(String message, Throwable cause, String uuid) {
+        super(message, cause);
+        this.uuid = uuid;
+        this.id = null;
+    }
 
-	public Integer getId() {
-		return id;
-	}
+    public PersistenceException(String message, Throwable cause, Integer id) {
+        super(message, cause);
+        this.uuid = null;
+        this.id = id;
+    }
+
+    public static long getSerialversionuid() {
+        return serialVersionUID;
+    }
+
+    public String getUuid() {
+        return uuid;
+    }
+
+    public Integer getId() {
+        return id;
+    }
 }

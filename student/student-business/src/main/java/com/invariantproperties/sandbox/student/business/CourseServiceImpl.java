@@ -40,8 +40,7 @@ import com.invariantproperties.sandbox.student.repository.CourseRepository;
  * @author Bear Giles <bgiles@coyotesong.com>
  */
 public class CourseServiceImpl implements CourseService {
-    private static final Logger log = LoggerFactory
-            .getLogger(CourseServiceImpl.class);
+    private static final Logger log = LoggerFactory.getLogger(CourseServiceImpl.class);
 
     @Resource
     private CourseRepository courseRepository;
@@ -119,8 +118,7 @@ public class CourseServiceImpl implements CourseService {
             if (!(e instanceof UnitTestException)) {
                 log.info("internal error retrieving course: " + uuid, e);
             }
-            throw new PersistenceException("unable to find course by uuid", e,
-                    uuid);
+            throw new PersistenceException("unable to find course by uuid", e, uuid);
         }
 
         if (course == null) {
@@ -161,8 +159,7 @@ public class CourseServiceImpl implements CourseService {
     public Course updateCourse(Course course, String name) {
         Course updated = null;
         try {
-            final Course actual = courseRepository.findCourseByUuid(course
-                    .getUuid());
+            final Course actual = courseRepository.findCourseByUuid(course.getUuid());
 
             if (actual == null) {
                 log.debug("did not find course: " + course.getUuid());
@@ -175,11 +172,9 @@ public class CourseServiceImpl implements CourseService {
 
         } catch (DataAccessException e) {
             if (!(e instanceof UnitTestException)) {
-                log.info("internal error deleting course: " + course.getUuid(),
-                        e);
+                log.info("internal error deleting course: " + course.getUuid(), e);
             }
-            throw new PersistenceException("unable to delete course", e,
-                    course.getUuid());
+            throw new PersistenceException("unable to delete course", e, course.getUuid());
         }
 
         return updated;

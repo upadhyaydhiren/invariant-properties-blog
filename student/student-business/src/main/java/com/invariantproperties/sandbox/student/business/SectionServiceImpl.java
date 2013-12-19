@@ -35,8 +35,7 @@ import com.invariantproperties.sandbox.student.domain.Section;
 import com.invariantproperties.sandbox.student.repository.SectionRepository;
 
 public class SectionServiceImpl implements SectionService {
-    private static final Logger log = LoggerFactory
-            .getLogger(SectionServiceImpl.class);
+    private static final Logger log = LoggerFactory.getLogger(SectionServiceImpl.class);
 
     @Resource
     private SectionRepository sectionRepository;
@@ -90,8 +89,7 @@ public class SectionServiceImpl implements SectionService {
             if (!(e instanceof UnitTestException)) {
                 log.info("internal error retrieving section: " + id, e);
             }
-            throw new PersistenceException("unable to find section by id", e,
-                    id);
+            throw new PersistenceException("unable to find section by id", e, id);
         }
 
         if (section == null) {
@@ -115,8 +113,7 @@ public class SectionServiceImpl implements SectionService {
             if (!(e instanceof UnitTestException)) {
                 log.info("internal error retrieving section: " + uuid, e);
             }
-            throw new PersistenceException("unable to find section by uuid", e,
-                    uuid);
+            throw new PersistenceException("unable to find section by uuid", e, uuid);
         }
 
         if (section == null) {
@@ -157,8 +154,7 @@ public class SectionServiceImpl implements SectionService {
     public Section updateSection(Section section, String name) {
         Section updated = null;
         try {
-            final Section actual = sectionRepository.findSectionByUuid(section
-                    .getUuid());
+            final Section actual = sectionRepository.findSectionByUuid(section.getUuid());
 
             if (actual == null) {
                 log.debug("did not find section: " + section.getUuid());
@@ -171,12 +167,9 @@ public class SectionServiceImpl implements SectionService {
 
         } catch (DataAccessException e) {
             if (!(e instanceof UnitTestException)) {
-                log.info(
-                        "internal error deleting section: " + section.getUuid(),
-                        e);
+                log.info("internal error deleting section: " + section.getUuid(), e);
             }
-            throw new PersistenceException("unable to delete section", e,
-                    section.getUuid());
+            throw new PersistenceException("unable to delete section", e, section.getUuid());
         }
 
         return updated;
