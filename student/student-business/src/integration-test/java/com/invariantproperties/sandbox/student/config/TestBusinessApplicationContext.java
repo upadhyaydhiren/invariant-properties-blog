@@ -41,8 +41,8 @@ import org.springframework.context.annotation.Configuration;
 // @ComponentScan(basePackages = {
 // "com.invariantproperties.sandbox.student.business" })
 // @PropertySource("classpath:application.properties")
-public class BusinessApplicationContextTest {
+public class TestBusinessApplicationContext {
 
-    @Resource
-    private Environment environment;
+    // @Resource
+    // private Environment environment;
 }

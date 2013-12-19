@@ -29,11 +29,18 @@ import javax.annotation.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.invariantproperties.sandbox.student.domain.Section;
 import com.invariantproperties.sandbox.student.repository.SectionRepository;
 
+/**
+ * Implementation of SectionService
+ * 
+ * @author Bear Giles <bgiles@coyotesong.com>
+ */
+@Service
 public class SectionServiceImpl implements SectionService {
     private static final Logger log = LoggerFactory.getLogger(SectionServiceImpl.class);
 
