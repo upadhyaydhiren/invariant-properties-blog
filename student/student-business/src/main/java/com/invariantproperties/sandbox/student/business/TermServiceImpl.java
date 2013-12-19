@@ -29,11 +29,18 @@ import javax.annotation.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.invariantproperties.sandbox.student.domain.Term;
 import com.invariantproperties.sandbox.student.repository.TermRepository;
 
+/**
+ * Implementation of TermService
+ * 
+ * @author Bear Giles <bgiles@coyotesong.com>
+ */
+@Service
 public class TermServiceImpl implements TermService {
     private static final Logger log = LoggerFactory.getLogger(TermServiceImpl.class);
 

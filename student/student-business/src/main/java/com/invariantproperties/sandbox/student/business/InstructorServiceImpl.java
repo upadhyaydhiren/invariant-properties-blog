@@ -29,6 +29,7 @@ import javax.annotation.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.invariantproperties.sandbox.student.domain.Instructor;
@@ -39,6 +40,7 @@ import com.invariantproperties.sandbox.student.repository.InstructorRepository;
  * 
  * @author Bear Giles <bgiles@coyotesong.com>
  */
+@Service
 public class InstructorServiceImpl implements InstructorService {
     private static final Logger log = LoggerFactory.getLogger(InstructorServiceImpl.class);
 
