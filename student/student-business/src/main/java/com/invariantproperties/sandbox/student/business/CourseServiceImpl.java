@@ -156,6 +156,8 @@ public class CourseServiceImpl implements CourseService {
      *      updateCourse(com.invariantproperties.sandbox.course.domain.Course,
      *      java.lang.String)
      */
+    @Transactional
+    @Override
     public Course updateCourse(Course course, String name) {
         Course updated = null;
         try {

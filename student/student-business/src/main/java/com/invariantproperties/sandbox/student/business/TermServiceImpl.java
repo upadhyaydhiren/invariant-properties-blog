@@ -151,6 +151,8 @@ public class TermServiceImpl implements TermService {
      *      updateTerm(com.invariantproperties.sandbox.term.domain.Term,
      *      java.lang.String)
      */
+    @Transactional
+    @Override
     public Term updateTerm(Term term, String name) {
         Term updated = null;
         try {

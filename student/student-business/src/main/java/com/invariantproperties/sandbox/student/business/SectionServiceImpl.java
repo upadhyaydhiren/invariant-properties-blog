@@ -151,6 +151,8 @@ public class SectionServiceImpl implements SectionService {
      *      updateSection(com.invariantproperties.sandbox.section.domain.Section,
      *      java.lang.String)
      */
+    @Transactional
+    @Override
     public Section updateSection(Section section, String name) {
         Section updated = null;
         try {
