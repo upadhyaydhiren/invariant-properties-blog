@@ -34,4 +34,3 @@ import com.invariantproperties.sandbox.student.domain.Term;
 public interface TermRepository extends JpaRepository<Term, Integer> {
     Term findTermByUuid(String uuid);
 }
-	
