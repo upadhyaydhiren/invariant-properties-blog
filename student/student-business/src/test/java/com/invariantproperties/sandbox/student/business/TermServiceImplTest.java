@@ -39,196 +39,196 @@ import com.invariantproperties.sandbox.student.repository.TermRepository;
 
 public class TermServiceImplTest {
 
-	@Test
-	public void testFindAllTerms() {
-		final List<Term> expected = Collections.emptyList();
+    @Test
+    public void testFindAllTerms() {
+        final List<Term> expected = Collections.emptyList();
 
-		final TermRepository repository = Mockito.mock(TermRepository.class);
-		when(repository.findAll()).thenReturn(expected);
+        final TermRepository repository = Mockito.mock(TermRepository.class);
+        when(repository.findAll()).thenReturn(expected);
 
-		final TermService service = new TermServiceImpl(repository);
-		final List<Term> actual = service.findAllTerms();
+        final TermService service = new TermServiceImpl(repository);
+        final List<Term> actual = service.findAllTerms();
 
-		assertEquals(expected, actual);
-	}
+        assertEquals(expected, actual);
+    }
 
-	@Test(expected = PersistenceException.class)
-	public void testFindAllTermsError() {
-		final List<Term> expected = Collections.emptyList();
+    @Test(expected = PersistenceException.class)
+    public void testFindAllTermsError() {
+        final List<Term> expected = Collections.emptyList();
 
-		final TermRepository repository = Mockito.mock(TermRepository.class);
-		when(repository.findAll()).thenThrow(new UnitTestException());
+        final TermRepository repository = Mockito.mock(TermRepository.class);
+        when(repository.findAll()).thenThrow(new UnitTestException());
 
-		final TermService service = new TermServiceImpl(repository);
-		final List<Term> actual = service.findAllTerms();
+        final TermService service = new TermServiceImpl(repository);
+        final List<Term> actual = service.findAllTerms();
 
-		assertEquals(expected, actual);
-	}
+        assertEquals(expected, actual);
+    }
 
-	@Test
-	public void testFindTermById() {
-		final Term expected = new Term();
-		expected.setId(1);
+    @Test
+    public void testFindTermById() {
+        final Term expected = new Term();
+        expected.setId(1);
 
-		final TermRepository repository = Mockito.mock(TermRepository.class);
-		when(repository.findOne(any(Integer.class))).thenReturn(expected);
+        final TermRepository repository = Mockito.mock(TermRepository.class);
+        when(repository.findOne(any(Integer.class))).thenReturn(expected);
 
-		final TermService service = new TermServiceImpl(repository);
-		final Term actual = service.findTermById(expected.getId());
+        final TermService service = new TermServiceImpl(repository);
+        final Term actual = service.findTermById(expected.getId());
 
-		assertEquals(expected, actual);
-	}
+        assertEquals(expected, actual);
+    }
 
-	@Test(expected = ObjectNotFoundException.class)
-	public void testFindTermByIdMissing() {
-		final TermRepository repository = Mockito.mock(TermRepository.class);
-		when(repository.findOne(any(Integer.class))).thenReturn(null);
+    @Test(expected = ObjectNotFoundException.class)
+    public void testFindTermByIdMissing() {
+        final TermRepository repository = Mockito.mock(TermRepository.class);
+        when(repository.findOne(any(Integer.class))).thenReturn(null);
 
-		final TermService service = new TermServiceImpl(repository);
-		service.findTermById(1);
-	}
+        final TermService service = new TermServiceImpl(repository);
+        service.findTermById(1);
+    }
 
-	@Test(expected = PersistenceException.class)
-	public void testFindTermByIdError() {
-		final TermRepository repository = Mockito.mock(TermRepository.class);
-		when(repository.findOne(any(Integer.class))).thenThrow(
-		        new UnitTestException());
+    @Test(expected = PersistenceException.class)
+    public void testFindTermByIdError() {
+        final TermRepository repository = Mockito.mock(TermRepository.class);
+        when(repository.findOne(any(Integer.class))).thenThrow(
+                new UnitTestException());
 
-		final TermService service = new TermServiceImpl(repository);
-		service.findTermById(1);
-	}
+        final TermService service = new TermServiceImpl(repository);
+        service.findTermById(1);
+    }
 
-	@Test
-	public void testFindTermByUuid() {
-		final Term expected = new Term();
-		expected.setUuid("[uuid]");
+    @Test
+    public void testFindTermByUuid() {
+        final Term expected = new Term();
+        expected.setUuid("[uuid]");
 
-		final TermRepository repository = Mockito.mock(TermRepository.class);
-		when(repository.findTermByUuid(any(String.class))).thenReturn(expected);
+        final TermRepository repository = Mockito.mock(TermRepository.class);
+        when(repository.findTermByUuid(any(String.class))).thenReturn(expected);
 
-		final TermService service = new TermServiceImpl(repository);
-		final Term actual = service.findTermByUuid(expected.getUuid());
+        final TermService service = new TermServiceImpl(repository);
+        final Term actual = service.findTermByUuid(expected.getUuid());
 
-		assertEquals(expected, actual);
-	}
+        assertEquals(expected, actual);
+    }
 
-	@Test(expected = ObjectNotFoundException.class)
-	public void testFindTermByUuidMissing() {
-		final TermRepository repository = Mockito.mock(TermRepository.class);
-		when(repository.findTermByUuid(any(String.class))).thenReturn(null);
+    @Test(expected = ObjectNotFoundException.class)
+    public void testFindTermByUuidMissing() {
+        final TermRepository repository = Mockito.mock(TermRepository.class);
+        when(repository.findTermByUuid(any(String.class))).thenReturn(null);
 
-		final TermService service = new TermServiceImpl(repository);
-		service.findTermByUuid("[uuid]");
-	}
+        final TermService service = new TermServiceImpl(repository);
+        service.findTermByUuid("[uuid]");
+    }
 
-	@Test(expected = PersistenceException.class)
-	public void testFindTermByUuidError() {
-		final TermRepository repository = Mockito.mock(TermRepository.class);
-		when(repository.findTermByUuid(any(String.class))).thenThrow(
-		        new UnitTestException());
+    @Test(expected = PersistenceException.class)
+    public void testFindTermByUuidError() {
+        final TermRepository repository = Mockito.mock(TermRepository.class);
+        when(repository.findTermByUuid(any(String.class))).thenThrow(
+                new UnitTestException());
 
-		final TermService service = new TermServiceImpl(repository);
-		service.findTermByUuid("[uuid]");
-	}
+        final TermService service = new TermServiceImpl(repository);
+        service.findTermByUuid("[uuid]");
+    }
 
-	@Test
-	public void testCreateTerm() {
-		final Term expected = new Term();
-		expected.setName("name");
-		expected.setUuid("[uuid]");
+    @Test
+    public void testCreateTerm() {
+        final Term expected = new Term();
+        expected.setName("name");
+        expected.setUuid("[uuid]");
 
-		final TermRepository repository = Mockito.mock(TermRepository.class);
-		when(repository.saveAndFlush(any(Term.class))).thenReturn(expected);
+        final TermRepository repository = Mockito.mock(TermRepository.class);
+        when(repository.saveAndFlush(any(Term.class))).thenReturn(expected);
 
-		final TermService service = new TermServiceImpl(repository);
-		final Term actual = service.createTerm(expected.getName());
+        final TermService service = new TermServiceImpl(repository);
+        final Term actual = service.createTerm(expected.getName());
 
-		assertEquals(expected, actual);
-	}
+        assertEquals(expected, actual);
+    }
 
-	@Test(expected = PersistenceException.class)
-	public void testCreateTermError() {
-		final TermRepository repository = Mockito.mock(TermRepository.class);
-		when(repository.saveAndFlush(any(Term.class))).thenThrow(
-		        new UnitTestException());
+    @Test(expected = PersistenceException.class)
+    public void testCreateTermError() {
+        final TermRepository repository = Mockito.mock(TermRepository.class);
+        when(repository.saveAndFlush(any(Term.class))).thenThrow(
+                new UnitTestException());
 
-		final TermService service = new TermServiceImpl(repository);
-		service.createTerm("name");
-	}
+        final TermService service = new TermServiceImpl(repository);
+        service.createTerm("name");
+    }
 
-	@Test
-	public void testUpdateTerm() {
-		final Term expected = new Term();
-		expected.setName("Fall 2013");
-		expected.setUuid("[uuid]");
+    @Test
+    public void testUpdateTerm() {
+        final Term expected = new Term();
+        expected.setName("Fall 2013");
+        expected.setUuid("[uuid]");
 
-		final TermRepository repository = Mockito.mock(TermRepository.class);
-		when(repository.findTermByUuid(any(String.class))).thenReturn(expected);
-		when(repository.saveAndFlush(any(Term.class))).thenReturn(expected);
+        final TermRepository repository = Mockito.mock(TermRepository.class);
+        when(repository.findTermByUuid(any(String.class))).thenReturn(expected);
+        when(repository.saveAndFlush(any(Term.class))).thenReturn(expected);
 
-		final TermService service = new TermServiceImpl(repository);
-		final Term actual = service.updateTerm(expected, "Fall 2014");
+        final TermService service = new TermServiceImpl(repository);
+        final Term actual = service.updateTerm(expected, "Fall 2014");
 
-		assertEquals("Fall 2014", actual.getName());
-	}
+        assertEquals("Fall 2014", actual.getName());
+    }
 
-	@Test(expected = ObjectNotFoundException.class)
-	public void testUpdateTermMissing() {
-		final Term expected = new Term();
-		final TermRepository repository = Mockito.mock(TermRepository.class);
-		when(repository.findTermByUuid(any(String.class))).thenReturn(null);
+    @Test(expected = ObjectNotFoundException.class)
+    public void testUpdateTermMissing() {
+        final Term expected = new Term();
+        final TermRepository repository = Mockito.mock(TermRepository.class);
+        when(repository.findTermByUuid(any(String.class))).thenReturn(null);
 
-		final TermService service = new TermServiceImpl(repository);
-		service.updateTerm(expected, "Fall 2014");
-	}
+        final TermService service = new TermServiceImpl(repository);
+        service.updateTerm(expected, "Fall 2014");
+    }
 
-	@Test(expected = PersistenceException.class)
-	public void testUpdateTermError() {
-		final Term expected = new Term();
-		expected.setUuid("[uuid]");
+    @Test(expected = PersistenceException.class)
+    public void testUpdateTermError() {
+        final Term expected = new Term();
+        expected.setUuid("[uuid]");
 
-		final TermRepository repository = Mockito.mock(TermRepository.class);
-		when(repository.findTermByUuid(any(String.class))).thenReturn(expected);
-		doThrow(new UnitTestException()).when(repository).saveAndFlush(
-		        any(Term.class));
+        final TermRepository repository = Mockito.mock(TermRepository.class);
+        when(repository.findTermByUuid(any(String.class))).thenReturn(expected);
+        doThrow(new UnitTestException()).when(repository).saveAndFlush(
+                any(Term.class));
 
-		final TermService service = new TermServiceImpl(repository);
-		service.updateTerm(expected, "Fall 2014");
-	}
+        final TermService service = new TermServiceImpl(repository);
+        service.updateTerm(expected, "Fall 2014");
+    }
 
-	@Test
-	public void testDeleteTerm() {
-		final Term expected = new Term();
-		expected.setUuid("[uuid]");
+    @Test
+    public void testDeleteTerm() {
+        final Term expected = new Term();
+        expected.setUuid("[uuid]");
 
-		final TermRepository repository = Mockito.mock(TermRepository.class);
-		when(repository.findTermByUuid(any(String.class))).thenReturn(expected);
-		doNothing().when(repository).delete(any(Term.class));
+        final TermRepository repository = Mockito.mock(TermRepository.class);
+        when(repository.findTermByUuid(any(String.class))).thenReturn(expected);
+        doNothing().when(repository).delete(any(Term.class));
 
-		final TermService service = new TermServiceImpl(repository);
-		service.deleteTerm(expected.getUuid());
-	}
+        final TermService service = new TermServiceImpl(repository);
+        service.deleteTerm(expected.getUuid());
+    }
 
-	@Test(expected = ObjectNotFoundException.class)
-	public void testDeleteTermMissing() {
-		final TermRepository repository = Mockito.mock(TermRepository.class);
-		when(repository.findTermByUuid(any(String.class))).thenReturn(null);
+    @Test(expected = ObjectNotFoundException.class)
+    public void testDeleteTermMissing() {
+        final TermRepository repository = Mockito.mock(TermRepository.class);
+        when(repository.findTermByUuid(any(String.class))).thenReturn(null);
 
-		final TermService service = new TermServiceImpl(repository);
-		service.deleteTerm("[uuid]");
-	}
+        final TermService service = new TermServiceImpl(repository);
+        service.deleteTerm("[uuid]");
+    }
 
-	@Test(expected = PersistenceException.class)
-	public void testDeleteTermError() {
-		final Term expected = new Term();
-		expected.setUuid("[uuid]");
+    @Test(expected = PersistenceException.class)
+    public void testDeleteTermError() {
+        final Term expected = new Term();
+        expected.setUuid("[uuid]");
 
-		final TermRepository repository = Mockito.mock(TermRepository.class);
-		when(repository.findTermByUuid(any(String.class))).thenReturn(expected);
-		doThrow(new UnitTestException()).when(repository).delete(
-		        any(Term.class));
+        final TermRepository repository = Mockito.mock(TermRepository.class);
+        when(repository.findTermByUuid(any(String.class))).thenReturn(expected);
+        doThrow(new UnitTestException()).when(repository).delete(
+                any(Term.class));
 
-		final TermService service = new TermServiceImpl(repository);
-		service.deleteTerm(expected.getUuid());
-	}
+        final TermService service = new TermServiceImpl(repository);
+        service.deleteTerm(expected.getUuid());
+    }
 }

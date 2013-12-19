@@ -30,9 +30,9 @@ import org.springframework.dao.DataAccessException;
  * @author Bear Giles <bgiles@coyotesong.com>
  */
 public class UnitTestException extends DataAccessException {
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	public UnitTestException() {
-		super("[unit test]", null);
-	}
+    public UnitTestException() {
+        super("[unit test]", null);
+    }
 }
