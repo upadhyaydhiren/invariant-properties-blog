@@ -35,8 +35,7 @@ import com.invariantproperties.sandbox.student.domain.Term;
 import com.invariantproperties.sandbox.student.repository.TermRepository;
 
 public class TermServiceImpl implements TermService {
-    private static final Logger log = LoggerFactory
-            .getLogger(TermServiceImpl.class);
+    private static final Logger log = LoggerFactory.getLogger(TermServiceImpl.class);
 
     @Resource
     private TermRepository termRepository;
@@ -114,8 +113,7 @@ public class TermServiceImpl implements TermService {
             if (!(e instanceof UnitTestException)) {
                 log.info("internal error retrieving term: " + uuid, e);
             }
-            throw new PersistenceException("unable to find term by uuid", e,
-                    uuid);
+            throw new PersistenceException("unable to find term by uuid", e, uuid);
         }
 
         if (term == null) {
@@ -171,8 +169,7 @@ public class TermServiceImpl implements TermService {
             if (!(e instanceof UnitTestException)) {
                 log.info("internal error deleting term: " + term.getUuid(), e);
             }
-            throw new PersistenceException("unable to delete term", e,
-                    term.getUuid());
+            throw new PersistenceException("unable to delete term", e, term.getUuid());
         }
 
         return updated;

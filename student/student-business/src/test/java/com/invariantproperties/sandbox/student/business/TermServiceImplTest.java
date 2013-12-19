@@ -91,8 +91,7 @@ public class TermServiceImplTest {
     @Test(expected = PersistenceException.class)
     public void testFindTermByIdError() {
         final TermRepository repository = Mockito.mock(TermRepository.class);
-        when(repository.findOne(any(Integer.class))).thenThrow(
-                new UnitTestException());
+        when(repository.findOne(any(Integer.class))).thenThrow(new UnitTestException());
 
         final TermService service = new TermServiceImpl(repository);
         service.findTermById(1);
@@ -124,8 +123,7 @@ public class TermServiceImplTest {
     @Test(expected = PersistenceException.class)
     public void testFindTermByUuidError() {
         final TermRepository repository = Mockito.mock(TermRepository.class);
-        when(repository.findTermByUuid(any(String.class))).thenThrow(
-                new UnitTestException());
+        when(repository.findTermByUuid(any(String.class))).thenThrow(new UnitTestException());
 
         final TermService service = new TermServiceImpl(repository);
         service.findTermByUuid("[uuid]");
@@ -149,8 +147,7 @@ public class TermServiceImplTest {
     @Test(expected = PersistenceException.class)
     public void testCreateTermError() {
         final TermRepository repository = Mockito.mock(TermRepository.class);
-        when(repository.saveAndFlush(any(Term.class))).thenThrow(
-                new UnitTestException());
+        when(repository.saveAndFlush(any(Term.class))).thenThrow(new UnitTestException());
 
         final TermService service = new TermServiceImpl(repository);
         service.createTerm("name");
@@ -189,8 +186,7 @@ public class TermServiceImplTest {
 
         final TermRepository repository = Mockito.mock(TermRepository.class);
         when(repository.findTermByUuid(any(String.class))).thenReturn(expected);
-        doThrow(new UnitTestException()).when(repository).saveAndFlush(
-                any(Term.class));
+        doThrow(new UnitTestException()).when(repository).saveAndFlush(any(Term.class));
 
         final TermService service = new TermServiceImpl(repository);
         service.updateTerm(expected, "Fall 2014");
@@ -225,8 +221,7 @@ public class TermServiceImplTest {
 
         final TermRepository repository = Mockito.mock(TermRepository.class);
         when(repository.findTermByUuid(any(String.class))).thenReturn(expected);
-        doThrow(new UnitTestException()).when(repository).delete(
-                any(Term.class));
+        doThrow(new UnitTestException()).when(repository).delete(any(Term.class));
 
         final TermService service = new TermServiceImpl(repository);
         service.deleteTerm(expected.getUuid());

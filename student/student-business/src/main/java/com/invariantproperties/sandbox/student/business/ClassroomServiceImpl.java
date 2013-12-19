@@ -35,8 +35,7 @@ import com.invariantproperties.sandbox.student.domain.Classroom;
 import com.invariantproperties.sandbox.student.repository.ClassroomRepository;
 
 public class ClassroomServiceImpl implements ClassroomService {
-    private static final Logger log = LoggerFactory
-            .getLogger(ClassroomServiceImpl.class);
+    private static final Logger log = LoggerFactory.getLogger(ClassroomServiceImpl.class);
 
     @Resource
     private ClassroomRepository classroomRepository;
@@ -68,11 +67,9 @@ public class ClassroomServiceImpl implements ClassroomService {
             classrooms = classroomRepository.findAll();
         } catch (DataAccessException e) {
             if (!(e instanceof UnitTestException)) {
-                log.info("error loading list of classrooms: " + e.getMessage(),
-                        e);
+                log.info("error loading list of classrooms: " + e.getMessage(), e);
             }
-            throw new PersistenceException("unable to get list of classrooms.",
-                    e);
+            throw new PersistenceException("unable to get list of classrooms.", e);
         }
 
         return classrooms;
@@ -92,8 +89,7 @@ public class ClassroomServiceImpl implements ClassroomService {
             if (!(e instanceof UnitTestException)) {
                 log.info("internal error retrieving classroom: " + id, e);
             }
-            throw new PersistenceException("unable to find classroom by id", e,
-                    id);
+            throw new PersistenceException("unable to find classroom by id", e, id);
         }
 
         if (classroom == null) {
@@ -117,8 +113,7 @@ public class ClassroomServiceImpl implements ClassroomService {
             if (!(e instanceof UnitTestException)) {
                 log.info("internal error retrieving classroom: " + uuid, e);
             }
-            throw new PersistenceException("unable to find classroom by uuid",
-                    e, uuid);
+            throw new PersistenceException("unable to find classroom by uuid", e, uuid);
         }
 
         if (classroom == null) {
@@ -159,8 +154,7 @@ public class ClassroomServiceImpl implements ClassroomService {
     public Classroom updateClassroom(Classroom classroom, String name) {
         Classroom updated = null;
         try {
-            final Classroom actual = classroomRepository
-                    .findClassroomByUuid(classroom.getUuid());
+            final Classroom actual = classroomRepository.findClassroomByUuid(classroom.getUuid());
 
             if (actual == null) {
                 log.debug("did not find classroom: " + classroom.getUuid());
@@ -173,12 +167,9 @@ public class ClassroomServiceImpl implements ClassroomService {
 
         } catch (DataAccessException e) {
             if (!(e instanceof UnitTestException)) {
-                log.info(
-                        "internal error deleting classroom: "
-                                + classroom.getUuid(), e);
+                log.info("internal error deleting classroom: " + classroom.getUuid(), e);
             }
-            throw new PersistenceException("unable to delete classroom", e,
-                    classroom.getUuid());
+            throw new PersistenceException("unable to delete classroom", e, classroom.getUuid());
         }
 
         return updated;
@@ -205,8 +196,7 @@ public class ClassroomServiceImpl implements ClassroomService {
             if (!(e instanceof UnitTestException)) {
                 log.info("internal error deleting classroom: " + uuid, e);
             }
-            throw new PersistenceException("unable to delete classroom", e,
-                    uuid);
+            throw new PersistenceException("unable to delete classroom", e, uuid);
         }
     }
 }
