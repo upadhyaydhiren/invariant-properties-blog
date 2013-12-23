@@ -33,6 +33,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.invariantproperties.sandbox.student.domain.Section;
+import com.invariantproperties.sandbox.student.domain.TestRun;
 import com.invariantproperties.sandbox.student.repository.SectionRepository;
 
 /**
@@ -68,18 +69,7 @@ public class SectionServiceImpl implements SectionService {
     @Transactional(readOnly = true)
     @Override
     public List<Section> findAllSections() {
-        List<Section> sections = null;
-
-        try {
-            sections = sectionRepository.findAll();
-        } catch (DataAccessException e) {
-            if (!(e instanceof UnitTestException)) {
-                log.info("error loading list of sections: " + e.getMessage(), e);
-            }
-            throw new PersistenceException("unable to get list of sections.", e);
-        }
-
-        return sections;
+        return findSectionsByTestRun(null);
     }
 
     /**
@@ -132,6 +122,27 @@ public class SectionServiceImpl implements SectionService {
 
     /**
      * @see com.invariantproperties.sandbox.student.business.SectionService#
+     *      findSectionsByTestRun(com.invariantproperties.sandbox.student.common.TestRun)
+     */
+    @Transactional(readOnly = true)
+    @Override
+    public List<Section> findSectionsByTestRun(TestRun testRun) {
+        List<Section> sections = null;
+
+        try {
+            sections = sectionRepository.findSectionsByTestRun(testRun);
+        } catch (DataAccessException e) {
+            if (!(e instanceof UnitTestException)) {
+                log.info("error loading list of sections: " + e.getMessage(), e);
+            }
+            throw new PersistenceException("unable to get list of sections.", e);
+        }
+
+        return sections;
+    }
+
+    /**
+     * @see com.invariantproperties.sandbox.student.business.SectionService#
      *      createSection(java.lang.String)
      */
     @Transactional
@@ -139,6 +150,31 @@ public class SectionServiceImpl implements SectionService {
     public Section createSection(String name) {
         final Section section = new Section();
         section.setName(name);
+
+        Section actual = null;
+        try {
+            actual = sectionRepository.saveAndFlush(section);
+        } catch (DataAccessException e) {
+            if (!(e instanceof UnitTestException)) {
+                log.info("internal error retrieving section: " + name, e);
+            }
+            throw new PersistenceException("unable to create section", e);
+        }
+
+        return actual;
+    }
+
+    /**
+     * @see com.invariantproperties.sandbox.student.business.SectionService#
+     *      createSectionForTesting(java.lang.String,
+     *      com.invariantproperties.sandbox.student.common.TestRun)
+     */
+    @Transactional
+    @Override
+    public Section createSectionForTesting(String name, TestRun testRun) {
+        final Section section = new Section();
+        section.setName(name);
+        section.setTestRun(testRun);
 
         Section actual = null;
         try {

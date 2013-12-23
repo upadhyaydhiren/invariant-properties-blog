@@ -33,6 +33,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.invariantproperties.sandbox.student.domain.Instructor;
+import com.invariantproperties.sandbox.student.domain.TestRun;
 import com.invariantproperties.sandbox.student.repository.InstructorRepository;
 
 /**
@@ -68,18 +69,7 @@ public class InstructorServiceImpl implements InstructorService {
     @Transactional(readOnly = true)
     @Override
     public List<Instructor> findAllInstructors() {
-        List<Instructor> instructors = null;
-
-        try {
-            instructors = instructorRepository.findAll();
-        } catch (DataAccessException e) {
-            if (!(e instanceof UnitTestException)) {
-                log.info("error loading list of instructors: " + e.getMessage(), e);
-            }
-            throw new PersistenceException("unable to get list of instructors.", e);
-        }
-
-        return instructors;
+        return findInstructorsByTestRun(null);
     }
 
     /**
@@ -132,6 +122,27 @@ public class InstructorServiceImpl implements InstructorService {
 
     /**
      * @see com.invariantproperties.sandbox.student.business.InstructorService#
+     *      findInstructorsByTestRun(com.invariantproperties.sandbox.student.common.TestRun)
+     */
+    @Transactional(readOnly = true)
+    @Override
+    public List<Instructor> findInstructorsByTestRun(TestRun testRun) {
+        List<Instructor> instructors = null;
+
+        try {
+            instructors = instructorRepository.findInstructorsByTestRun(testRun);
+        } catch (DataAccessException e) {
+            if (!(e instanceof UnitTestException)) {
+                log.info("error loading list of instructors: " + e.getMessage(), e);
+            }
+            throw new PersistenceException("unable to get list of instructors.", e);
+        }
+
+        return instructors;
+    }
+
+    /**
+     * @see com.invariantproperties.sandbox.student.business.InstructorService#
      *      findInstructorByEmailAddress(java.lang.String)
      */
     @Transactional(readOnly = true)
@@ -164,6 +175,32 @@ public class InstructorServiceImpl implements InstructorService {
         final Instructor instructor = new Instructor();
         instructor.setName(name);
         instructor.setEmailAddress(emailAddress);
+
+        Instructor actual = null;
+        try {
+            actual = instructorRepository.saveAndFlush(instructor);
+        } catch (DataAccessException e) {
+            if (!(e instanceof UnitTestException)) {
+                log.info("internal error retrieving instructor: " + name, e);
+            }
+            throw new PersistenceException("unable to create instructor", e);
+        }
+
+        return actual;
+    }
+
+    /**
+     * @see com.invariantproperties.sandbox.student.business.InstructorService#
+     *      createInstructorForTesting(java.lang.String, java.lang.String,
+     *      com.invariantproperties.sandbox.student.common.TestRun)
+     */
+    @Transactional
+    @Override
+    public Instructor createInstructorForTesting(String name, String emailAddress, TestRun testRun) {
+        final Instructor instructor = new Instructor();
+        instructor.setName(name);
+        instructor.setEmailAddress(emailAddress);
+        instructor.setTestRun(testRun);
 
         Instructor actual = null;
         try {

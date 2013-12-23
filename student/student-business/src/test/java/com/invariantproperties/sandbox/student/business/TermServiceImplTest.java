@@ -37,6 +37,11 @@ import org.mockito.Mockito;
 import com.invariantproperties.sandbox.student.domain.Term;
 import com.invariantproperties.sandbox.student.repository.TermRepository;
 
+/**
+ * Unit tests for TermServiceImpl.
+ * 
+ * @author Bear Giles <bgiles@coyotesong.com>
+ */
 public class TermServiceImplTest {
 
     @Test
@@ -44,7 +49,7 @@ public class TermServiceImplTest {
         final List<Term> expected = Collections.emptyList();
 
         final TermRepository repository = Mockito.mock(TermRepository.class);
-        when(repository.findAll()).thenReturn(expected);
+        when(repository.findTermsByTestRun(null)).thenReturn(expected);
 
         final TermService service = new TermServiceImpl(repository);
         final List<Term> actual = service.findAllTerms();
@@ -54,15 +59,11 @@ public class TermServiceImplTest {
 
     @Test(expected = PersistenceException.class)
     public void testFindAllTermsError() {
-        final List<Term> expected = Collections.emptyList();
-
         final TermRepository repository = Mockito.mock(TermRepository.class);
-        when(repository.findAll()).thenThrow(new UnitTestException());
+        when(repository.findTermsByTestRun(null)).thenThrow(new UnitTestException());
 
         final TermService service = new TermServiceImpl(repository);
-        final List<Term> actual = service.findAllTerms();
-
-        assertEquals(expected, actual);
+        service.findAllTerms();
     }
 
     @Test

@@ -15,7 +15,7 @@
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
  * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
+ * specific language governing pestRunissions and limitations
  * under the License.
  * 
  * Copyright (c) 2013 Bear Giles <bgiles@coyotesong.com>
@@ -45,16 +45,14 @@ import org.apache.log4j.Logger;
 import org.springframework.stereotype.Service;
 
 import com.invariantproperties.sandbox.student.business.ObjectNotFoundException;
-import com.invariantproperties.sandbox.student.business.SectionService;
 import com.invariantproperties.sandbox.student.business.TestRunService;
-import com.invariantproperties.sandbox.student.domain.Section;
 import com.invariantproperties.sandbox.student.domain.TestRun;
 
 @Service
-@Path("/section")
-public class SectionResource extends AbstractResource {
-    private static final Logger log = Logger.getLogger(SectionResource.class);
-    private static final Section[] EMPTY_SECTION_ARRAY = new Section[0];
+@Path("/testRun")
+public class TestRunResource extends AbstractResource {
+    private static final Logger log = Logger.getLogger(TestRunResource.class);
+    private static final TestRun[] EMPTY_TERM_ARRAY = new TestRun[0];
 
     @Context
     UriInfo uriInfo;
@@ -63,15 +61,12 @@ public class SectionResource extends AbstractResource {
     Request request;
 
     @Resource
-    private SectionService service;
-
-    @Resource
-    private TestRunService testService;
+    private TestRunService service;
 
     /**
      * Default constructor.
      */
-    public SectionResource() {
+    public TestRunResource() {
 
     }
 
@@ -80,31 +75,30 @@ public class SectionResource extends AbstractResource {
      * 
      * @param service
      */
-    SectionResource(SectionService service, TestRunService testService) {
+    TestRunResource(TestRunService service) {
         this.service = service;
-        this.testService = testService;
     }
 
     /**
-     * Get all Sections.
+     * Get all TestRuns.
      * 
      * @return
      */
     @GET
     @Produces({ MediaType.APPLICATION_JSON, MediaType.TEXT_XML })
-    public Response findAllSections() {
-        log.debug("SectionResource: findAllSections()");
+    public Response findAllTestRuns() {
+        log.debug("TestRunResource: findAllTestRuns()");
 
         Response response = null;
         try {
-            List<Section> sections = service.findAllSections();
+            List<TestRun> testRuns = service.findAllTestRuns();
 
-            List<Section> results = new ArrayList<Section>(sections.size());
-            for (Section section : sections) {
-                results.add(scrubSection(section));
+            List<TestRun> results = new ArrayList<TestRun>(testRuns.size());
+            for (TestRun testRun : testRuns) {
+                results.add(scrubTestRun(testRun));
             }
 
-            response = Response.ok(results.toArray(EMPTY_SECTION_ARRAY)).build();
+            response = Response.ok(results.toArray(EMPTY_TERM_ARRAY)).build();
         } catch (Exception e) {
             if (!(e instanceof UnitTestException)) {
                 log.info("unhandled exception", e);
@@ -116,7 +110,7 @@ public class SectionResource extends AbstractResource {
     }
 
     /**
-     * Create a Section.
+     * Create a TestRun.
      * 
      * @param req
      * @return
@@ -124,8 +118,8 @@ public class SectionResource extends AbstractResource {
     @POST
     @Consumes({ MediaType.APPLICATION_JSON, MediaType.TEXT_XML })
     @Produces({ MediaType.APPLICATION_JSON, MediaType.TEXT_XML })
-    public Response createSection(Name req) {
-        log.debug("SectionResource: createSection()");
+    public Response createTestRun(Name req) {
+        log.debug("TestRunResource: createTestRun()");
 
         final String name = req.getName();
         if ((name == null) || name.isEmpty()) {
@@ -135,22 +129,11 @@ public class SectionResource extends AbstractResource {
         Response response = null;
 
         try {
-            Section section = null;
-
-            if (req.getTestUuid() != null) {
-                TestRun testRun = testService.findTestRunByUuid(req.getTestUuid());
-                if (testRun != null) {
-                    section = service.createSectionForTesting(name, testRun);
-                } else {
-                    response = Response.status(Status.BAD_REQUEST).entity("unknown test UUID").build();
-                }
-            } else {
-                section = service.createSection(name);
-            }
-            if (section == null) {
+            TestRun testRun = service.createTestRun(name);
+            if (testRun == null) {
                 response = Response.status(Status.INTERNAL_SERVER_ERROR).build();
             } else {
-                response = Response.created(URI.create(section.getUuid())).entity(scrubSection(section)).build();
+                response = Response.created(URI.create(testRun.getUuid())).entity(scrubTestRun(testRun)).build();
             }
         } catch (Exception e) {
             if (!(e instanceof UnitTestException)) {
@@ -163,21 +146,21 @@ public class SectionResource extends AbstractResource {
     }
 
     /**
-     * Get a specific Section.
+     * Get a specific TestRun.
      * 
      * @param uuid
      * @return
      */
-    @Path("/{sectionId}")
+    @Path("/{testRunId}")
     @GET
     @Produces({ MediaType.APPLICATION_JSON, MediaType.TEXT_XML })
-    public Response getSection(@PathParam("sectionId") String id) {
-        log.debug("SectionResource: getSection()");
+    public Response getTestRun(@PathParam("testRunId") String id) {
+        log.debug("TestRunResource: getTestRun()");
 
         Response response = null;
         try {
-            Section section = service.findSectionByUuid(id);
-            response = Response.ok(scrubSection(section)).build();
+            TestRun testRun = service.findTestRunByUuid(id);
+            response = Response.ok(scrubTestRun(testRun)).build();
         } catch (ObjectNotFoundException e) {
             response = Response.status(Status.NOT_FOUND).build();
         } catch (Exception e) {
@@ -191,57 +174,19 @@ public class SectionResource extends AbstractResource {
     }
 
     /**
-     * Update a Section.
-     * 
-     * FIXME: what about uniqueness violations?
-     * 
-     * @param id
-     * @param req
-     * @return
-     */
-    @Path("/{sectionId}")
-    @POST
-    @Consumes({ MediaType.APPLICATION_JSON, MediaType.TEXT_XML })
-    @Produces({ MediaType.APPLICATION_JSON, MediaType.TEXT_XML })
-    public Response updateSection(@PathParam("sectionId") String id, Name req) {
-        log.debug("SectionResource: updateSection()");
-
-        final String name = req.getName();
-        if ((name == null) || name.isEmpty()) {
-            return Response.status(Status.BAD_REQUEST).entity("'name' is required'").build();
-        }
-
-        Response response = null;
-        try {
-            final Section section = service.findSectionByUuid(id);
-            final Section updatedSection = service.updateSection(section, name);
-            response = Response.ok(scrubSection(updatedSection)).build();
-        } catch (ObjectNotFoundException exception) {
-            response = Response.status(Status.NOT_FOUND).build();
-        } catch (Exception e) {
-            if (!(e instanceof UnitTestException)) {
-                log.info("unhandled exception", e);
-            }
-            response = Response.status(Status.INTERNAL_SERVER_ERROR).build();
-        }
-
-        return response;
-    }
-
-    /**
-     * Delete a Section.
+     * Delete a TestRun.
      * 
      * @param id
      * @return
      */
-    @Path("/{sectionId}")
+    @Path("/{testRunId}")
     @DELETE
-    public Response deleteSection(@PathParam("sectionId") String id) {
-        log.debug("SectionResource: deleteSection()");
+    public Response deleteTestRun(@PathParam("testRunId") String id) {
+        log.debug("TestRunResource: deleteTestRun()");
 
         Response response = null;
         try {
-            service.deleteSection(id);
+            service.deleteTestRun(id);
             response = Response.noContent().build();
         } catch (ObjectNotFoundException exception) {
             response = Response.noContent().build();

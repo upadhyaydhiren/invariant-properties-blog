@@ -33,6 +33,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.invariantproperties.sandbox.student.domain.Student;
+import com.invariantproperties.sandbox.student.domain.TestRun;
 import com.invariantproperties.sandbox.student.repository.StudentRepository;
 
 /**
@@ -68,18 +69,7 @@ public class StudentServiceImpl implements StudentService {
     @Transactional(readOnly = true)
     @Override
     public List<Student> findAllStudents() {
-        List<Student> students = null;
-
-        try {
-            students = studentRepository.findAll();
-        } catch (DataAccessException e) {
-            if (!(e instanceof UnitTestException)) {
-                log.info("error loading list of students: " + e.getMessage(), e);
-            }
-            throw new PersistenceException("unable to get list of students.", e);
-        }
-
-        return students;
+        return findStudentsByTestRun(null);
     }
 
     /**
@@ -132,6 +122,27 @@ public class StudentServiceImpl implements StudentService {
 
     /**
      * @see com.invariantproperties.sandbox.student.business.StudentService#
+     *      findStudentsByTestRun(com.invariantproperties.sandbox.student.common.TestRun)
+     */
+    @Transactional(readOnly = true)
+    @Override
+    public List<Student> findStudentsByTestRun(TestRun testRun) {
+        List<Student> students = null;
+
+        try {
+            students = studentRepository.findStudentsByTestRun(testRun);
+        } catch (DataAccessException e) {
+            if (!(e instanceof UnitTestException)) {
+                log.info("error loading list of students: " + e.getMessage(), e);
+            }
+            throw new PersistenceException("unable to get list of students.", e);
+        }
+
+        return students;
+    }
+
+    /**
+     * @see com.invariantproperties.sandbox.student.business.StudentService#
      *      findStudentByEmailAddress(java.lang.String)
      */
     @Transactional(readOnly = true)
@@ -164,6 +175,32 @@ public class StudentServiceImpl implements StudentService {
         final Student student = new Student();
         student.setName(name);
         student.setEmailAddress(emailAddress);
+
+        Student actual = null;
+        try {
+            actual = studentRepository.saveAndFlush(student);
+        } catch (DataAccessException e) {
+            if (!(e instanceof UnitTestException)) {
+                log.info("internal error retrieving student: " + name, e);
+            }
+            throw new PersistenceException("unable to create student", e);
+        }
+
+        return actual;
+    }
+
+    /**
+     * @see com.invariantproperties.sandbox.student.business.StudentService#
+     *      createStudentForTesting(java.lang.String, java.lang.String,
+     *      com.invariantproperties.sandbox.student.common.TestRun)
+     */
+    @Transactional
+    @Override
+    public Student createStudentForTesting(String name, String emailAddress, TestRun testRun) {
+        final Student student = new Student();
+        student.setName(name);
+        student.setEmailAddress(emailAddress);
+        student.setTestRun(testRun);
 
         Student actual = null;
         try {

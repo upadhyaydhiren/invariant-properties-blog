@@ -59,15 +59,11 @@ public class CourseServiceImplTest {
 
     @Test(expected = PersistenceException.class)
     public void testFindAllCoursesError() {
-        final List<Course> expected = Collections.emptyList();
-
         final CourseRepository repository = Mockito.mock(CourseRepository.class);
-        when(repository.findAll()).thenThrow(new UnitTestException());
+        when(repository.findCoursesByTestRun(null)).thenThrow(new UnitTestException());
 
         final CourseService service = new CourseServiceImpl(repository);
-        final List<Course> actual = service.findAllCourses();
-
-        assertEquals(expected, actual);
+        service.findAllCourses();
     }
 
     @Test

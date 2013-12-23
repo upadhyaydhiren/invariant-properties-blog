@@ -23,6 +23,7 @@
 package com.invariantproperties.sandbox.student.webservice.client;
 
 import com.invariantproperties.sandbox.student.domain.Term;
+import com.invariantproperties.sandbox.student.domain.TestRun;
 
 /**
  * Implementation of TermRestClient.
@@ -52,8 +53,20 @@ public class TermRestClientImpl extends AbstractRestClientImpl<Term> implements 
     }
 
     /**
+     * Create JSON string.
+     * 
+     * @param name
+     * @param testUuid
+     * @return
+     */
+    String createJson(final String name, final TestRun testRun) {
+        return String.format("{ \"name\": \"%s\", \"testUuid\": \"%s\" }", name, testRun.getUuid());
+    }
+
+    /**
      * @see com.invariantproperties.sandbox.student.webservice.client.TermRestClient#getAllTerms()
      */
+    @Override
     public Term[] getAllTerms() {
         return super.getAllObjects(EMPTY_TERM_ARRAY);
     }
@@ -61,6 +74,7 @@ public class TermRestClientImpl extends AbstractRestClientImpl<Term> implements 
     /**
      * @see com.invariantproperties.sandbox.student.webservice.client.TermRestClient#getTerm(java.lang.String)
      */
+    @Override
     public Term getTerm(final String uuid) {
         return super.getObject(uuid);
     }
@@ -68,6 +82,7 @@ public class TermRestClientImpl extends AbstractRestClientImpl<Term> implements 
     /**
      * @see com.invariantproperties.sandbox.student.webservice.client.TermRestClient#createTerm(java.lang.String)
      */
+    @Override
     public Term createTerm(final String name) {
         if (name == null || name.isEmpty()) {
             throw new IllegalArgumentException("'name' is required");
@@ -77,9 +92,27 @@ public class TermRestClientImpl extends AbstractRestClientImpl<Term> implements 
     }
 
     /**
+     * @see com.invariantproperties.sandbox.student.webservice.client.TermRestClient#createTermForTesting(java.lang.String,
+     *      com.invariantproperties.sandbox.student.common.TestRun)
+     */
+    @Override
+    public Term createTermForTesting(final String name, final TestRun testRun) {
+        if (name == null || name.isEmpty()) {
+            throw new IllegalArgumentException("'name' is required");
+        }
+
+        if (testRun == null || testRun.getUuid() == null || testRun.getUuid().isEmpty()) {
+            throw new IllegalArgumentException("'testRun' is required");
+        }
+
+        return createObject(createJson(name, testRun));
+    }
+
+    /**
      * @see com.invariantproperties.sandbox.student.webservice.client.TermRestClient#updateTerm(java.lang.String,
      *      java.lang.String)
      */
+    @Override
     public Term updateTerm(final String uuid, final String name) {
         if (name == null || name.isEmpty()) {
             throw new IllegalArgumentException("'name' is required");
@@ -91,6 +124,7 @@ public class TermRestClientImpl extends AbstractRestClientImpl<Term> implements 
     /**
      * @see com.invariantproperties.sandbox.student.webservice.client.TermRestClient#deleteTerm(java.lang.String)
      */
+    @Override
     public void deleteTerm(final String uuid) {
         super.deleteObject(uuid);
     }

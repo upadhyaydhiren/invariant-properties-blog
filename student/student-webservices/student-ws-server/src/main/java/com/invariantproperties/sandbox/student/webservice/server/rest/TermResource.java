@@ -46,7 +46,9 @@ import org.springframework.stereotype.Service;
 
 import com.invariantproperties.sandbox.student.business.ObjectNotFoundException;
 import com.invariantproperties.sandbox.student.business.TermService;
+import com.invariantproperties.sandbox.student.business.TestRunService;
 import com.invariantproperties.sandbox.student.domain.Term;
+import com.invariantproperties.sandbox.student.domain.TestRun;
 
 @Service
 @Path("/term")
@@ -63,6 +65,9 @@ public class TermResource extends AbstractResource {
     @Resource
     private TermService service;
 
+    @Resource
+    private TestRunService testService;
+
     /**
      * Default constructor.
      */
@@ -75,8 +80,9 @@ public class TermResource extends AbstractResource {
      * 
      * @param service
      */
-    TermResource(TermService service) {
+    TermResource(TermService service, TestRunService testService) {
         this.service = service;
+        this.testService = testService;
     }
 
     /**
@@ -129,7 +135,19 @@ public class TermResource extends AbstractResource {
         Response response = null;
 
         try {
-            Term term = service.createTerm(name);
+            Term term = null;
+
+            if (req.getTestUuid() != null) {
+                TestRun testRun = testService.findTestRunByUuid(req.getTestUuid());
+                if (testRun != null) {
+                    term = service.createTermForTesting(name, testRun);
+                } else {
+                    response = Response.status(Status.BAD_REQUEST).entity("unknown test UUID").build();
+                }
+            } else {
+                term = service.createTerm(name);
+            }
+
             if (term == null) {
                 response = Response.status(Status.INTERNAL_SERVER_ERROR).build();
             } else {

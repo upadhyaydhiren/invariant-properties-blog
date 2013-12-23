@@ -23,6 +23,7 @@
 package com.invariantproperties.sandbox.student.webservice.client;
 
 import com.invariantproperties.sandbox.student.domain.Student;
+import com.invariantproperties.sandbox.student.domain.TestRun;
 
 /**
  * Implementation of StudentRestClient.
@@ -53,8 +54,21 @@ public class StudentRestClientImpl extends AbstractRestClientImpl<Student> imple
     }
 
     /**
+     * Create JSON string.
+     * 
+     * @param name
+     * @param testUuid
+     * @return
+     */
+    String createJson(final String name, final String emailAddress, final TestRun testRun) {
+        return String.format("{ \"name\": \"%s\", \"emailAddress\": \"%s\", \"testUuid\": \"%s\" }", name,
+                emailAddress, testRun.getUuid());
+    }
+
+    /**
      * @see com.invariantproperties.sandbox.student.webservice.client.StudentRestClient#getAllStudents()
      */
+    @Override
     public Student[] getAllStudents() {
         return super.getAllObjects(EMPTY_STUDENT_ARRAY);
     }
@@ -62,6 +76,7 @@ public class StudentRestClientImpl extends AbstractRestClientImpl<Student> imple
     /**
      * @see com.invariantproperties.sandbox.student.webservice.client.StudentRestClient#getStudent(java.lang.String)
      */
+    @Override
     public Student getStudent(final String uuid) {
         return super.getObject(uuid);
     }
@@ -70,6 +85,7 @@ public class StudentRestClientImpl extends AbstractRestClientImpl<Student> imple
      * @see com.invariantproperties.sandbox.student.webservice.client.StudentRestClient#createStudent(java.lang.String,
      *      java.lang.String)
      */
+    @Override
     public Student createStudent(final String name, final String emailAddress) {
         if (name == null || name.isEmpty()) {
             throw new IllegalArgumentException("'name' is required");
@@ -83,9 +99,31 @@ public class StudentRestClientImpl extends AbstractRestClientImpl<Student> imple
     }
 
     /**
+     * @see com.invariantproperties.sandbox.student.webservice.client.StudentRestClient#createStudentForTesting(java.lang.String,
+     *      com.invariantproperties.sandbox.student.common.TestRun)
+     */
+    @Override
+    public Student createStudentForTesting(final String name, final String emailAddress, final TestRun testRun) {
+        if (name == null || name.isEmpty()) {
+            throw new IllegalArgumentException("'name' is required");
+        }
+
+        if (emailAddress == null || emailAddress.isEmpty()) {
+            throw new IllegalArgumentException("'emailAddress' is required");
+        }
+
+        if (testRun == null || testRun.getUuid() == null || testRun.getUuid().isEmpty()) {
+            throw new IllegalArgumentException("'testRun' is required");
+        }
+
+        return createObject(createJson(name, emailAddress, testRun));
+    }
+
+    /**
      * @see com.invariantproperties.sandbox.student.webservice.client.StudentRestClient#updateStudent(java.lang.String,
      *      java.lang.String, java.lang.String)
      */
+    @Override
     public Student updateStudent(final String uuid, final String name, final String emailAddress) {
         if (name == null || name.isEmpty()) {
             throw new IllegalArgumentException("'name' is required");
@@ -101,6 +139,7 @@ public class StudentRestClientImpl extends AbstractRestClientImpl<Student> imple
     /**
      * @see com.invariantproperties.sandbox.student.webservice.client.StudentRestClient#deleteStudent(java.lang.String)
      */
+    @Override
     public void deleteStudent(final String uuid) {
         super.deleteObject(uuid);
     }

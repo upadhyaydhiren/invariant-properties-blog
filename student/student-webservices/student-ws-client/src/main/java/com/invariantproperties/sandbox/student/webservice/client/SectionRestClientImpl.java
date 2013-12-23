@@ -23,6 +23,7 @@
 package com.invariantproperties.sandbox.student.webservice.client;
 
 import com.invariantproperties.sandbox.student.domain.Section;
+import com.invariantproperties.sandbox.student.domain.TestRun;
 
 /**
  * Implementation of SectionRestClient.
@@ -52,8 +53,20 @@ public class SectionRestClientImpl extends AbstractRestClientImpl<Section> imple
     }
 
     /**
+     * Create JSON string.
+     * 
+     * @param name
+     * @param testUuid
+     * @return
+     */
+    String createJson(final String name, final TestRun testRun) {
+        return String.format("{ \"name\": \"%s\", \"testUuid\": \"%s\" }", name, testRun.getUuid());
+    }
+
+    /**
      * @see com.invariantproperties.sandbox.student.webservice.client.SectionRestClient#getAllSections()
      */
+    @Override
     public Section[] getAllSections() {
         return super.getAllObjects(EMPTY_COURSE_ARRAY);
     }
@@ -61,6 +74,7 @@ public class SectionRestClientImpl extends AbstractRestClientImpl<Section> imple
     /**
      * @see com.invariantproperties.sandbox.student.webservice.client.SectionRestClient#getSection(java.lang.String)
      */
+    @Override
     public Section getSection(final String uuid) {
         return super.getObject(uuid);
     }
@@ -68,6 +82,7 @@ public class SectionRestClientImpl extends AbstractRestClientImpl<Section> imple
     /**
      * @see com.invariantproperties.sandbox.student.webservice.client.SectionRestClient#createSection(java.lang.String)
      */
+    @Override
     public Section createSection(final String name) {
         if (name == null || name.isEmpty()) {
             throw new IllegalArgumentException("'name' is required");
@@ -77,9 +92,27 @@ public class SectionRestClientImpl extends AbstractRestClientImpl<Section> imple
     }
 
     /**
+     * @see com.invariantproperties.sandbox.student.webservice.client.SectionRestClient#createSectionForTesting(java.lang.String,
+     *      com.invariantproperties.sandbox.student.common.TestRun)
+     */
+    @Override
+    public Section createSectionForTesting(final String name, final TestRun testRun) {
+        if (name == null || name.isEmpty()) {
+            throw new IllegalArgumentException("'name' is required");
+        }
+
+        if (testRun == null || testRun.getUuid() == null || testRun.getUuid().isEmpty()) {
+            throw new IllegalArgumentException("'testRun' is required");
+        }
+
+        return createObject(createJson(name, testRun));
+    }
+
+    /**
      * @see com.invariantproperties.sandbox.student.webservice.client.SectionRestClient#updateSection(java.lang.String,
      *      java.lang.String)
      */
+    @Override
     public Section updateSection(final String uuid, final String name) {
         if (name == null || name.isEmpty()) {
             throw new IllegalArgumentException("'name' is required");
@@ -91,6 +124,7 @@ public class SectionRestClientImpl extends AbstractRestClientImpl<Section> imple
     /**
      * @see com.invariantproperties.sandbox.student.webservice.client.SectionRestClient#deleteSection(java.lang.String)
      */
+    @Override
     public void deleteSection(final String uuid) {
         super.deleteObject(uuid);
     }

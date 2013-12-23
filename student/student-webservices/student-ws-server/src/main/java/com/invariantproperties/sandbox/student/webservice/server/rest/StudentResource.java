@@ -46,7 +46,9 @@ import org.springframework.stereotype.Service;
 
 import com.invariantproperties.sandbox.student.business.ObjectNotFoundException;
 import com.invariantproperties.sandbox.student.business.StudentService;
+import com.invariantproperties.sandbox.student.business.TestRunService;
 import com.invariantproperties.sandbox.student.domain.Student;
+import com.invariantproperties.sandbox.student.domain.TestRun;
 
 @Service
 @Path("/student")
@@ -63,6 +65,9 @@ public class StudentResource extends AbstractResource {
     @Resource
     private StudentService service;
 
+    @Resource
+    private TestRunService testService;
+
     /**
      * Default constructor.
      */
@@ -75,8 +80,9 @@ public class StudentResource extends AbstractResource {
      * 
      * @param service
      */
-    StudentResource(StudentService service) {
+    StudentResource(StudentService service, TestRunService testService) {
         this.service = service;
+        this.testService = testService;
     }
 
     /**
@@ -134,7 +140,19 @@ public class StudentResource extends AbstractResource {
         Response response = null;
 
         try {
-            Student student = service.createStudent(name, email);
+            Student student = null;
+
+            if (req.getTestUuid() != null) {
+                TestRun testRun = testService.findTestRunByUuid(req.getTestUuid());
+                if (testRun != null) {
+                    student = service.createStudentForTesting(name, email, testRun);
+                } else {
+                    response = Response.status(Status.BAD_REQUEST).entity("unknown test UUID").build();
+                }
+            } else {
+                student = service.createStudent(name, email);
+            }
+
             if (student == null) {
                 response = Response.status(Status.INTERNAL_SERVER_ERROR).build();
             } else {

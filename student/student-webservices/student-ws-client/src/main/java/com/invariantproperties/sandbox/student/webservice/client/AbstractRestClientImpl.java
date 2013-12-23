@@ -25,7 +25,7 @@ package com.invariantproperties.sandbox.student.webservice.client;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import com.invariantproperties.sandbox.student.domain.PersistentObject;
+import com.invariantproperties.sandbox.student.domain.TestablePersistentObject;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
@@ -35,7 +35,7 @@ import com.sun.jersey.api.client.WebResource;
  * 
  * @author Bear Giles <bgiles@coyotesong.com>
  */
-public class AbstractRestClientImpl<T extends PersistentObject> {
+public class AbstractRestClientImpl<T extends TestablePersistentObject> {
     private final String resource;
     private final Class<T> objectClass;
     private final Class<T[]> objectArrayClass;

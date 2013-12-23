@@ -25,6 +25,7 @@ package com.invariantproperties.sandbox.student.business;
 import java.util.List;
 
 import com.invariantproperties.sandbox.student.domain.Course;
+import com.invariantproperties.sandbox.student.domain.TestRun;
 
 /**
  * @author Bear Giles <bgiles@coyotesong.com>
@@ -36,9 +37,13 @@ public interface CourseService {
 
     Course findCourseByUuid(String uuid);
 
+    List<Course> findCoursesByTestRun(TestRun testRun);
+
     Course createCourse(String name);
 
     Course updateCourse(Course course, String name);
 
     void deleteCourse(String uuid);
+
+    Course createCourseForTesting(String name, TestRun testRun);
 }

@@ -23,6 +23,7 @@
 package com.invariantproperties.sandbox.student.webservice.client;
 
 import com.invariantproperties.sandbox.student.domain.Classroom;
+import com.invariantproperties.sandbox.student.domain.TestRun;
 
 /**
  * Classroom REST client.
@@ -49,6 +50,14 @@ public interface ClassroomRestClient {
      * @param name
      */
     Classroom createClassroom(String name);
+
+    /**
+     * Create specific classroom.
+     * 
+     * @param name
+     * @param testRun
+     */
+    Classroom createClassroomForTesting(String name, TestRun testRun);
 
     /**
      * Update specific classroom.

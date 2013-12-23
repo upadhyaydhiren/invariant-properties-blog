@@ -22,7 +22,7 @@
  */
 package com.invariantproperties.sandbox.student.webservice.client;
 
-import com.invariantproperties.sandbox.student.domain.PersistentObject;
+import com.invariantproperties.sandbox.student.domain.TestablePersistentObject;
 import com.sun.jersey.api.client.ClientResponse;
 
 /**
@@ -34,7 +34,7 @@ public class RestClientFailureException extends RestClientException {
     private static final long serialVersionUID = 1L;
 
     private final String resource;
-    private final Class<? extends PersistentObject> objectClass;
+    private final Class<? extends TestablePersistentObject> objectClass;
     private final String uuid;
     private final int statusCode;
 
@@ -46,7 +46,7 @@ public class RestClientFailureException extends RestClientException {
      * @param uuid
      * @param response
      */
-    public RestClientFailureException(final String resource, final Class<? extends PersistentObject> objectClass,
+    public RestClientFailureException(final String resource, final Class<? extends TestablePersistentObject> objectClass,
             final String uuid, final ClientResponse response) {
         super("rest client received error (" + response.getStatus() + "): " + resource + "[" + uuid + "]");
         this.resource = resource;
@@ -59,7 +59,7 @@ public class RestClientFailureException extends RestClientException {
         return resource;
     }
 
-    public Class<? extends PersistentObject> getObjectClass() {
+    public Class<? extends TestablePersistentObject> getObjectClass() {
         return objectClass;
     }
 

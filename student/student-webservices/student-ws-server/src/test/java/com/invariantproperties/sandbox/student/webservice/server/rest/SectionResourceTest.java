@@ -39,18 +39,19 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-import com.invariantproperties.sandbox.student.business.CourseService;
 import com.invariantproperties.sandbox.student.business.ObjectNotFoundException;
-import com.invariantproperties.sandbox.student.domain.Course;
+import com.invariantproperties.sandbox.student.business.SectionService;
+import com.invariantproperties.sandbox.student.business.TestRunService;
+import com.invariantproperties.sandbox.student.domain.Section;
 
 /**
- * Unit tests for CourseResource.
+ * Unit tests for SectionResource.
  * 
  * @author Bear Giles <bgiles@coyotesong.com>
  */
 public class SectionResourceTest {
-    private Course physicsFall2013 = new Course();
-    private Course physicsFall2014 = new Course();
+    private Section physicsFall2013 = new Section();
+    private Section physicsFall2014 = new Section();
 
     @Before
     public void init() {
@@ -64,17 +65,19 @@ public class SectionResourceTest {
     }
 
     @Test
-    public void testFindAllCourses() {
-        final List<Course> expected = Arrays.asList(physicsFall2013);
+    public void testFindAllSections() {
+        final List<Section> expected = Arrays.asList(physicsFall2013);
 
-        final CourseService service = Mockito.mock(CourseService.class);
-        when(service.findAllCourses()).thenReturn(expected);
+        final SectionService service = Mockito.mock(SectionService.class);
+        when(service.findAllSections()).thenReturn(expected);
 
-        final CourseResource resource = new CourseResource(service);
-        final Response response = resource.findAllCourses();
+        final TestRunService testService = Mockito.mock(TestRunService.class);
+
+        final SectionResource resource = new SectionResource(service, testService);
+        final Response response = resource.findAllSections();
 
         assertEquals(200, response.getStatus());
-        final Course[] actual = (Course[]) response.getEntity();
+        final Section[] actual = (Section[]) response.getEntity();
         assertEquals(expected.size(), actual.length);
         assertNull(actual[0].getId());
         assertEquals(expected.get(0).getName(), actual[0].getName());
@@ -82,247 +85,279 @@ public class SectionResourceTest {
     }
 
     @Test
-    public void testFindAllCoursesEmpty() {
-        final List<Course> expected = new ArrayList<>();
+    public void testFindAllSectionsEmpty() {
+        final List<Section> expected = new ArrayList<>();
 
-        final CourseService service = Mockito.mock(CourseService.class);
-        when(service.findAllCourses()).thenReturn(expected);
+        final SectionService service = Mockito.mock(SectionService.class);
+        when(service.findAllSections()).thenReturn(expected);
 
-        final CourseResource resource = new CourseResource(service);
-        final Response response = resource.findAllCourses();
+        final TestRunService testService = Mockito.mock(TestRunService.class);
+
+        final SectionResource resource = new SectionResource(service, testService);
+        final Response response = resource.findAllSections();
 
         assertEquals(200, response.getStatus());
-        final Course[] actual = (Course[]) response.getEntity();
+        final Section[] actual = (Section[]) response.getEntity();
         assertEquals(0, actual.length);
     }
 
     @Test
-    public void testFindAllCoursesFailure() {
-        final CourseService service = Mockito.mock(CourseService.class);
-        when(service.findAllCourses()).thenThrow(new UnitTestException());
+    public void testFindAllSectionsFailure() {
+        final SectionService service = Mockito.mock(SectionService.class);
+        when(service.findAllSections()).thenThrow(new UnitTestException());
 
-        final CourseResource resource = new CourseResource(service);
-        final Response response = resource.findAllCourses();
+        final TestRunService testService = Mockito.mock(TestRunService.class);
+
+        final SectionResource resource = new SectionResource(service, testService);
+        final Response response = resource.findAllSections();
 
         assertEquals(500, response.getStatus());
     }
 
     @Test
-    public void testGetCourse() {
-        final Course expected = physicsFall2013;
+    public void testGetSection() {
+        final Section expected = physicsFall2013;
 
-        final CourseService service = Mockito.mock(CourseService.class);
-        when(service.findCourseByUuid(expected.getUuid())).thenReturn(expected);
+        final SectionService service = Mockito.mock(SectionService.class);
+        when(service.findSectionByUuid(expected.getUuid())).thenReturn(expected);
 
-        final CourseResource resource = new CourseResource(service);
-        final Response response = resource.getCourse(expected.getUuid());
+        final TestRunService testService = Mockito.mock(TestRunService.class);
+
+        final SectionResource resource = new SectionResource(service, testService);
+        final Response response = resource.getSection(expected.getUuid());
 
         assertEquals(200, response.getStatus());
-        final Course actual = (Course) response.getEntity();
+        final Section actual = (Section) response.getEntity();
         assertNull(actual.getId());
         assertEquals(expected.getName(), actual.getName());
         assertEquals(expected.getUuid(), actual.getUuid());
     }
 
     @Test
-    public void testGetCourseMissing() {
-        final CourseService service = Mockito.mock(CourseService.class);
-        when(service.findCourseByUuid(physicsFall2013.getUuid())).thenThrow(
+    public void testGetSectionMissing() {
+        final SectionService service = Mockito.mock(SectionService.class);
+        when(service.findSectionByUuid(physicsFall2013.getUuid())).thenThrow(
                 new ObjectNotFoundException(physicsFall2013.getUuid()));
 
-        final CourseResource resource = new CourseResource(service);
-        final Response response = resource.getCourse(physicsFall2013.getUuid());
+        final TestRunService testService = Mockito.mock(TestRunService.class);
+
+        final SectionResource resource = new SectionResource(service, testService);
+        final Response response = resource.getSection(physicsFall2013.getUuid());
 
         assertEquals(404, response.getStatus());
     }
 
     @Test
-    public void testGetCourseFailure() {
-        final CourseService service = Mockito.mock(CourseService.class);
-        when(service.findCourseByUuid(physicsFall2013.getUuid())).thenThrow(new UnitTestException());
+    public void testGetSectionFailure() {
+        final SectionService service = Mockito.mock(SectionService.class);
+        when(service.findSectionByUuid(physicsFall2013.getUuid())).thenThrow(new UnitTestException());
 
-        final CourseResource resource = new CourseResource(service);
-        final Response response = resource.getCourse(physicsFall2013.getUuid());
+        final TestRunService testService = Mockito.mock(TestRunService.class);
+
+        final SectionResource resource = new SectionResource(service, testService);
+        final Response response = resource.getSection(physicsFall2013.getUuid());
 
         assertEquals(500, response.getStatus());
     }
 
     @Test
-    public void testCreateCourse() {
-        final Course expected = physicsFall2013;
+    public void testCreateSection() {
+        final Section expected = physicsFall2013;
         final Name name = new Name();
         name.setName(expected.getName());
 
-        final CourseService service = Mockito.mock(CourseService.class);
-        when(service.createCourse(name.getName())).thenReturn(expected);
+        final SectionService service = Mockito.mock(SectionService.class);
+        when(service.createSection(name.getName())).thenReturn(expected);
 
-        final CourseResource resource = new CourseResource(service);
-        final Response response = resource.createCourse(name);
+        final TestRunService testService = Mockito.mock(TestRunService.class);
+
+        final SectionResource resource = new SectionResource(service, testService);
+        final Response response = resource.createSection(name);
 
         assertEquals(201, response.getStatus());
-        final Course actual = (Course) response.getEntity();
+        final Section actual = (Section) response.getEntity();
         assertNull(actual.getId());
         assertEquals(expected.getName(), actual.getName());
     }
 
     @Test
-    public void testCreateCourseBlankName() {
+    public void testCreateSectionBlankName() {
         final Name name = new Name();
 
-        final CourseService service = Mockito.mock(CourseService.class);
-        when(service.createCourse(name.getName())).thenReturn(null);
+        final SectionService service = Mockito.mock(SectionService.class);
+        when(service.createSection(name.getName())).thenReturn(null);
 
-        final CourseResource resource = new CourseResource(service);
-        final Response response = resource.createCourse(name);
+        final TestRunService testService = Mockito.mock(TestRunService.class);
+
+        final SectionResource resource = new SectionResource(service, testService);
+        final Response response = resource.createSection(name);
 
         assertEquals(400, response.getStatus());
     }
 
     /**
-     * Test handling when the course can't be created for some reason. For now
+     * Test handling when the section can't be created for some reason. For now
      * the service layer just returns a null value - it should throw an
      * appropriate exception.
      */
     @Test
-    public void testCreateCourseProblem() {
-        final Course expected = physicsFall2013;
+    public void testCreateSectionProblem() {
+        final Section expected = physicsFall2013;
         final Name name = new Name();
         name.setName(expected.getName());
 
-        final CourseService service = Mockito.mock(CourseService.class);
-        when(service.createCourse(name.getName())).thenReturn(null);
+        final SectionService service = Mockito.mock(SectionService.class);
+        when(service.createSection(name.getName())).thenReturn(null);
 
-        final CourseResource resource = new CourseResource(service);
-        final Response response = resource.createCourse(name);
+        final TestRunService testService = Mockito.mock(TestRunService.class);
+
+        final SectionResource resource = new SectionResource(service, testService);
+        final Response response = resource.createSection(name);
 
         assertEquals(500, response.getStatus());
     }
 
     @Test
-    public void testCreateCourseFailure() {
-        final Course expected = physicsFall2013;
+    public void testCreateSectionFailure() {
+        final Section expected = physicsFall2013;
         final Name name = new Name();
         name.setName(expected.getName());
 
-        final CourseService service = Mockito.mock(CourseService.class);
-        when(service.createCourse(name.getName())).thenThrow(new UnitTestException());
+        final SectionService service = Mockito.mock(SectionService.class);
+        when(service.createSection(name.getName())).thenThrow(new UnitTestException());
 
-        final CourseResource resource = new CourseResource(service);
-        final Response response = resource.createCourse(name);
+        final TestRunService testService = Mockito.mock(TestRunService.class);
+
+        final SectionResource resource = new SectionResource(service, testService);
+        final Response response = resource.createSection(name);
 
         assertEquals(500, response.getStatus());
     }
 
     @Test
-    public void testUpdateCourse() {
-        final Course expected = physicsFall2013;
+    public void testUpdateSection() {
+        final Section expected = physicsFall2013;
         final Name name = new Name();
         name.setName(physicsFall2014.getName());
-        final Course updated = new Course();
+        final Section updated = new Section();
         updated.setId(expected.getId());
         updated.setName(physicsFall2014.getName());
         updated.setUuid(expected.getUuid());
 
-        final CourseService service = Mockito.mock(CourseService.class);
-        when(service.findCourseByUuid(expected.getUuid())).thenReturn(expected);
-        when(service.updateCourse(expected, name.getName())).thenReturn(updated);
+        final SectionService service = Mockito.mock(SectionService.class);
+        when(service.findSectionByUuid(expected.getUuid())).thenReturn(expected);
+        when(service.updateSection(expected, name.getName())).thenReturn(updated);
 
-        final CourseResource resource = new CourseResource(service);
-        final Response response = resource.updateCourse(expected.getUuid(), name);
+        final TestRunService testService = Mockito.mock(TestRunService.class);
+
+        final SectionResource resource = new SectionResource(service, testService);
+        final Response response = resource.updateSection(expected.getUuid(), name);
 
         assertEquals(200, response.getStatus());
-        final Course actual = (Course) response.getEntity();
+        final Section actual = (Section) response.getEntity();
         assertNull(actual.getId());
         assertEquals(physicsFall2014.getName(), actual.getName());
         assertEquals(expected.getUuid(), actual.getUuid());
     }
 
     @Test
-    public void testUpdateCourseBlankName() {
-        final Course expected = physicsFall2013;
+    public void testUpdateSectionBlankName() {
+        final Section expected = physicsFall2013;
         final Name name = new Name();
 
-        final CourseService service = Mockito.mock(CourseService.class);
-        when(service.createCourse(name.getName())).thenReturn(null);
+        final SectionService service = Mockito.mock(SectionService.class);
+        when(service.createSection(name.getName())).thenReturn(null);
 
-        final CourseResource resource = new CourseResource(service);
-        final Response response = resource.updateCourse(expected.getUuid(), name);
+        final TestRunService testService = Mockito.mock(TestRunService.class);
+
+        final SectionResource resource = new SectionResource(service, testService);
+        final Response response = resource.updateSection(expected.getUuid(), name);
 
         assertEquals(400, response.getStatus());
     }
 
     /**
-     * Test handling when the course can't be updated for some reason. For now
+     * Test handling when the section can't be updated for some reason. For now
      * the service layer just returns a null value - it should throw an
      * appropriate exception.
      */
     @Test
-    public void testUpdateCourseProblem() {
-        final Course expected = physicsFall2013;
+    public void testUpdateSectionProblem() {
+        final Section expected = physicsFall2013;
         final Name name = new Name();
         name.setName(expected.getName());
 
-        final CourseService service = Mockito.mock(CourseService.class);
-        when(service.updateCourse(expected, name.getName())).thenReturn(null);
+        final SectionService service = Mockito.mock(SectionService.class);
+        when(service.updateSection(expected, name.getName())).thenReturn(null);
 
-        final CourseResource resource = new CourseResource(service);
-        final Response response = resource.createCourse(name);
+        final TestRunService testService = Mockito.mock(TestRunService.class);
+
+        final SectionResource resource = new SectionResource(service, testService);
+        final Response response = resource.createSection(name);
 
         assertEquals(500, response.getStatus());
     }
 
     @Test
-    public void testUpdateCourseFailure() {
-        final Course expected = physicsFall2013;
+    public void testUpdateSectionFailure() {
+        final Section expected = physicsFall2013;
         final Name name = new Name();
         name.setName(expected.getName());
 
-        final CourseService service = Mockito.mock(CourseService.class);
-        when(service.updateCourse(expected, name.getName())).thenThrow(new UnitTestException());
+        final SectionService service = Mockito.mock(SectionService.class);
+        when(service.updateSection(expected, name.getName())).thenThrow(new UnitTestException());
 
-        final CourseResource resource = new CourseResource(service);
-        final Response response = resource.createCourse(name);
+        final TestRunService testService = Mockito.mock(TestRunService.class);
+
+        final SectionResource resource = new SectionResource(service, testService);
+        final Response response = resource.createSection(name);
 
         assertEquals(500, response.getStatus());
     }
 
     @Test
-    public void testDeleteCourse() {
-        final Course expected = physicsFall2013;
+    public void testDeleteSection() {
+        final Section expected = physicsFall2013;
 
-        final CourseService service = Mockito.mock(CourseService.class);
-        doNothing().when(service).deleteCourse(expected.getUuid());
+        final SectionService service = Mockito.mock(SectionService.class);
+        doNothing().when(service).deleteSection(expected.getUuid());
 
-        final CourseResource resource = new CourseResource(service);
-        final Response response = resource.deleteCourse(expected.getUuid());
+        final TestRunService testService = Mockito.mock(TestRunService.class);
+
+        final SectionResource resource = new SectionResource(service, testService);
+        final Response response = resource.deleteSection(expected.getUuid());
 
         assertEquals(204, response.getStatus());
     }
 
     @Test
-    public void testDeleteCourseMissing() {
-        final Course expected = physicsFall2013;
+    public void testDeleteSectionMissing() {
+        final Section expected = physicsFall2013;
         final Name name = new Name();
         name.setName(expected.getName());
 
-        final CourseService service = Mockito.mock(CourseService.class);
-        doThrow(new ObjectNotFoundException(expected.getUuid())).when(service).deleteCourse(expected.getUuid());
+        final SectionService service = Mockito.mock(SectionService.class);
+        doThrow(new ObjectNotFoundException(expected.getUuid())).when(service).deleteSection(expected.getUuid());
 
-        final CourseResource resource = new CourseResource(service);
-        final Response response = resource.deleteCourse(expected.getUuid());
+        final TestRunService testService = Mockito.mock(TestRunService.class);
+
+        final SectionResource resource = new SectionResource(service, testService);
+        final Response response = resource.deleteSection(expected.getUuid());
 
         assertEquals(204, response.getStatus());
     }
 
     @Test
-    public void testDeleteCourseFailure() {
-        final Course expected = physicsFall2013;
+    public void testDeleteSectionFailure() {
+        final Section expected = physicsFall2013;
 
-        final CourseService service = Mockito.mock(CourseService.class);
-        doThrow(new UnitTestException()).when(service).deleteCourse(expected.getUuid());
+        final SectionService service = Mockito.mock(SectionService.class);
+        doThrow(new UnitTestException()).when(service).deleteSection(expected.getUuid());
 
-        final CourseResource resource = new CourseResource(service);
-        final Response response = resource.deleteCourse(expected.getUuid());
+        final TestRunService testService = Mockito.mock(TestRunService.class);
+
+        final SectionResource resource = new SectionResource(service, testService);
+        final Response response = resource.deleteSection(expected.getUuid());
 
         assertEquals(500, response.getStatus());
     }

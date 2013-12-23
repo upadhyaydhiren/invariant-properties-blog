@@ -28,6 +28,7 @@ import com.invariantproperties.sandbox.student.domain.Instructor;
 import com.invariantproperties.sandbox.student.domain.Section;
 import com.invariantproperties.sandbox.student.domain.Student;
 import com.invariantproperties.sandbox.student.domain.Term;
+import com.invariantproperties.sandbox.student.domain.TestRun;
 
 /**
  * @author Bear Giles <bgiles@coyotesong.com>
@@ -78,6 +79,14 @@ public abstract class AbstractResource {
 
     public Term scrubTerm(final Term dirty) {
         final Term clean = new Term();
+        clean.setUuid(dirty.getUuid());
+        clean.setName(dirty.getName());
+        // clean.setSelf("resource/" + dirty.getUuid());
+        return clean;
+    }
+
+    public TestRun scrubTestRun(final TestRun dirty) {
+        final TestRun clean = new TestRun();
         clean.setUuid(dirty.getUuid());
         clean.setName(dirty.getName());
         // clean.setSelf("resource/" + dirty.getUuid());

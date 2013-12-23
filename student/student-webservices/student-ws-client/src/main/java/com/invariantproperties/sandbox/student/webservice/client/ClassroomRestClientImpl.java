@@ -23,6 +23,7 @@
 package com.invariantproperties.sandbox.student.webservice.client;
 
 import com.invariantproperties.sandbox.student.domain.Classroom;
+import com.invariantproperties.sandbox.student.domain.TestRun;
 
 /**
  * Implementation of ClassroomRestClient.
@@ -52,8 +53,20 @@ public class ClassroomRestClientImpl extends AbstractRestClientImpl<Classroom> i
     }
 
     /**
+     * Create JSON string.
+     * 
+     * @param name
+     * @param testUuid
+     * @return
+     */
+    String createJson(final String name, final TestRun testRun) {
+        return String.format("{ \"name\": \"%s\", \"testUuid\": \"%s\" }", name, testRun.getUuid());
+    }
+
+    /**
      * @see com.invariantproperties.sandbox.student.webservice.client.ClassroomRestClient#getAllClassrooms()
      */
+    @Override
     public Classroom[] getAllClassrooms() {
         return super.getAllObjects(EMPTY_CLASSROOM_ARRAY);
     }
@@ -61,6 +74,7 @@ public class ClassroomRestClientImpl extends AbstractRestClientImpl<Classroom> i
     /**
      * @see com.invariantproperties.sandbox.student.webservice.client.ClassroomRestClient#getClassroom(java.lang.String)
      */
+    @Override
     public Classroom getClassroom(final String uuid) {
         return super.getObject(uuid);
     }
@@ -68,6 +82,7 @@ public class ClassroomRestClientImpl extends AbstractRestClientImpl<Classroom> i
     /**
      * @see com.invariantproperties.sandbox.student.webservice.client.ClassroomRestClient#createClassroom(java.lang.String)
      */
+    @Override
     public Classroom createClassroom(final String name) {
         if (name == null || name.isEmpty()) {
             throw new IllegalArgumentException("'name' is required");
@@ -77,9 +92,27 @@ public class ClassroomRestClientImpl extends AbstractRestClientImpl<Classroom> i
     }
 
     /**
+     * @see com.invariantproperties.sandbox.student.webservice.client.ClassroomRestClient#createClassroomForTesting(java.lang.String,
+     *      com.invariantproperties.sandbox.student.common.TestRun)
+     */
+    @Override
+    public Classroom createClassroomForTesting(final String name, final TestRun testRun) {
+        if (name == null || name.isEmpty()) {
+            throw new IllegalArgumentException("'name' is required");
+        }
+
+        if (testRun == null || testRun.getUuid() == null || testRun.getUuid().isEmpty()) {
+            throw new IllegalArgumentException("'testRun' is required");
+        }
+
+        return createObject(createJson(name, testRun));
+    }
+
+    /**
      * @see com.invariantproperties.sandbox.student.webservice.client.ClassroomRestClient#updateClassroom(java.lang.String,
      *      java.lang.String)
      */
+    @Override
     public Classroom updateClassroom(final String uuid, final String name) {
         if (name == null || name.isEmpty()) {
             throw new IllegalArgumentException("'name' is required");
@@ -91,6 +124,7 @@ public class ClassroomRestClientImpl extends AbstractRestClientImpl<Classroom> i
     /**
      * @see com.invariantproperties.sandbox.student.webservice.client.ClassroomRestClient#deleteClassroom(java.lang.String)
      */
+    @Override
     public void deleteClassroom(final String uuid) {
         super.deleteObject(uuid);
     }

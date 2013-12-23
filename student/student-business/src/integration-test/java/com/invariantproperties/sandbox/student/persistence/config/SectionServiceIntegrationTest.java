@@ -26,7 +26,10 @@ import static com.invariantproperties.sandbox.student.matcher.SectionEquality.eq
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+
+import java.util.List;
 
 import javax.annotation.Resource;
 
@@ -39,10 +42,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.invariantproperties.sandbox.student.business.ObjectNotFoundException;
 import com.invariantproperties.sandbox.student.business.SectionService;
+import com.invariantproperties.sandbox.student.business.TestRunService;
 import com.invariantproperties.sandbox.student.business.config.BusinessApplicationContext;
 import com.invariantproperties.sandbox.student.config.TestBusinessApplicationContext;
 import com.invariantproperties.sandbox.student.config.TestPersistenceJpaConfig;
 import com.invariantproperties.sandbox.student.domain.Section;
+import com.invariantproperties.sandbox.student.domain.TestRun;
+import com.invariantproperties.sandbox.student.domain.TestablePersistentObject;
 
 /**
  * @author Bear Giles <bgiles@coyotesong.com>
@@ -57,9 +63,14 @@ public class SectionServiceIntegrationTest {
     @Resource
     private SectionService dao;
 
+    @Resource
+    TestRunService testService;
+
     @Test
     public void testSectionLifecycle() throws Exception {
-        final String name = "Calculus 101 - Fall 2013";
+        final TestRun testRun = testService.createTestRun();
+
+        final String name = "Calculus 101 - Fall 2013 : " + testRun.getUuid();
 
         final Section expected = new Section();
         expected.setName(name);
@@ -84,10 +95,18 @@ public class SectionServiceIntegrationTest {
         actual = dao.findSectionByUuid(expected.getUuid());
         assertThat(expected, equalTo(actual));
 
+        // get all sections
+        final List<Section> sections = dao.findSectionsByTestRun(testRun);
+        assertTrue(sections.contains(actual));
+
         // update section
-        expected.setName("Calculus 101 - Fall 2014");
+        expected.setName("Calculus 101 - Fall 2014 : " + testRun.getUuid());
         actual = dao.updateSection(actual, expected.getName());
         assertThat(expected, equalTo(actual));
+
+        // verify testRun.getObjects
+        final List<TestablePersistentObject> objects = testRun.getObjects();
+        assertTrue(objects.contains(actual));
 
         // delete Section
         dao.deleteSection(expected.getUuid());
@@ -97,6 +116,8 @@ public class SectionServiceIntegrationTest {
         } catch (ObjectNotFoundException e) {
             // expected
         }
+
+        testService.deleteTestRun(testRun.getUuid());
     }
 
     /**

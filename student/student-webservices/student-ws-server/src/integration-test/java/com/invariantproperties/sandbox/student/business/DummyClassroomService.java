@@ -32,20 +32,24 @@ import java.util.UUID;
 import org.apache.log4j.Logger;
 
 import com.invariantproperties.sandbox.student.domain.Classroom;
+import com.invariantproperties.sandbox.student.domain.TestRun;
 
 public class DummyClassroomService implements ClassroomService {
     private static final Logger log = Logger.getLogger(DummyClassroomService.class);
     private Map<String, Classroom> cache = Collections.synchronizedMap(new HashMap<String, Classroom>());
 
+    @Override
     public List<Classroom> findAllClassrooms() {
         log.debug("ClassroomServer: findAllClassrooms()");
         return new ArrayList<Classroom>(cache.values());
     }
 
+    @Override
     public Classroom findClassroomById(Integer id) {
         throw new ObjectNotFoundException(id);
     }
 
+    @Override
     public Classroom findClassroomByUuid(String uuid) {
         log.debug("ClassroomServer: findClassroomByUuid()");
         if (!cache.containsKey(uuid)) {
@@ -54,27 +58,50 @@ public class DummyClassroomService implements ClassroomService {
         return cache.get(uuid);
     }
 
+    @Override
+    public List<Classroom> findClassroomsByTestRun(TestRun testRun) {
+        log.debug("ClassroomServer: findClassroomsByTestRun()");
+        final List<Classroom> results = new ArrayList<Classroom>();
+        for (Classroom classroom : cache.values()) {
+            if (testRun.equals(classroom.getTestRun())) {
+                results.add(classroom);
+            }
+        }
+        return results;
+    }
+
+    @Override
     public Classroom createClassroom(String name) {
         log.debug("ClassroomServer: createClassroom()");
-        Classroom classroom = new Classroom();
+        final Classroom classroom = new Classroom();
         classroom.setUuid(UUID.randomUUID().toString());
         classroom.setName(name);
         cache.put(classroom.getUuid(), classroom);
         return classroom;
     }
 
+    @Override
+    public Classroom createClassroomForTesting(String name, TestRun testRun) {
+        final Classroom classroom = createClassroom(name);
+        classroom.setTestRun(testRun);
+        return classroom;
+    }
+
+    @Override
     public Classroom updateClassroom(Classroom oldClassroom, String name) {
         log.debug("ClassroomServer: updateClassroom()");
         if (!cache.containsKey(oldClassroom.getUuid())) {
             throw new ObjectNotFoundException(oldClassroom.getUuid());
         }
 
-        Classroom classroom = cache.get(oldClassroom.getUuid());
+        final Classroom classroom = cache.get(oldClassroom.getUuid());
         classroom.setUuid(UUID.randomUUID().toString());
+        classroom.setTestRun(oldClassroom.getTestRun());
         classroom.setName(name);
         return classroom;
     }
 
+    @Override
     public void deleteClassroom(String uuid) {
         log.debug("ClassroomServer: deleteClassroom()");
         if (cache.containsKey(uuid)) {

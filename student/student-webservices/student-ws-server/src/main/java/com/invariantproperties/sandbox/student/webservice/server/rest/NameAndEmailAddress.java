@@ -31,6 +31,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 public class NameAndEmailAddress {
     private String name;
     private String emailAddress;
+    private String testUuid;
 
     public String getName() {
         return name;
@@ -46,5 +47,13 @@ public class NameAndEmailAddress {
 
     public void setEmailAddress(String emailAddress) {
         this.emailAddress = emailAddress;
+    }
+
+    public String getTestUuid() {
+        return testUuid;
+    }
+
+    public void setTestUuid(String testUuid) {
+        this.testUuid = testUuid;
     }
 }

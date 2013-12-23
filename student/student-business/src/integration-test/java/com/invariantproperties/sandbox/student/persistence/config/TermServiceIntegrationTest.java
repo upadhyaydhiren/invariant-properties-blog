@@ -26,7 +26,10 @@ import static com.invariantproperties.sandbox.student.matcher.TermEquality.equal
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+
+import java.util.List;
 
 import javax.annotation.Resource;
 
@@ -39,10 +42,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.invariantproperties.sandbox.student.business.ObjectNotFoundException;
 import com.invariantproperties.sandbox.student.business.TermService;
+import com.invariantproperties.sandbox.student.business.TestRunService;
 import com.invariantproperties.sandbox.student.business.config.BusinessApplicationContext;
 import com.invariantproperties.sandbox.student.config.TestBusinessApplicationContext;
 import com.invariantproperties.sandbox.student.config.TestPersistenceJpaConfig;
 import com.invariantproperties.sandbox.student.domain.Term;
+import com.invariantproperties.sandbox.student.domain.TestRun;
+import com.invariantproperties.sandbox.student.domain.TestablePersistentObject;
 
 /**
  * @author Bear Giles <bgiles@coyotesong.com>
@@ -57,9 +63,14 @@ public class TermServiceIntegrationTest {
     @Resource
     private TermService dao;
 
+    @Resource
+    TestRunService testService;
+
     @Test
     public void testTermLifecycle() throws Exception {
-        final String name = "Fall 2013";
+        final TestRun testRun = testService.createTestRun();
+
+        final String name = "Fall 2013 : " + testRun.getUuid();
 
         final Term expected = new Term();
         expected.setName(name);
@@ -84,10 +95,18 @@ public class TermServiceIntegrationTest {
         actual = dao.findTermByUuid(expected.getUuid());
         assertThat(expected, equalTo(actual));
 
+        // get all terms
+        final List<Term> terms = dao.findTermsByTestRun(testRun);
+        assertTrue(terms.contains(actual));
+
         // update term
-        expected.setName("Fall 2014");
+        expected.setName("Fall 2014 : " + testRun.getUuid());
         actual = dao.updateTerm(actual, expected.getName());
         assertThat(expected, equalTo(actual));
+
+        // verify testRun.getObjects
+        final List<TestablePersistentObject> objects = testRun.getObjects();
+        assertTrue(objects.contains(actual));
 
         // delete Term
         dao.deleteTerm(expected.getUuid());
@@ -97,6 +116,8 @@ public class TermServiceIntegrationTest {
         } catch (ObjectNotFoundException e) {
             // expected
         }
+
+        testService.deleteTestRun(testRun.getUuid());
     }
 
     /**
