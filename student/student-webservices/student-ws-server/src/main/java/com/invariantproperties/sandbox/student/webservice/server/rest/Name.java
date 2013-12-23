@@ -30,6 +30,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement
 public class Name {
     private String name;
+    private String testUuid;
 
     public String getName() {
         return name;
@@ -37,5 +38,13 @@ public class Name {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getTestUuid() {
+        return testUuid;
+    }
+
+    public void setTestUuid(String testUuid) {
+        this.testUuid = testUuid;
     }
 }

@@ -33,6 +33,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.invariantproperties.sandbox.student.domain.Course;
+import com.invariantproperties.sandbox.student.domain.TestRun;
 import com.invariantproperties.sandbox.student.repository.CourseRepository;
 
 /**
@@ -68,18 +69,7 @@ public class CourseServiceImpl implements CourseService {
     @Transactional(readOnly = true)
     @Override
     public List<Course> findAllCourses() {
-        List<Course> courses = null;
-
-        try {
-            courses = courseRepository.findAll();
-        } catch (DataAccessException e) {
-            if (!(e instanceof UnitTestException)) {
-                log.info("error loading list of courses: " + e.getMessage(), e);
-            }
-            throw new PersistenceException("unable to get list of courses.", e);
-        }
-
-        return courses;
+        return findCoursesByTestRun(null);
     }
 
     /**
@@ -132,6 +122,27 @@ public class CourseServiceImpl implements CourseService {
 
     /**
      * @see com.invariantproperties.sandbox.student.business.CourseService#
+     *      findCoursesByTestRun(java.lang.String)
+     */
+    @Transactional(readOnly = true)
+    @Override
+    public List<Course> findCoursesByTestRun(TestRun testRun) {
+        List<Course> courses = null;
+
+        try {
+            courses = courseRepository.findCoursesByTestRun(testRun);
+        } catch (DataAccessException e) {
+            if (!(e instanceof UnitTestException)) {
+                log.info("error loading list of courses: " + e.getMessage(), e);
+            }
+            throw new PersistenceException("unable to get list of courses.", e);
+        }
+
+        return courses;
+    }
+
+    /**
+     * @see com.invariantproperties.sandbox.student.business.CourseService#
      *      createCourse(java.lang.String)
      */
     @Transactional
@@ -139,6 +150,31 @@ public class CourseServiceImpl implements CourseService {
     public Course createCourse(String name) {
         final Course course = new Course();
         course.setName(name);
+
+        Course actual = null;
+        try {
+            actual = courseRepository.saveAndFlush(course);
+        } catch (DataAccessException e) {
+            if (!(e instanceof UnitTestException)) {
+                log.info("internal error retrieving course: " + name, e);
+            }
+            throw new PersistenceException("unable to create course", e);
+        }
+
+        return actual;
+    }
+
+    /**
+     * @see com.invariantproperties.sandbox.student.business.CourseService#
+     *      createCourseForTesting(java.lang.String,
+     *      com.invariantproperties.sandbox.student.common.TestRun)
+     */
+    @Transactional
+    @Override
+    public Course createCourseForTesting(String name, TestRun testRun) {
+        final Course course = new Course();
+        course.setName(name);
+        course.setTestRun(testRun);
 
         Course actual = null;
         try {

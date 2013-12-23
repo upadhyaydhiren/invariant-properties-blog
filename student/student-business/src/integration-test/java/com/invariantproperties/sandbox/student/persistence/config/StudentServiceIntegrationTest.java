@@ -26,7 +26,10 @@ import static com.invariantproperties.sandbox.student.matcher.StudentEquality.eq
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+
+import java.util.List;
 
 import javax.annotation.Resource;
 
@@ -39,10 +42,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.invariantproperties.sandbox.student.business.ObjectNotFoundException;
 import com.invariantproperties.sandbox.student.business.StudentService;
+import com.invariantproperties.sandbox.student.business.TestRunService;
 import com.invariantproperties.sandbox.student.business.config.BusinessApplicationContext;
 import com.invariantproperties.sandbox.student.config.TestBusinessApplicationContext;
 import com.invariantproperties.sandbox.student.config.TestPersistenceJpaConfig;
 import com.invariantproperties.sandbox.student.domain.Student;
+import com.invariantproperties.sandbox.student.domain.TestRun;
+import com.invariantproperties.sandbox.student.domain.TestablePersistentObject;
 
 /**
  * @author Bear Giles <bgiles@coyotesong.com>
@@ -57,10 +63,15 @@ public class StudentServiceIntegrationTest {
     @Resource
     private StudentService dao;
 
+    @Resource
+    TestRunService testService;
+
     @Test
     public void testStudentLifecycle() throws Exception {
-        final String name = "Alice";
-        final String email = "alice@example.com";
+        final TestRun testRun = testService.createTestRun();
+
+        final String name = "Alice : " + testRun.getUuid();
+        final String email = "alice-" + testRun.getUuid() + "@example.com";
 
         final Student expected = new Student();
         expected.setName(name);
@@ -86,11 +97,19 @@ public class StudentServiceIntegrationTest {
         actual = dao.findStudentByUuid(expected.getUuid());
         assertThat(expected, equalTo(actual));
 
+        // get all students
+        final List<Student> students = dao.findStudentsByTestRun(testRun);
+        assertTrue(students.contains(actual));
+
         // update student
-        expected.setName("Bob");
-        expected.setEmailAddress("bob@example.com");
+        expected.setName("Bob : " + testRun.getUuid());
+        expected.setEmailAddress("bob-" + testRun.getUuid() + "@example.com");
         actual = dao.updateStudent(actual, expected.getName(), expected.getEmailAddress());
         assertThat(expected, equalTo(actual));
+
+        // verify testRun.getObjects
+        final List<TestablePersistentObject> objects = testRun.getObjects();
+        assertTrue(objects.contains(actual));
 
         // delete Student
         dao.deleteStudent(expected.getUuid());
@@ -100,6 +119,8 @@ public class StudentServiceIntegrationTest {
         } catch (ObjectNotFoundException e) {
             // expected
         }
+
+        testService.deleteTestRun(testRun.getUuid());
     }
 
     /**

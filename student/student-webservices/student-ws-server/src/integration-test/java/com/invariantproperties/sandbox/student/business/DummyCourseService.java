@@ -32,20 +32,30 @@ import java.util.UUID;
 import org.apache.log4j.Logger;
 
 import com.invariantproperties.sandbox.student.domain.Course;
+import com.invariantproperties.sandbox.student.domain.TestRun;
 
 public class DummyCourseService implements CourseService {
     private static final Logger log = Logger.getLogger(DummyCourseService.class);
     private Map<String, Course> cache = Collections.synchronizedMap(new HashMap<String, Course>());
 
+    @Override
     public List<Course> findAllCourses() {
         log.debug("CourseServer: findAllCourses()");
-        return new ArrayList<Course>(cache.values());
+        final List<Course> results = new ArrayList<Course>();
+        for (Course course : cache.values()) {
+            if (course.getTestRun() == null) {
+                results.add(course);
+            }
+        }
+        return results;
     }
 
+    @Override
     public Course findCourseById(Integer id) {
         throw new ObjectNotFoundException(id);
     }
 
+    @Override
     public Course findCourseByUuid(String uuid) {
         log.debug("CourseServer: findCourseByUuid()");
         if (!cache.containsKey(uuid)) {
@@ -54,15 +64,37 @@ public class DummyCourseService implements CourseService {
         return cache.get(uuid);
     }
 
+    @Override
+    public List<Course> findCoursesByTestRun(TestRun testRun) {
+        log.debug("CourseServer: findCoursesByTestRun()");
+        final List<Course> results = new ArrayList<Course>();
+        for (Course course : cache.values()) {
+            if (testRun.equals(course.getTestRun())) {
+                results.add(course);
+            }
+        }
+        return results;
+    }
+
+    @Override
     public Course createCourse(String name) {
         log.debug("CourseServer: createCourse()");
-        Course course = new Course();
+        final Course course = new Course();
         course.setUuid(UUID.randomUUID().toString());
         course.setName(name);
         cache.put(course.getUuid(), course);
         return course;
     }
 
+    @Override
+    public Course createCourseForTesting(String name, TestRun testRun) {
+        log.debug("CourseServer: createCourseForTesting()");
+        final Course course = createCourse(name);
+        course.setTestRun(course.getTestRun());
+        return course;
+    }
+
+    @Override
     public Course updateCourse(Course oldCourse, String name) {
         log.debug("CourseServer: updateCourse()");
         if (!cache.containsKey(oldCourse.getUuid())) {
@@ -70,11 +102,13 @@ public class DummyCourseService implements CourseService {
         }
 
         Course course = cache.get(oldCourse.getUuid());
-        course.setUuid(UUID.randomUUID().toString());
         course.setName(name);
+        course.setUuid(oldCourse.getUuid());
+        course.setTestRun(oldCourse.getTestRun());
         return course;
     }
 
+    @Override
     public void deleteCourse(String uuid) {
         log.debug("CourseServer: deleteCourse()");
         if (cache.containsKey(uuid)) {

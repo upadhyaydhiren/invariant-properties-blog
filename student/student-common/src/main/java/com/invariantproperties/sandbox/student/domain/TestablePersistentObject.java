@@ -20,46 +20,45 @@
  * 
  * Copyright (c) 2013 Bear Giles <bgiles@coyotesong.com>
  */
-package com.invariantproperties.sandbox.student.webservice.client;
+package com.invariantproperties.sandbox.student.domain;
 
-import com.invariantproperties.sandbox.student.domain.TestablePersistentObject;
+import javax.persistence.FetchType;
+import javax.persistence.ManyToOne;
+import javax.persistence.MappedSuperclass;
+import javax.persistence.Transient;
 
 /**
- * Exception thrown when an expected object is not found.
+ * Abstract base class for all persistent objects that include a Test UUID.
+ * 
+ * This class supports a form of data sharding for testing purposes. Normal data
+ * should have a null value, test data should have a unique value that
+ * references a TestRun object.
  * 
  * @author Bear Giles <bgiles@coyotesong.com>
  */
-public class ObjectNotFoundException extends RestClientException {
+@MappedSuperclass
+public abstract class TestablePersistentObject extends PersistentObject {
     private static final long serialVersionUID = 1L;
-
-    private final Class<? extends TestablePersistentObject> objectClass;
-    private final String resource;
-    private final String uuid;
+    private TestRun testRun;
 
     /**
-     * Constructor
+     * Fetch testRun object. We use lazy fetching since we rarely care about the
+     * contents of this object - we just want to ensure referential integrity to
+     * an existing testRun object when persisting a TPO.
      * 
-     * @param resource
-     * @param objectClass
-     * @param uuid
+     * @return
      */
-    public ObjectNotFoundException(final String resource, final Class<? extends TestablePersistentObject> objectClass,
-            final String uuid) {
-        super("object not found: " + resource + "[" + uuid + "]");
-        this.resource = resource;
-        this.objectClass = objectClass;
-        this.uuid = uuid;
+    @ManyToOne(fetch = FetchType.LAZY, optional = true)
+    public TestRun getTestRun() {
+        return testRun;
     }
 
-    public String getResource() {
-        return resource;
+    public void setTestRun(TestRun testRun) {
+        this.testRun = testRun;
     }
 
-    public Class<? extends TestablePersistentObject> getObjectClass() {
-        return objectClass;
-    }
-
-    public String getUuid() {
-        return uuid;
+    @Transient
+    public boolean isTestData() {
+        return testRun != null;
     }
 }

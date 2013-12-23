@@ -39,18 +39,19 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-import com.invariantproperties.sandbox.student.business.CourseService;
 import com.invariantproperties.sandbox.student.business.ObjectNotFoundException;
-import com.invariantproperties.sandbox.student.domain.Course;
+import com.invariantproperties.sandbox.student.business.TermService;
+import com.invariantproperties.sandbox.student.business.TestRunService;
+import com.invariantproperties.sandbox.student.domain.Term;
 
 /**
- * Unit tests for CourseResource.
+ * Unit tests for TermResource.
  * 
  * @author Bear Giles <bgiles@coyotesong.com>
  */
 public class TermResourceTest {
-    private Course fall2013 = new Course();
-    private Course fall2014 = new Course();
+    private Term fall2013 = new Term();
+    private Term fall2014 = new Term();
 
     @Before
     public void init() {
@@ -64,17 +65,19 @@ public class TermResourceTest {
     }
 
     @Test
-    public void testFindAllCourses() {
-        final List<Course> expected = Arrays.asList(fall2013);
+    public void testFindAllTerms() {
+        final List<Term> expected = Arrays.asList(fall2013);
 
-        final CourseService service = Mockito.mock(CourseService.class);
-        when(service.findAllCourses()).thenReturn(expected);
+        final TermService service = Mockito.mock(TermService.class);
+        when(service.findAllTerms()).thenReturn(expected);
 
-        final CourseResource resource = new CourseResource(service);
-        final Response response = resource.findAllCourses();
+        final TestRunService testService = Mockito.mock(TestRunService.class);
+
+        final TermResource resource = new TermResource(service, testService);
+        final Response response = resource.findAllTerms();
 
         assertEquals(200, response.getStatus());
-        final Course[] actual = (Course[]) response.getEntity();
+        final Term[] actual = (Term[]) response.getEntity();
         assertEquals(expected.size(), actual.length);
         assertNull(actual[0].getId());
         assertEquals(expected.get(0).getName(), actual[0].getName());
@@ -82,246 +85,278 @@ public class TermResourceTest {
     }
 
     @Test
-    public void testFindAllCoursesEmpty() {
-        final List<Course> expected = new ArrayList<>();
+    public void testFindAllTermsEmpty() {
+        final List<Term> expected = new ArrayList<>();
 
-        final CourseService service = Mockito.mock(CourseService.class);
-        when(service.findAllCourses()).thenReturn(expected);
+        final TermService service = Mockito.mock(TermService.class);
+        when(service.findAllTerms()).thenReturn(expected);
 
-        final CourseResource resource = new CourseResource(service);
-        final Response response = resource.findAllCourses();
+        final TestRunService testService = Mockito.mock(TestRunService.class);
+
+        final TermResource resource = new TermResource(service, testService);
+        final Response response = resource.findAllTerms();
 
         assertEquals(200, response.getStatus());
-        final Course[] actual = (Course[]) response.getEntity();
+        final Term[] actual = (Term[]) response.getEntity();
         assertEquals(0, actual.length);
     }
 
     @Test
-    public void testFindAllCoursesFailure() {
-        final CourseService service = Mockito.mock(CourseService.class);
-        when(service.findAllCourses()).thenThrow(new UnitTestException());
+    public void testFindAllTermsFailure() {
+        final TermService service = Mockito.mock(TermService.class);
+        when(service.findAllTerms()).thenThrow(new UnitTestException());
 
-        final CourseResource resource = new CourseResource(service);
-        final Response response = resource.findAllCourses();
+        final TestRunService testService = Mockito.mock(TestRunService.class);
+
+        final TermResource resource = new TermResource(service, testService);
+        final Response response = resource.findAllTerms();
 
         assertEquals(500, response.getStatus());
     }
 
     @Test
-    public void testGetCourse() {
-        final Course expected = fall2013;
+    public void testGetTerm() {
+        final Term expected = fall2013;
 
-        final CourseService service = Mockito.mock(CourseService.class);
-        when(service.findCourseByUuid(expected.getUuid())).thenReturn(expected);
+        final TermService service = Mockito.mock(TermService.class);
+        when(service.findTermByUuid(expected.getUuid())).thenReturn(expected);
 
-        final CourseResource resource = new CourseResource(service);
-        final Response response = resource.getCourse(expected.getUuid());
+        final TestRunService testService = Mockito.mock(TestRunService.class);
+
+        final TermResource resource = new TermResource(service, testService);
+        final Response response = resource.getTerm(expected.getUuid());
 
         assertEquals(200, response.getStatus());
-        final Course actual = (Course) response.getEntity();
+        final Term actual = (Term) response.getEntity();
         assertNull(actual.getId());
         assertEquals(expected.getName(), actual.getName());
         assertEquals(expected.getUuid(), actual.getUuid());
     }
 
     @Test
-    public void testGetCourseMissing() {
-        final CourseService service = Mockito.mock(CourseService.class);
-        when(service.findCourseByUuid(fall2013.getUuid())).thenThrow(new ObjectNotFoundException(fall2013.getUuid()));
+    public void testGetTermMissing() {
+        final TermService service = Mockito.mock(TermService.class);
+        when(service.findTermByUuid(fall2013.getUuid())).thenThrow(new ObjectNotFoundException(fall2013.getUuid()));
 
-        final CourseResource resource = new CourseResource(service);
-        final Response response = resource.getCourse(fall2013.getUuid());
+        final TestRunService testService = Mockito.mock(TestRunService.class);
+
+        final TermResource resource = new TermResource(service, testService);
+        final Response response = resource.getTerm(fall2013.getUuid());
 
         assertEquals(404, response.getStatus());
     }
 
     @Test
-    public void testGetCourseFailure() {
-        final CourseService service = Mockito.mock(CourseService.class);
-        when(service.findCourseByUuid(fall2013.getUuid())).thenThrow(new UnitTestException());
+    public void testGetTermFailure() {
+        final TermService service = Mockito.mock(TermService.class);
+        when(service.findTermByUuid(fall2013.getUuid())).thenThrow(new UnitTestException());
 
-        final CourseResource resource = new CourseResource(service);
-        final Response response = resource.getCourse(fall2013.getUuid());
+        final TestRunService testService = Mockito.mock(TestRunService.class);
+
+        final TermResource resource = new TermResource(service, testService);
+        final Response response = resource.getTerm(fall2013.getUuid());
 
         assertEquals(500, response.getStatus());
     }
 
     @Test
-    public void testCreateCourse() {
-        final Course expected = fall2013;
+    public void testCreateTerm() {
+        final Term expected = fall2013;
         final Name name = new Name();
         name.setName(expected.getName());
 
-        final CourseService service = Mockito.mock(CourseService.class);
-        when(service.createCourse(name.getName())).thenReturn(expected);
+        final TermService service = Mockito.mock(TermService.class);
+        when(service.createTerm(name.getName())).thenReturn(expected);
 
-        final CourseResource resource = new CourseResource(service);
-        final Response response = resource.createCourse(name);
+        final TestRunService testService = Mockito.mock(TestRunService.class);
+
+        final TermResource resource = new TermResource(service, testService);
+        final Response response = resource.createTerm(name);
 
         assertEquals(201, response.getStatus());
-        final Course actual = (Course) response.getEntity();
+        final Term actual = (Term) response.getEntity();
         assertNull(actual.getId());
         assertEquals(expected.getName(), actual.getName());
     }
 
     @Test
-    public void testCreateCourseBlankName() {
+    public void testCreateTermBlankName() {
         final Name name = new Name();
 
-        final CourseService service = Mockito.mock(CourseService.class);
-        when(service.createCourse(name.getName())).thenReturn(null);
+        final TermService service = Mockito.mock(TermService.class);
+        when(service.createTerm(name.getName())).thenReturn(null);
 
-        final CourseResource resource = new CourseResource(service);
-        final Response response = resource.createCourse(name);
+        final TestRunService testService = Mockito.mock(TestRunService.class);
+
+        final TermResource resource = new TermResource(service, testService);
+        final Response response = resource.createTerm(name);
 
         assertEquals(400, response.getStatus());
     }
 
     /**
-     * Test handling when the course can't be created for some reason. For now
-     * the service layer just returns a null value - it should throw an
-     * appropriate exception.
+     * Test handling when the term can't be created for some reason. For now the
+     * service layer just returns a null value - it should throw an appropriate
+     * exception.
      */
     @Test
-    public void testCreateCourseProblem() {
-        final Course expected = fall2013;
+    public void testCreateTermProblem() {
+        final Term expected = fall2013;
         final Name name = new Name();
         name.setName(expected.getName());
 
-        final CourseService service = Mockito.mock(CourseService.class);
-        when(service.createCourse(name.getName())).thenReturn(null);
+        final TermService service = Mockito.mock(TermService.class);
+        when(service.createTerm(name.getName())).thenReturn(null);
 
-        final CourseResource resource = new CourseResource(service);
-        final Response response = resource.createCourse(name);
+        final TestRunService testService = Mockito.mock(TestRunService.class);
+
+        final TermResource resource = new TermResource(service, testService);
+        final Response response = resource.createTerm(name);
 
         assertEquals(500, response.getStatus());
     }
 
     @Test
-    public void testCreateCourseFailure() {
-        final Course expected = fall2013;
+    public void testCreateTermFailure() {
+        final Term expected = fall2013;
         final Name name = new Name();
         name.setName(expected.getName());
 
-        final CourseService service = Mockito.mock(CourseService.class);
-        when(service.createCourse(name.getName())).thenThrow(new UnitTestException());
+        final TermService service = Mockito.mock(TermService.class);
+        when(service.createTerm(name.getName())).thenThrow(new UnitTestException());
 
-        final CourseResource resource = new CourseResource(service);
-        final Response response = resource.createCourse(name);
+        final TestRunService testService = Mockito.mock(TestRunService.class);
+
+        final TermResource resource = new TermResource(service, testService);
+        final Response response = resource.createTerm(name);
 
         assertEquals(500, response.getStatus());
     }
 
     @Test
-    public void testUpdateCourse() {
-        final Course expected = fall2013;
+    public void testUpdateTerm() {
+        final Term expected = fall2013;
         final Name name = new Name();
         name.setName(fall2014.getName());
-        final Course updated = new Course();
+        final Term updated = new Term();
         updated.setId(expected.getId());
         updated.setName(fall2014.getName());
         updated.setUuid(expected.getUuid());
 
-        final CourseService service = Mockito.mock(CourseService.class);
-        when(service.findCourseByUuid(expected.getUuid())).thenReturn(expected);
-        when(service.updateCourse(expected, name.getName())).thenReturn(updated);
+        final TermService service = Mockito.mock(TermService.class);
+        when(service.findTermByUuid(expected.getUuid())).thenReturn(expected);
+        when(service.updateTerm(expected, name.getName())).thenReturn(updated);
 
-        final CourseResource resource = new CourseResource(service);
-        final Response response = resource.updateCourse(expected.getUuid(), name);
+        final TestRunService testService = Mockito.mock(TestRunService.class);
+
+        final TermResource resource = new TermResource(service, testService);
+        final Response response = resource.updateTerm(expected.getUuid(), name);
 
         assertEquals(200, response.getStatus());
-        final Course actual = (Course) response.getEntity();
+        final Term actual = (Term) response.getEntity();
         assertNull(actual.getId());
         assertEquals(fall2014.getName(), actual.getName());
         assertEquals(expected.getUuid(), actual.getUuid());
     }
 
     @Test
-    public void testUpdateCourseBlankName() {
-        final Course expected = fall2013;
+    public void testUpdateTermBlankName() {
+        final Term expected = fall2013;
         final Name name = new Name();
 
-        final CourseService service = Mockito.mock(CourseService.class);
-        when(service.createCourse(name.getName())).thenReturn(null);
+        final TermService service = Mockito.mock(TermService.class);
+        when(service.createTerm(name.getName())).thenReturn(null);
 
-        final CourseResource resource = new CourseResource(service);
-        final Response response = resource.updateCourse(expected.getUuid(), name);
+        final TestRunService testService = Mockito.mock(TestRunService.class);
+
+        final TermResource resource = new TermResource(service, testService);
+        final Response response = resource.updateTerm(expected.getUuid(), name);
 
         assertEquals(400, response.getStatus());
     }
 
     /**
-     * Test handling when the course can't be updated for some reason. For now
-     * the service layer just returns a null value - it should throw an
-     * appropriate exception.
+     * Test handling when the term can't be updated for some reason. For now the
+     * service layer just returns a null value - it should throw an appropriate
+     * exception.
      */
     @Test
-    public void testUpdateCourseProblem() {
-        final Course expected = fall2013;
+    public void testUpdateTermProblem() {
+        final Term expected = fall2013;
         final Name name = new Name();
         name.setName(expected.getName());
 
-        final CourseService service = Mockito.mock(CourseService.class);
-        when(service.updateCourse(expected, name.getName())).thenReturn(null);
+        final TermService service = Mockito.mock(TermService.class);
+        when(service.updateTerm(expected, name.getName())).thenReturn(null);
 
-        final CourseResource resource = new CourseResource(service);
-        final Response response = resource.createCourse(name);
+        final TestRunService testService = Mockito.mock(TestRunService.class);
+
+        final TermResource resource = new TermResource(service, testService);
+        final Response response = resource.createTerm(name);
 
         assertEquals(500, response.getStatus());
     }
 
     @Test
-    public void testUpdateCourseFailure() {
-        final Course expected = fall2013;
+    public void testUpdateTermFailure() {
+        final Term expected = fall2013;
         final Name name = new Name();
         name.setName(expected.getName());
 
-        final CourseService service = Mockito.mock(CourseService.class);
-        when(service.updateCourse(expected, name.getName())).thenThrow(new UnitTestException());
+        final TermService service = Mockito.mock(TermService.class);
+        when(service.updateTerm(expected, name.getName())).thenThrow(new UnitTestException());
 
-        final CourseResource resource = new CourseResource(service);
-        final Response response = resource.createCourse(name);
+        final TestRunService testService = Mockito.mock(TestRunService.class);
+
+        final TermResource resource = new TermResource(service, testService);
+        final Response response = resource.createTerm(name);
 
         assertEquals(500, response.getStatus());
     }
 
     @Test
-    public void testDeleteCourse() {
-        final Course expected = fall2013;
+    public void testDeleteTerm() {
+        final Term expected = fall2013;
 
-        final CourseService service = Mockito.mock(CourseService.class);
-        doNothing().when(service).deleteCourse(expected.getUuid());
+        final TermService service = Mockito.mock(TermService.class);
+        doNothing().when(service).deleteTerm(expected.getUuid());
 
-        final CourseResource resource = new CourseResource(service);
-        final Response response = resource.deleteCourse(expected.getUuid());
+        final TestRunService testService = Mockito.mock(TestRunService.class);
+
+        final TermResource resource = new TermResource(service, testService);
+        final Response response = resource.deleteTerm(expected.getUuid());
 
         assertEquals(204, response.getStatus());
     }
 
     @Test
-    public void testDeleteCourseMissing() {
-        final Course expected = fall2013;
+    public void testDeleteTermMissing() {
+        final Term expected = fall2013;
         final Name name = new Name();
         name.setName(expected.getName());
 
-        final CourseService service = Mockito.mock(CourseService.class);
-        doThrow(new ObjectNotFoundException(expected.getUuid())).when(service).deleteCourse(expected.getUuid());
+        final TermService service = Mockito.mock(TermService.class);
+        doThrow(new ObjectNotFoundException(expected.getUuid())).when(service).deleteTerm(expected.getUuid());
 
-        final CourseResource resource = new CourseResource(service);
-        final Response response = resource.deleteCourse(expected.getUuid());
+        final TestRunService testService = Mockito.mock(TestRunService.class);
+
+        final TermResource resource = new TermResource(service, testService);
+        final Response response = resource.deleteTerm(expected.getUuid());
 
         assertEquals(204, response.getStatus());
     }
 
     @Test
-    public void testDeleteCourseFailure() {
-        final Course expected = fall2013;
+    public void testDeleteTermFailure() {
+        final Term expected = fall2013;
 
-        final CourseService service = Mockito.mock(CourseService.class);
-        doThrow(new UnitTestException()).when(service).deleteCourse(expected.getUuid());
+        final TermService service = Mockito.mock(TermService.class);
+        doThrow(new UnitTestException()).when(service).deleteTerm(expected.getUuid());
 
-        final CourseResource resource = new CourseResource(service);
-        final Response response = resource.deleteCourse(expected.getUuid());
+        final TestRunService testService = Mockito.mock(TestRunService.class);
+
+        final TermResource resource = new TermResource(service, testService);
+        final Response response = resource.deleteTerm(expected.getUuid());
 
         assertEquals(500, response.getStatus());
     }

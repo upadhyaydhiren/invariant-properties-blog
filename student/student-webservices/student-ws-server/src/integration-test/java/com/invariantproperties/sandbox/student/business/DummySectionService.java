@@ -32,20 +32,24 @@ import java.util.UUID;
 import org.apache.log4j.Logger;
 
 import com.invariantproperties.sandbox.student.domain.Section;
+import com.invariantproperties.sandbox.student.domain.TestRun;
 
 public class DummySectionService implements SectionService {
     private static final Logger log = Logger.getLogger(DummySectionService.class);
     private Map<String, Section> cache = Collections.synchronizedMap(new HashMap<String, Section>());
 
+    @Override
     public List<Section> findAllSections() {
         log.debug("SectionServer: findAllSections()");
         return new ArrayList<Section>(cache.values());
     }
 
+    @Override
     public Section findSectionById(Integer id) {
         throw new ObjectNotFoundException(id);
     }
 
+    @Override
     public Section findSectionByUuid(String uuid) {
         log.debug("SectionServer: findSectionByUuid()");
         if (!cache.containsKey(uuid)) {
@@ -54,27 +58,49 @@ public class DummySectionService implements SectionService {
         return cache.get(uuid);
     }
 
+    @Override
+    public List<Section> findSectionsByTestRun(TestRun testRun) {
+        final List<Section> results = new ArrayList<Section>();
+        for (Section section : cache.values()) {
+            if (testRun.equals(section.getTestRun())) {
+                results.add(section);
+            }
+        }
+        return results;
+    }
+
+    @Override
     public Section createSection(String name) {
         log.debug("SectionServer: createSection()");
-        Section section = new Section();
+        final Section section = new Section();
         section.setUuid(UUID.randomUUID().toString());
         section.setName(name);
         cache.put(section.getUuid(), section);
         return section;
     }
 
+    @Override
+    public Section createSectionForTesting(String name, TestRun testRun) {
+        final Section section = createSection(name);
+        section.setTestRun(testRun);
+        return section;
+    }
+
+    @Override
     public Section updateSection(Section oldSection, String name) {
         log.debug("SectionServer: updateSection()");
         if (!cache.containsKey(oldSection.getUuid())) {
             throw new ObjectNotFoundException(oldSection.getUuid());
         }
 
-        Section section = cache.get(oldSection.getUuid());
+        final Section section = cache.get(oldSection.getUuid());
         section.setUuid(UUID.randomUUID().toString());
+        section.setTestRun(oldSection.getTestRun());
         section.setName(name);
         return section;
     }
 
+    @Override
     public void deleteSection(String uuid) {
         log.debug("SectionServer: deleteSection()");
         if (cache.containsKey(uuid)) {

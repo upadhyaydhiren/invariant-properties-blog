@@ -30,18 +30,22 @@ import java.util.Map;
 import java.util.UUID;
 
 import com.invariantproperties.sandbox.student.domain.Instructor;
+import com.invariantproperties.sandbox.student.domain.TestRun;
 
 public class DummyInstructorService implements InstructorService {
     private Map<String, Instructor> cache = Collections.synchronizedMap(new HashMap<String, Instructor>());
 
+    @Override
     public List<Instructor> findAllInstructors() {
         return new ArrayList<Instructor>(cache.values());
     }
 
+    @Override
     public Instructor findInstructorById(Integer id) {
         throw new ObjectNotFoundException(id);
     }
 
+    @Override
     public Instructor findInstructorByUuid(String uuid) {
         if (!cache.containsKey(uuid)) {
             throw new ObjectNotFoundException(uuid);
@@ -49,12 +53,25 @@ public class DummyInstructorService implements InstructorService {
         return cache.get(uuid);
     }
 
+    @Override
+    public List<Instructor> findInstructorsByTestRun(TestRun testRun) {
+        final List<Instructor> results = new ArrayList<Instructor>();
+        for (Instructor instructor : cache.values()) {
+            if (testRun.equals(instructor.getTestRun())) {
+                results.add(instructor);
+            }
+        }
+        return results;
+    }
+
+    @Override
     public Instructor findInstructorByEmailAddress(String emailAddress) {
         throw new ObjectNotFoundException("[email]");
     }
 
+    @Override
     public Instructor createInstructor(String name, String emailAddress) {
-        Instructor instructor = new Instructor();
+        final Instructor instructor = new Instructor();
         instructor.setUuid(UUID.randomUUID().toString());
         instructor.setName(name);
         instructor.setEmailAddress(emailAddress);
@@ -62,18 +79,28 @@ public class DummyInstructorService implements InstructorService {
         return instructor;
     }
 
+    @Override
+    public Instructor createInstructorForTesting(String name, String emailAddress, TestRun testRun) {
+        final Instructor instructor = createInstructor(name, emailAddress);
+        instructor.setTestRun(testRun);
+        return instructor;
+    }
+
+    @Override
     public Instructor updateInstructor(Instructor oldInstructor, String name, String emailAddress) {
         if (!cache.containsKey(oldInstructor.getUuid())) {
             throw new ObjectNotFoundException(oldInstructor.getUuid());
         }
 
-        Instructor instructor = cache.get(oldInstructor.getUuid());
+        final Instructor instructor = cache.get(oldInstructor.getUuid());
         instructor.setUuid(UUID.randomUUID().toString());
+        instructor.setTestRun(oldInstructor.getTestRun());
         instructor.setName(name);
         instructor.setEmailAddress(emailAddress);
         return instructor;
     }
 
+    @Override
     public void deleteInstructor(String uuid) {
         if (cache.containsKey(uuid)) {
             cache.remove(uuid);

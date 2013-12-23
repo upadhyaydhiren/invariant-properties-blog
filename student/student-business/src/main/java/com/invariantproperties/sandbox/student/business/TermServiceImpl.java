@@ -33,6 +33,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.invariantproperties.sandbox.student.domain.Term;
+import com.invariantproperties.sandbox.student.domain.TestRun;
 import com.invariantproperties.sandbox.student.repository.TermRepository;
 
 /**
@@ -68,18 +69,7 @@ public class TermServiceImpl implements TermService {
     @Transactional(readOnly = true)
     @Override
     public List<Term> findAllTerms() {
-        List<Term> terms = null;
-
-        try {
-            terms = termRepository.findAll();
-        } catch (DataAccessException e) {
-            if (!(e instanceof UnitTestException)) {
-                log.info("error loading list of terms: " + e.getMessage(), e);
-            }
-            throw new PersistenceException("unable to get list of terms.", e);
-        }
-
-        return terms;
+        return findTermsByTestRun(null);
     }
 
     /**
@@ -132,6 +122,27 @@ public class TermServiceImpl implements TermService {
 
     /**
      * @see com.invariantproperties.sandbox.student.business.TermService#
+     *      findTermsByTestRun(com.invariantproperties.sandbox.student.common.TestRun)
+     */
+    @Transactional(readOnly = true)
+    @Override
+    public List<Term> findTermsByTestRun(TestRun testRun) {
+        List<Term> terms = null;
+
+        try {
+            terms = termRepository.findTermsByTestRun(testRun);
+        } catch (DataAccessException e) {
+            if (!(e instanceof UnitTestException)) {
+                log.info("error loading list of terms: " + e.getMessage(), e);
+            }
+            throw new PersistenceException("unable to get list of terms.", e);
+        }
+
+        return terms;
+    }
+
+    /**
+     * @see com.invariantproperties.sandbox.student.business.TermService#
      *      createTerm(java.lang.String)
      */
     @Transactional
@@ -139,6 +150,31 @@ public class TermServiceImpl implements TermService {
     public Term createTerm(String name) {
         final Term term = new Term();
         term.setName(name);
+
+        Term actual = null;
+        try {
+            actual = termRepository.saveAndFlush(term);
+        } catch (DataAccessException e) {
+            if (!(e instanceof UnitTestException)) {
+                log.info("internal error retrieving term: " + name, e);
+            }
+            throw new PersistenceException("unable to create term", e);
+        }
+
+        return actual;
+    }
+
+    /**
+     * @see com.invariantproperties.sandbox.student.business.TermService#
+     *      createTermForTesting(java.lang.String,
+     *      com.invariantproperties.sandbox.student.common.TestRun)
+     */
+    @Transactional
+    @Override
+    public Term createTermForTesting(String name, TestRun testRun) {
+        final Term term = new Term();
+        term.setName(name);
+        term.setTestRun(testRun);
 
         Term actual = null;
         try {

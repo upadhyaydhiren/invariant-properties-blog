@@ -20,32 +20,17 @@
  * 
  * Copyright (c) 2013 Bear Giles <bgiles@coyotesong.com>
  */
-package com.invariantproperties.sandbox.student.business;
+package com.invariantproperties.sandbox.student.repository;
 
-import java.util.List;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
-import com.invariantproperties.sandbox.student.domain.Instructor;
 import com.invariantproperties.sandbox.student.domain.TestRun;
 
 /**
  * @author Bear Giles <bgiles@coyotesong.com>
  */
-public interface InstructorService {
-    List<Instructor> findAllInstructors();
-
-    Instructor findInstructorById(Integer id);
-
-    Instructor findInstructorByUuid(String uuid);
-
-    List<Instructor> findInstructorsByTestRun(TestRun testRun);
-
-    Instructor findInstructorByEmailAddress(String emailAddress);
-
-    Instructor createInstructor(String name, String emailAddress);
-
-    Instructor updateInstructor(Instructor instructor, String name, String emailAddress);
-
-    void deleteInstructor(String uuid);
-
-    Instructor createInstructorForTesting(String name, String emailAddress, TestRun testRun);
+@Repository
+public interface TestRunRepository extends JpaRepository<TestRun, Integer> {
+    TestRun findTestRunByUuid(String uuid);
 }

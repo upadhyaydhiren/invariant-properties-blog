@@ -39,7 +39,7 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 /**
- * Abstract base class for all persistent obejcts. This ensures consistent
+ * Abstract base class for all persistent objects. This ensures consistent
  * behavior.
  * 
  * Business key semantics used for hashCode and equals. See

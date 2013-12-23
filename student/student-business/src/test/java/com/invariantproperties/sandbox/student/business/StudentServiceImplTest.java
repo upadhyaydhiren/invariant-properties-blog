@@ -49,7 +49,7 @@ public class StudentServiceImplTest {
         final List<Student> expected = Collections.emptyList();
 
         final StudentRepository repository = Mockito.mock(StudentRepository.class);
-        when(repository.findAll()).thenReturn(expected);
+        when(repository.findStudentsByTestRun(null)).thenReturn(expected);
 
         final StudentService service = new StudentServiceImpl(repository);
         final List<Student> actual = service.findAllStudents();
@@ -59,15 +59,11 @@ public class StudentServiceImplTest {
 
     @Test(expected = PersistenceException.class)
     public void testFindAllStudentsError() {
-        final List<Student> expected = Collections.emptyList();
-
         final StudentRepository repository = Mockito.mock(StudentRepository.class);
-        when(repository.findAll()).thenThrow(new UnitTestException());
+        when(repository.findStudentsByTestRun(null)).thenThrow(new UnitTestException());
 
         final StudentService service = new StudentServiceImpl(repository);
-        final List<Student> actual = service.findAllStudents();
-
-        assertEquals(expected, actual);
+        service.findAllStudents();
     }
 
     @Test

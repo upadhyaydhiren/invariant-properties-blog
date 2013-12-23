@@ -25,6 +25,7 @@ package com.invariantproperties.sandbox.student.business;
 import java.util.List;
 
 import com.invariantproperties.sandbox.student.domain.Student;
+import com.invariantproperties.sandbox.student.domain.TestRun;
 
 /**
  * @author Bear Giles <bgiles@coyotesong.com>
@@ -36,6 +37,8 @@ public interface StudentService {
 
     Student findStudentByUuid(String uuid);
 
+    List<Student> findStudentsByTestRun(TestRun testRun);
+
     Student findStudentByEmailAddress(String emailAddress);
 
     Student createStudent(String name, String emailAddress);
@@ -43,4 +46,6 @@ public interface StudentService {
     Student updateStudent(Student student, String name, String emailAddress);
 
     void deleteStudent(String uuid);
+
+    Student createStudentForTesting(String name, String emailAddress, TestRun testRun);
 }

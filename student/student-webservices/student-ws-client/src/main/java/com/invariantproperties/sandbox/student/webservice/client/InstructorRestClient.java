@@ -23,6 +23,7 @@
 package com.invariantproperties.sandbox.student.webservice.client;
 
 import com.invariantproperties.sandbox.student.domain.Instructor;
+import com.invariantproperties.sandbox.student.domain.TestRun;
 
 /**
  * Instructor REST client.
@@ -50,6 +51,15 @@ public interface InstructorRestClient {
      * @param emailAddress
      */
     Instructor createInstructor(String name, String emailAddress);
+
+    /**
+     * Create specific instructor for testing.
+     * 
+     * @param name
+     * @param emailAddress
+     * @param testRun
+     */
+    Instructor createInstructorForTesting(String name, String emailAddress, TestRun testRun);
 
     /**
      * Update specific instructor.

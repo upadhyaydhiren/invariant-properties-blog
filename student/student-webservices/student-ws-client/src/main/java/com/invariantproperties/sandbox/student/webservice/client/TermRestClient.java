@@ -23,6 +23,7 @@
 package com.invariantproperties.sandbox.student.webservice.client;
 
 import com.invariantproperties.sandbox.student.domain.Term;
+import com.invariantproperties.sandbox.student.domain.TestRun;
 
 /**
  * Term REST client.
@@ -49,6 +50,14 @@ public interface TermRestClient {
      * @param name
      */
     Term createTerm(String name);
+
+    /**
+     * Create specific term for testing.
+     * 
+     * @param name
+     * @param testRun
+     */
+    Term createTermForTesting(String name, TestRun testRun);
 
     /**
      * Update specific term.

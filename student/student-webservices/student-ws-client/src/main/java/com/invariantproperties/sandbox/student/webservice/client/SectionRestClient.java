@@ -23,6 +23,7 @@
 package com.invariantproperties.sandbox.student.webservice.client;
 
 import com.invariantproperties.sandbox.student.domain.Section;
+import com.invariantproperties.sandbox.student.domain.TestRun;
 
 /**
  * Section REST client.
@@ -49,6 +50,14 @@ public interface SectionRestClient {
      * @param name
      */
     Section createSection(String name);
+
+    /**
+     * Create specific section.
+     * 
+     * @param name
+     * @param testRun
+     */
+    Section createSectionForTesting(String name, TestRun testRun);
 
     /**
      * Update specific section.

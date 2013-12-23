@@ -41,6 +41,7 @@ import org.mockito.Mockito;
 
 import com.invariantproperties.sandbox.student.business.ClassroomService;
 import com.invariantproperties.sandbox.student.business.ObjectNotFoundException;
+import com.invariantproperties.sandbox.student.business.TestRunService;
 import com.invariantproperties.sandbox.student.domain.Classroom;
 
 /**
@@ -70,7 +71,9 @@ public class ClassroomResourceTest {
         final ClassroomService service = Mockito.mock(ClassroomService.class);
         when(service.findAllClassrooms()).thenReturn(expected);
 
-        final ClassroomResource resource = new ClassroomResource(service);
+        final TestRunService testService = Mockito.mock(TestRunService.class);
+
+        final ClassroomResource resource = new ClassroomResource(service, testService);
         final Response response = resource.findAllClassrooms();
 
         assertEquals(200, response.getStatus());
@@ -88,7 +91,9 @@ public class ClassroomResourceTest {
         final ClassroomService service = Mockito.mock(ClassroomService.class);
         when(service.findAllClassrooms()).thenReturn(expected);
 
-        final ClassroomResource resource = new ClassroomResource(service);
+        final TestRunService testService = Mockito.mock(TestRunService.class);
+
+        final ClassroomResource resource = new ClassroomResource(service, testService);
         final Response response = resource.findAllClassrooms();
 
         assertEquals(200, response.getStatus());
@@ -101,7 +106,9 @@ public class ClassroomResourceTest {
         final ClassroomService service = Mockito.mock(ClassroomService.class);
         when(service.findAllClassrooms()).thenThrow(new UnitTestException());
 
-        final ClassroomResource resource = new ClassroomResource(service);
+        final TestRunService testService = Mockito.mock(TestRunService.class);
+
+        final ClassroomResource resource = new ClassroomResource(service, testService);
         final Response response = resource.findAllClassrooms();
 
         assertEquals(500, response.getStatus());
@@ -114,7 +121,9 @@ public class ClassroomResourceTest {
         final ClassroomService service = Mockito.mock(ClassroomService.class);
         when(service.findClassroomByUuid(expected.getUuid())).thenReturn(expected);
 
-        final ClassroomResource resource = new ClassroomResource(service);
+        final TestRunService testService = Mockito.mock(TestRunService.class);
+
+        final ClassroomResource resource = new ClassroomResource(service, testService);
         final Response response = resource.getClassroom(expected.getUuid());
 
         assertEquals(200, response.getStatus());
@@ -129,7 +138,9 @@ public class ClassroomResourceTest {
         final ClassroomService service = Mockito.mock(ClassroomService.class);
         when(service.findClassroomByUuid(eng201.getUuid())).thenThrow(new ObjectNotFoundException(eng201.getUuid()));
 
-        final ClassroomResource resource = new ClassroomResource(service);
+        final TestRunService testService = Mockito.mock(TestRunService.class);
+
+        final ClassroomResource resource = new ClassroomResource(service, testService);
         final Response response = resource.getClassroom(eng201.getUuid());
 
         assertEquals(404, response.getStatus());
@@ -140,7 +151,9 @@ public class ClassroomResourceTest {
         final ClassroomService service = Mockito.mock(ClassroomService.class);
         when(service.findClassroomByUuid(eng201.getUuid())).thenThrow(new UnitTestException());
 
-        final ClassroomResource resource = new ClassroomResource(service);
+        final TestRunService testService = Mockito.mock(TestRunService.class);
+
+        final ClassroomResource resource = new ClassroomResource(service, testService);
         final Response response = resource.getClassroom(eng201.getUuid());
 
         assertEquals(500, response.getStatus());
@@ -155,7 +168,9 @@ public class ClassroomResourceTest {
         final ClassroomService service = Mockito.mock(ClassroomService.class);
         when(service.createClassroom(name.getName())).thenReturn(expected);
 
-        final ClassroomResource resource = new ClassroomResource(service);
+        final TestRunService testService = Mockito.mock(TestRunService.class);
+
+        final ClassroomResource resource = new ClassroomResource(service, testService);
         final Response response = resource.createClassroom(name);
 
         assertEquals(201, response.getStatus());
@@ -171,7 +186,9 @@ public class ClassroomResourceTest {
         final ClassroomService service = Mockito.mock(ClassroomService.class);
         when(service.createClassroom(name.getName())).thenReturn(null);
 
-        final ClassroomResource resource = new ClassroomResource(service);
+        final TestRunService testService = Mockito.mock(TestRunService.class);
+
+        final ClassroomResource resource = new ClassroomResource(service, testService);
         final Response response = resource.createClassroom(name);
 
         assertEquals(400, response.getStatus());
@@ -191,7 +208,9 @@ public class ClassroomResourceTest {
         final ClassroomService service = Mockito.mock(ClassroomService.class);
         when(service.createClassroom(name.getName())).thenReturn(null);
 
-        final ClassroomResource resource = new ClassroomResource(service);
+        final TestRunService testService = Mockito.mock(TestRunService.class);
+
+        final ClassroomResource resource = new ClassroomResource(service, testService);
         final Response response = resource.createClassroom(name);
 
         assertEquals(500, response.getStatus());
@@ -206,7 +225,9 @@ public class ClassroomResourceTest {
         final ClassroomService service = Mockito.mock(ClassroomService.class);
         when(service.createClassroom(name.getName())).thenThrow(new UnitTestException());
 
-        final ClassroomResource resource = new ClassroomResource(service);
+        final TestRunService testService = Mockito.mock(TestRunService.class);
+
+        final ClassroomResource resource = new ClassroomResource(service, testService);
         final Response response = resource.createClassroom(name);
 
         assertEquals(500, response.getStatus());
@@ -226,7 +247,9 @@ public class ClassroomResourceTest {
         when(service.findClassroomByUuid(expected.getUuid())).thenReturn(expected);
         when(service.updateClassroom(expected, name.getName())).thenReturn(updated);
 
-        final ClassroomResource resource = new ClassroomResource(service);
+        final TestRunService testService = Mockito.mock(TestRunService.class);
+
+        final ClassroomResource resource = new ClassroomResource(service, testService);
         final Response response = resource.updateClassroom(expected.getUuid(), name);
 
         assertEquals(200, response.getStatus());
@@ -244,7 +267,9 @@ public class ClassroomResourceTest {
         final ClassroomService service = Mockito.mock(ClassroomService.class);
         when(service.createClassroom(name.getName())).thenReturn(null);
 
-        final ClassroomResource resource = new ClassroomResource(service);
+        final TestRunService testService = Mockito.mock(TestRunService.class);
+
+        final ClassroomResource resource = new ClassroomResource(service, testService);
         final Response response = resource.updateClassroom(expected.getUuid(), name);
 
         assertEquals(400, response.getStatus());
@@ -264,7 +289,9 @@ public class ClassroomResourceTest {
         final ClassroomService service = Mockito.mock(ClassroomService.class);
         when(service.updateClassroom(expected, name.getName())).thenReturn(null);
 
-        final ClassroomResource resource = new ClassroomResource(service);
+        final TestRunService testService = Mockito.mock(TestRunService.class);
+
+        final ClassroomResource resource = new ClassroomResource(service, testService);
         final Response response = resource.createClassroom(name);
 
         assertEquals(500, response.getStatus());
@@ -279,7 +306,9 @@ public class ClassroomResourceTest {
         final ClassroomService service = Mockito.mock(ClassroomService.class);
         when(service.updateClassroom(expected, name.getName())).thenThrow(new UnitTestException());
 
-        final ClassroomResource resource = new ClassroomResource(service);
+        final TestRunService testService = Mockito.mock(TestRunService.class);
+
+        final ClassroomResource resource = new ClassroomResource(service, testService);
         final Response response = resource.createClassroom(name);
 
         assertEquals(500, response.getStatus());
@@ -292,7 +321,9 @@ public class ClassroomResourceTest {
         final ClassroomService service = Mockito.mock(ClassroomService.class);
         doNothing().when(service).deleteClassroom(expected.getUuid());
 
-        final ClassroomResource resource = new ClassroomResource(service);
+        final TestRunService testService = Mockito.mock(TestRunService.class);
+
+        final ClassroomResource resource = new ClassroomResource(service, testService);
         final Response response = resource.deleteClassroom(expected.getUuid());
 
         assertEquals(204, response.getStatus());
@@ -307,7 +338,9 @@ public class ClassroomResourceTest {
         final ClassroomService service = Mockito.mock(ClassroomService.class);
         doThrow(new ObjectNotFoundException(expected.getUuid())).when(service).deleteClassroom(expected.getUuid());
 
-        final ClassroomResource resource = new ClassroomResource(service);
+        final TestRunService testService = Mockito.mock(TestRunService.class);
+
+        final ClassroomResource resource = new ClassroomResource(service, testService);
         final Response response = resource.deleteClassroom(expected.getUuid());
 
         assertEquals(204, response.getStatus());
@@ -320,7 +353,9 @@ public class ClassroomResourceTest {
         final ClassroomService service = Mockito.mock(ClassroomService.class);
         doThrow(new UnitTestException()).when(service).deleteClassroom(expected.getUuid());
 
-        final ClassroomResource resource = new ClassroomResource(service);
+        final TestRunService testService = Mockito.mock(TestRunService.class);
+
+        final ClassroomResource resource = new ClassroomResource(service, testService);
         final Response response = resource.deleteClassroom(expected.getUuid());
 
         assertEquals(500, response.getStatus());

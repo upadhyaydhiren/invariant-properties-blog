@@ -33,6 +33,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.invariantproperties.sandbox.student.domain.Classroom;
+import com.invariantproperties.sandbox.student.domain.TestRun;
 import com.invariantproperties.sandbox.student.repository.ClassroomRepository;
 
 /**
@@ -68,18 +69,7 @@ public class ClassroomServiceImpl implements ClassroomService {
     @Transactional(readOnly = true)
     @Override
     public List<Classroom> findAllClassrooms() {
-        List<Classroom> classrooms = null;
-
-        try {
-            classrooms = classroomRepository.findAll();
-        } catch (DataAccessException e) {
-            if (!(e instanceof UnitTestException)) {
-                log.info("error loading list of classrooms: " + e.getMessage(), e);
-            }
-            throw new PersistenceException("unable to get list of classrooms.", e);
-        }
-
-        return classrooms;
+        return findClassroomsByTestRun(null);
     }
 
     /**
@@ -132,6 +122,27 @@ public class ClassroomServiceImpl implements ClassroomService {
 
     /**
      * @see com.invariantproperties.sandbox.student.business.ClassroomService#
+     *      findClassroomsByTestRun(com.invariantproperties.sandbox.student.common.TestRun)
+     */
+    @Transactional(readOnly = true)
+    @Override
+    public List<Classroom> findClassroomsByTestRun(TestRun testRun) {
+        List<Classroom> classrooms = null;
+
+        try {
+            classrooms = classroomRepository.findClassroomsByTestRun(testRun);
+        } catch (DataAccessException e) {
+            if (!(e instanceof UnitTestException)) {
+                log.info("error loading list of classrooms: " + e.getMessage(), e);
+            }
+            throw new PersistenceException("unable to get list of classrooms.", e);
+        }
+
+        return classrooms;
+    }
+
+    /**
+     * @see com.invariantproperties.sandbox.student.business.ClassroomService#
      *      createClassroom(java.lang.String)
      */
     @Transactional
@@ -139,6 +150,31 @@ public class ClassroomServiceImpl implements ClassroomService {
     public Classroom createClassroom(String name) {
         final Classroom classroom = new Classroom();
         classroom.setName(name);
+
+        Classroom actual = null;
+        try {
+            actual = classroomRepository.saveAndFlush(classroom);
+        } catch (DataAccessException e) {
+            if (!(e instanceof UnitTestException)) {
+                log.info("internal error retrieving classroom: " + name, e);
+            }
+            throw new PersistenceException("unable to create classroom", e);
+        }
+
+        return actual;
+    }
+
+    /**
+     * @see com.invariantproperties.sandbox.student.business.ClassroomService#
+     *      createClassroomForTesting(java.lang.String,
+     *      com.invariantproperties.sandbox.student.common.TestRun)
+     */
+    @Transactional
+    @Override
+    public Classroom createClassroomForTesting(String name, TestRun testRun) {
+        final Classroom classroom = new Classroom();
+        classroom.setName(name);
+        classroom.setTestRun(testRun);
 
         Classroom actual = null;
         try {

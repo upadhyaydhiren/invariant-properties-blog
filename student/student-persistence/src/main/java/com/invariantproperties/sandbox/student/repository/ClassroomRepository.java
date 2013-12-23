@@ -22,10 +22,13 @@
  */
 package com.invariantproperties.sandbox.student.repository;
 
+import java.util.List;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import com.invariantproperties.sandbox.student.domain.Classroom;
+import com.invariantproperties.sandbox.student.domain.TestRun;
 
 /**
  * @author Bear Giles <bgiles@coyotesong.com>
@@ -33,4 +36,6 @@ import com.invariantproperties.sandbox.student.domain.Classroom;
 @Repository
 public interface ClassroomRepository extends JpaRepository<Classroom, Integer> {
     Classroom findClassroomByUuid(String uuid);
+
+    List<Classroom> findClassroomsByTestRun(TestRun testRun);
 }

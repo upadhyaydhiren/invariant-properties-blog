@@ -49,7 +49,7 @@ public class InstructorServiceImplTest {
         final List<Instructor> expected = Collections.emptyList();
 
         final InstructorRepository repository = Mockito.mock(InstructorRepository.class);
-        when(repository.findAll()).thenReturn(expected);
+        when(repository.findInstructorsByTestRun(null)).thenReturn(expected);
 
         final InstructorService service = new InstructorServiceImpl(repository);
         final List<Instructor> actual = service.findAllInstructors();
@@ -59,15 +59,11 @@ public class InstructorServiceImplTest {
 
     @Test(expected = PersistenceException.class)
     public void testFindAllInstructorsError() {
-        final List<Instructor> expected = Collections.emptyList();
-
         final InstructorRepository repository = Mockito.mock(InstructorRepository.class);
-        when(repository.findAll()).thenThrow(new UnitTestException());
+        when(repository.findInstructorsByTestRun(null)).thenThrow(new UnitTestException());
 
         final InstructorService service = new InstructorServiceImpl(repository);
-        final List<Instructor> actual = service.findAllInstructors();
-
-        assertEquals(expected, actual);
+        service.findAllInstructors();
     }
 
     @Test

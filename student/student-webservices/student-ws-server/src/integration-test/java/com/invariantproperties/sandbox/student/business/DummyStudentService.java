@@ -30,18 +30,22 @@ import java.util.Map;
 import java.util.UUID;
 
 import com.invariantproperties.sandbox.student.domain.Student;
+import com.invariantproperties.sandbox.student.domain.TestRun;
 
 public class DummyStudentService implements StudentService {
     private Map<String, Student> cache = Collections.synchronizedMap(new HashMap<String, Student>());
 
+    @Override
     public List<Student> findAllStudents() {
         return new ArrayList<Student>(cache.values());
     }
 
+    @Override
     public Student findStudentById(Integer id) {
         throw new ObjectNotFoundException(id);
     }
 
+    @Override
     public Student findStudentByUuid(String uuid) {
         if (!cache.containsKey(uuid)) {
             throw new ObjectNotFoundException(uuid);
@@ -49,12 +53,25 @@ public class DummyStudentService implements StudentService {
         return cache.get(uuid);
     }
 
+    @Override
+    public List<Student> findStudentsByTestRun(TestRun testRun) {
+        final List<Student> results = new ArrayList<Student>();
+        for (Student student : cache.values()) {
+            if (testRun.equals(student.getTestRun())) {
+                results.add(student);
+            }
+        }
+        return results;
+    }
+
+    @Override
     public Student findStudentByEmailAddress(String emailAddress) {
         throw new ObjectNotFoundException("[email]");
     }
 
+    @Override
     public Student createStudent(String name, String emailAddress) {
-        Student student = new Student();
+        final Student student = new Student();
         student.setUuid(UUID.randomUUID().toString());
         student.setName(name);
         student.setEmailAddress(emailAddress);
@@ -62,18 +79,28 @@ public class DummyStudentService implements StudentService {
         return student;
     }
 
+    @Override
+    public Student createStudentForTesting(String name, String emailAddress, TestRun testRun) {
+        final Student student = createStudent(name, emailAddress);
+        student.setTestRun(testRun);
+        return student;
+    }
+
+    @Override
     public Student updateStudent(Student oldStudent, String name, String emailAddress) {
         if (!cache.containsKey(oldStudent.getUuid())) {
             throw new ObjectNotFoundException(oldStudent.getUuid());
         }
 
-        Student student = cache.get(oldStudent.getUuid());
+        final Student student = cache.get(oldStudent.getUuid());
         student.setUuid(UUID.randomUUID().toString());
+        student.setTestRun(oldStudent.getTestRun());
         student.setName(name);
         student.setEmailAddress(emailAddress);
         return student;
     }
 
+    @Override
     public void deleteStudent(String uuid) {
         if (cache.containsKey(uuid)) {
             cache.remove(uuid);

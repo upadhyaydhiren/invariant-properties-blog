@@ -26,7 +26,10 @@ import static com.invariantproperties.sandbox.student.matcher.ClassroomEquality.
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+
+import java.util.List;
 
 import javax.annotation.Resource;
 
@@ -39,10 +42,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.invariantproperties.sandbox.student.business.ClassroomService;
 import com.invariantproperties.sandbox.student.business.ObjectNotFoundException;
+import com.invariantproperties.sandbox.student.business.TestRunService;
 import com.invariantproperties.sandbox.student.business.config.BusinessApplicationContext;
 import com.invariantproperties.sandbox.student.config.TestBusinessApplicationContext;
 import com.invariantproperties.sandbox.student.config.TestPersistenceJpaConfig;
 import com.invariantproperties.sandbox.student.domain.Classroom;
+import com.invariantproperties.sandbox.student.domain.TestRun;
+import com.invariantproperties.sandbox.student.domain.TestablePersistentObject;
 
 /**
  * @author Bear Giles <bgiles@coyotesong.com>
@@ -57,9 +63,14 @@ public class ClassroomServiceIntegrationTest {
     @Resource
     private ClassroomService dao;
 
+    @Resource
+    private TestRunService testService;
+
     @Test
     public void testClassroomLifecycle() throws Exception {
-        final String name = "Eng 101";
+        final TestRun testRun = testService.createTestRun();
+
+        final String name = "Eng 101 : " + testRun.getUuid();
 
         final Classroom expected = new Classroom();
         expected.setName(name);
@@ -84,10 +95,18 @@ public class ClassroomServiceIntegrationTest {
         actual = dao.findClassroomByUuid(expected.getUuid());
         assertThat(expected, equalTo(actual));
 
+        // get all classrooms
+        final List<Classroom> classrooms = dao.findClassroomsByTestRun(testRun);
+        assertTrue(classrooms.contains(actual));
+
         // update classroom
-        expected.setName("Eng 102");
+        expected.setName("Eng 102 : " + testRun.getUuid());
         actual = dao.updateClassroom(actual, expected.getName());
         assertThat(expected, equalTo(actual));
+
+        // verify testRun.getObjects
+        final List<TestablePersistentObject> objects = testRun.getObjects();
+        assertTrue(objects.contains(actual));
 
         // delete Classroom
         dao.deleteClassroom(expected.getUuid());
@@ -97,6 +116,8 @@ public class ClassroomServiceIntegrationTest {
         } catch (ObjectNotFoundException e) {
             // expected
         }
+
+        testService.deleteTestRun(testRun.getUuid());
     }
 
     /**

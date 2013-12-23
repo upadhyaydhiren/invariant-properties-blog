@@ -26,7 +26,10 @@ import static com.invariantproperties.sandbox.student.matcher.CourseEquality.equ
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+
+import java.util.List;
 
 import javax.annotation.Resource;
 
@@ -39,10 +42,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.invariantproperties.sandbox.student.business.CourseService;
 import com.invariantproperties.sandbox.student.business.ObjectNotFoundException;
+import com.invariantproperties.sandbox.student.business.TestRunService;
 import com.invariantproperties.sandbox.student.business.config.BusinessApplicationContext;
 import com.invariantproperties.sandbox.student.config.TestBusinessApplicationContext;
 import com.invariantproperties.sandbox.student.config.TestPersistenceJpaConfig;
 import com.invariantproperties.sandbox.student.domain.Course;
+import com.invariantproperties.sandbox.student.domain.TestRun;
+import com.invariantproperties.sandbox.student.domain.TestablePersistentObject;
 
 /**
  * @author Bear Giles <bgiles@coyotesong.com>
@@ -57,9 +63,14 @@ public class CourseServiceIntegrationTest {
     @Resource
     private CourseService dao;
 
+    @Resource
+    private TestRunService testService;
+
     @Test
     public void testCourseLifecycle() throws Exception {
-        final String name = "Calculus 101";
+        final TestRun testRun = testService.createTestRun();
+
+        final String name = "Calculus 101 : " + testRun.getUuid();
 
         final Course expected = new Course();
         expected.setName(name);
@@ -67,7 +78,7 @@ public class CourseServiceIntegrationTest {
         assertNull(expected.getId());
 
         // create course
-        Course actual = dao.createCourse(name);
+        Course actual = dao.createCourseForTesting(name, testRun);
         expected.setId(actual.getId());
         expected.setUuid(actual.getUuid());
         expected.setCreationDate(actual.getCreationDate());
@@ -84,10 +95,18 @@ public class CourseServiceIntegrationTest {
         actual = dao.findCourseByUuid(expected.getUuid());
         assertThat(expected, equalTo(actual));
 
+        // get all courses
+        final List<Course> courses = dao.findCoursesByTestRun(testRun);
+        assertTrue(courses.contains(actual));
+
         // update course
-        expected.setName("Calculus 102");
+        expected.setName("Calculus 102 : " + testRun.getUuid());
         actual = dao.updateCourse(actual, expected.getName());
         assertThat(expected, equalTo(actual));
+
+        // verify testRun.getObjects
+        final List<TestablePersistentObject> objects = testRun.getObjects();
+        assertTrue(objects.contains(actual));
 
         // delete Course
         dao.deleteCourse(expected.getUuid());
@@ -97,6 +116,8 @@ public class CourseServiceIntegrationTest {
         } catch (ObjectNotFoundException e) {
             // expected
         }
+
+        testService.deleteTestRun(testRun.getUuid());
     }
 
     /**

@@ -25,6 +25,7 @@ package com.invariantproperties.sandbox.student.business;
 import java.util.List;
 
 import com.invariantproperties.sandbox.student.domain.Term;
+import com.invariantproperties.sandbox.student.domain.TestRun;
 
 /**
  * @author Bear Giles <bgiles@coyotesong.com>
@@ -36,9 +37,13 @@ public interface TermService {
 
     Term findTermByUuid(String uuid);
 
+    List<Term> findTermsByTestRun(TestRun testRun);
+
     Term createTerm(String name);
 
     Term updateTerm(Term term, String name);
 
     void deleteTerm(String uuid);
+
+    Term createTermForTesting(String name, TestRun testRun);
 }

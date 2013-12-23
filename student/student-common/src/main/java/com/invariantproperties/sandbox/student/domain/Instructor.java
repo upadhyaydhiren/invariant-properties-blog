@@ -41,7 +41,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @Entity
 @Table(name = "instructor")
 @AttributeOverride(name = "id", column = @Column(name = "instructor_pkey"))
-public class Instructor extends PersistentObject {
+public class Instructor extends TestablePersistentObject {
     private static final long serialVersionUID = 1L;
 
     private String name;

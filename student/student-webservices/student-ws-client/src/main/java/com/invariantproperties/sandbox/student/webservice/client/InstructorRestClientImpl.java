@@ -23,6 +23,7 @@
 package com.invariantproperties.sandbox.student.webservice.client;
 
 import com.invariantproperties.sandbox.student.domain.Instructor;
+import com.invariantproperties.sandbox.student.domain.TestRun;
 
 /**
  * Implementation of InstructorRestClient.
@@ -52,8 +53,21 @@ public class InstructorRestClientImpl extends AbstractRestClientImpl<Instructor>
     }
 
     /**
+     * Create JSON string.
+     * 
+     * @param name
+     * @param testRun
+     * @return
+     */
+    String createJson(final String name, final String emailAddress, final TestRun testRun) {
+        return String.format("{ \"name\": \"%s\", \"emailAddress\": \"%s\", \"testUuid\": \"%s\" }", name,
+                emailAddress, testRun.getUuid());
+    }
+
+    /**
      * @see com.invariantproperties.sandbox.student.webservice.client.InstructorRestClient#getAllInstructors()
      */
+    @Override
     public Instructor[] getAllInstructors() {
         return super.getAllObjects(EMPTY_INSTRUCTOR_ARRAY);
     }
@@ -61,6 +75,7 @@ public class InstructorRestClientImpl extends AbstractRestClientImpl<Instructor>
     /**
      * @see com.invariantproperties.sandbox.student.webservice.client.InstructorRestClient#getInstructor(java.lang.String)
      */
+    @Override
     public Instructor getInstructor(final String uuid) {
         return super.getObject(uuid);
     }
@@ -69,6 +84,7 @@ public class InstructorRestClientImpl extends AbstractRestClientImpl<Instructor>
      * @see com.invariantproperties.sandbox.student.webservice.client.InstructorRestClient#createInstructor(java.lang.String,
      *      java.lang.String)
      */
+    @Override
     public Instructor createInstructor(final String name, final String emailAddress) {
         if (name == null || name.isEmpty()) {
             throw new IllegalArgumentException("'name' is required");
@@ -82,9 +98,31 @@ public class InstructorRestClientImpl extends AbstractRestClientImpl<Instructor>
     }
 
     /**
+     * @see com.invariantproperties.sandbox.student.webservice.client.InstructorRestClient#createInstructorForTesting(java.lang.String,
+     *      com.invariantproperties.sandbox.student.common.TestRun)
+     */
+    @Override
+    public Instructor createInstructorForTesting(final String name, final String emailAddress, final TestRun testRun) {
+        if (name == null || name.isEmpty()) {
+            throw new IllegalArgumentException("'name' is required");
+        }
+
+        if (emailAddress == null || emailAddress.isEmpty()) {
+            throw new IllegalArgumentException("'emailAddress' is required");
+        }
+
+        if (testRun == null || testRun.getUuid() == null || testRun.getUuid().isEmpty()) {
+            throw new IllegalArgumentException("'testRun' is required");
+        }
+
+        return createObject(createJson(name, emailAddress, testRun));
+    }
+
+    /**
      * @see com.invariantproperties.sandbox.student.webservice.client.InstructorRestClient#updateInstructor(java.lang.String,
      *      java.lang.String, java.lang.String)
      */
+    @Override
     public Instructor updateInstructor(final String uuid, final String name, final String emailAddress) {
         if (name == null || name.isEmpty()) {
             throw new IllegalArgumentException("'name' is required");
@@ -100,6 +138,7 @@ public class InstructorRestClientImpl extends AbstractRestClientImpl<Instructor>
     /**
      * @see com.invariantproperties.sandbox.student.webservice.client.InstructorRestClient#deleteInstructor(java.lang.String)
      */
+    @Override
     public void deleteInstructor(final String uuid) {
         super.deleteObject(uuid);
     }

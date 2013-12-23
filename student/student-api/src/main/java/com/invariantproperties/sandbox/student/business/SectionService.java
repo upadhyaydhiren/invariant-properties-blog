@@ -25,6 +25,7 @@ package com.invariantproperties.sandbox.student.business;
 import java.util.List;
 
 import com.invariantproperties.sandbox.student.domain.Section;
+import com.invariantproperties.sandbox.student.domain.TestRun;
 
 /**
  * @author Bear Giles <bgiles@coyotesong.com>
@@ -36,9 +37,13 @@ public interface SectionService {
 
     Section findSectionByUuid(String uuid);
 
+    List<Section> findSectionsByTestRun(TestRun testRun);
+
     Section createSection(String name);
 
     Section updateSection(Section section, String name);
 
     void deleteSection(String uuid);
+
+    Section createSectionForTesting(String name, TestRun testRun);
 }

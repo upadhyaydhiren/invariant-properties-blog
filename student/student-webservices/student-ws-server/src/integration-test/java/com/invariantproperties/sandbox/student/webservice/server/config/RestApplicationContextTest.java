@@ -33,10 +33,12 @@ import com.invariantproperties.sandbox.student.business.DummyInstructorService;
 import com.invariantproperties.sandbox.student.business.DummySectionService;
 import com.invariantproperties.sandbox.student.business.DummyStudentService;
 import com.invariantproperties.sandbox.student.business.DummyTermService;
+import com.invariantproperties.sandbox.student.business.DummyTestRunService;
 import com.invariantproperties.sandbox.student.business.InstructorService;
 import com.invariantproperties.sandbox.student.business.SectionService;
 import com.invariantproperties.sandbox.student.business.StudentService;
 import com.invariantproperties.sandbox.student.business.TermService;
+import com.invariantproperties.sandbox.student.business.TestRunService;
 
 @Configuration
 // @Profile("test")
@@ -68,7 +70,12 @@ public class RestApplicationContextTest {
     }
 
     @Bean
-    TermService courseTerm() {
+    TermService termService() {
         return new DummyTermService();
+    }
+
+    @Bean
+    TestRunService testRunService() {
+        return new DummyTestRunService();
     }
 }

@@ -24,28 +24,21 @@ package com.invariantproperties.sandbox.student.business;
 
 import java.util.List;
 
-import com.invariantproperties.sandbox.student.domain.Instructor;
 import com.invariantproperties.sandbox.student.domain.TestRun;
 
 /**
  * @author Bear Giles <bgiles@coyotesong.com>
  */
-public interface InstructorService {
-    List<Instructor> findAllInstructors();
+public interface TestRunService {
+    List<TestRun> findAllTestRuns();
 
-    Instructor findInstructorById(Integer id);
+    TestRun findTestRunById(Integer id);
 
-    Instructor findInstructorByUuid(String uuid);
+    TestRun findTestRunByUuid(String uuid);
 
-    List<Instructor> findInstructorsByTestRun(TestRun testRun);
+    TestRun createTestRun();
 
-    Instructor findInstructorByEmailAddress(String emailAddress);
+    TestRun createTestRun(String name);
 
-    Instructor createInstructor(String name, String emailAddress);
-
-    Instructor updateInstructor(Instructor instructor, String name, String emailAddress);
-
-    void deleteInstructor(String uuid);
-
-    Instructor createInstructorForTesting(String name, String emailAddress, TestRun testRun);
+    void deleteTestRun(String uuid);
 }
