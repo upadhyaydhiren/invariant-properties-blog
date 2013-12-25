@@ -1,0 +1,36 @@
+<html t:type="layout" title="student-maintenance-webapp Index"
+      t:sidebarTitle="Framework Version"
+      xmlns:t="http://tapestry.apache.org/schema/tapestry_5_3.xsd"
+      xmlns:p="tapestry:parameter">
+        <!-- Most of the page content, including <head>, <body>, etc. tags, comes from Layout.tml -->
+
+    <t:zone t:id="zone">   
+        <p>
+            "Course" page
+        </p>
+   
+        <t:grid source="courses" row="course" add="delete">
+            <p:name>
+                <t:pagelink page="course/view" context="course.uuid">${course.name}</t:pagelink>
+            </p:name>
+            <p:deletecell>
+                <t:actionlink t:id="delete" context="course.uuid">Delete</t:actionlink>
+            </p:deletecell>
+            <p:empty>
+              <p>There are no courses to display; you can <t:pagelink page="course/add">add some</a>.</p>
+            </p:empty>
+        </t:grid>
+    </t:zone>
+
+    <p:sidebar>
+        <p>
+            [
+            <t:pagelink page="Course">Courses</t:pagelink>
+            ]
+            [
+            <t:pagelink page="Index">refresh page</t:pagelink>
+            ]
+        </p>
+    </p:sidebar>
+
+</html>
