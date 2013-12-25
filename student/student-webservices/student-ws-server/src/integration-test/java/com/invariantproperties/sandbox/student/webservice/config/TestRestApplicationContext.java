@@ -20,7 +20,7 @@
  * 
  * Copyright (c) 2013 Bear Giles <bgiles@coyotesong.com>
  */
-package com.invariantproperties.sandbox.student.webservice.server.config;
+package com.invariantproperties.sandbox.student.webservice.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -42,7 +42,12 @@ import com.invariantproperties.sandbox.student.business.TestRunService;
 
 @Configuration
 // @Profile("test")
-public class RestApplicationContextTest {
+public class TestRestApplicationContext {
+
+    @Bean
+    String resourceBase() {
+        return "http://localhost:18080/rest/";
+    }
 
     @Bean
     ClassroomService classroomService() {
