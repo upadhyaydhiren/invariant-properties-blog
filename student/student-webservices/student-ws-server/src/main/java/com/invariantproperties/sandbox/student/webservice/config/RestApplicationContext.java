@@ -20,7 +20,7 @@
  * 
  * Copyright (c) 2013 Bear Giles <bgiles@coyotesong.com>
  */
-package com.invariantproperties.sandbox.student.webservice.server.config;
+package com.invariantproperties.sandbox.student.webservice.config;
 
 import javax.annotation.Resource;
 
