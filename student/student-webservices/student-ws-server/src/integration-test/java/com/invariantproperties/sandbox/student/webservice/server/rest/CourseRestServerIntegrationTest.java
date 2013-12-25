@@ -29,21 +29,42 @@ import static org.junit.Assert.fail;
 
 import java.io.IOException;
 
+import javax.annotation.Resource;
+
+import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import com.invariantproperties.sandbox.student.domain.Course;
+import com.invariantproperties.sandbox.student.domain.TestRun;
 import com.invariantproperties.sandbox.student.webservice.client.CourseRestClient;
 import com.invariantproperties.sandbox.student.webservice.client.CourseRestClientImpl;
 import com.invariantproperties.sandbox.student.webservice.client.ObjectNotFoundException;
+import com.invariantproperties.sandbox.student.webservice.client.TestRunRestClient;
+import com.invariantproperties.sandbox.student.webservice.client.TestRunRestClientImpl;
+import com.invariantproperties.sandbox.student.webservice.config.TestRestApplicationContext;
 
 /**
  * Integration tests for CourseResource
  * 
  * @author bgiles
  */
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(classes = { TestRestApplicationContext.class })
 public class CourseRestServerIntegrationTest {
 
-    private final CourseRestClient client = new CourseRestClientImpl("http://localhost:8080/rest/course/");
+    @Resource
+    private String resourceBase;
+    private CourseRestClient client;
+    private TestRunRestClient testClient;
+
+    @Before
+    public void init() {
+        this.client = new CourseRestClientImpl(resourceBase + "course/");
+        this.testClient = new TestRunRestClientImpl(resourceBase + "testRun/");
+    }
 
     @Test
     public void testGetAll() throws IOException {
@@ -58,7 +79,9 @@ public class CourseRestServerIntegrationTest {
 
     @Test
     public void testLifecycle() throws IOException {
-        final String physicsName = "Physics 201";
+        final TestRun testRun = testClient.createTestRun();
+
+        final String physicsName = "Physics 201 : " + testRun.getUuid();
         final Course expected = client.createCourse(physicsName);
         assertEquals(physicsName, expected.getName());
 
@@ -68,7 +91,7 @@ public class CourseRestServerIntegrationTest {
         final Course[] courses = client.getAllCourses();
         assertTrue(courses.length > 0);
 
-        final String mechanicsName = "Newtonian Mechanics 201";
+        final String mechanicsName = "Newtonian Mechanics 201 : " + testRun.getUuid();
         final Course actual2 = client.updateCourse(actual1.getUuid(), mechanicsName);
         assertEquals(mechanicsName, actual2.getName());
 
@@ -79,5 +102,7 @@ public class CourseRestServerIntegrationTest {
         } catch (ObjectNotFoundException e) {
             // do nothing
         }
+
+        testClient.deleteTestRun(testRun.getUuid());
     }
 }

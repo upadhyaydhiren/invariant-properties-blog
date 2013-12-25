@@ -59,6 +59,7 @@ public class DummyTestRunService implements TestRunService {
 
     @Override
     public TestRun createTestRun() {
+        log.debug("TestRunServer: createTestRun()");
         final StackTraceElement[] elements = Thread.currentThread().getStackTrace();
         String classname = elements[1].getClassName();
         int idx = classname.lastIndexOf('.');
@@ -72,6 +73,10 @@ public class DummyTestRunService implements TestRunService {
     @Override
     public TestRun createTestRun(String name) {
         log.debug("TestRunServer: createTestRun()");
+        if (name == null || name.isEmpty()) {
+            return createTestRun();
+        }
+
         final TestRun testRun = new TestRun();
         testRun.setName(name);
         testRun.setUuid(UUID.randomUUID().toString());
