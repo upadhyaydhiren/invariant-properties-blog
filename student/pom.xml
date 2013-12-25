@@ -43,6 +43,7 @@
         <module>student-business</module>
 		<module>student-webservices</module>
 		<module>student-webapp</module>
+		<module>student-maintenance</module>
 	</modules>
 
 	<properties>
@@ -417,7 +418,7 @@
 				<groupId>javassist</groupId>
 				<artifactId>javassist</artifactId>
 				<version>3.12.1.GA</version>
-				<scope>test</scope>
+				<!-- <scope>test</scope> - test and runtime -->
 			</dependency>
 			<dependency>
 				<groupId>antlr</groupId>
