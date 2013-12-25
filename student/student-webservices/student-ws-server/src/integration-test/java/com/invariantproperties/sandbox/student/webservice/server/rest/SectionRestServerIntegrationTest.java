@@ -29,21 +29,41 @@ import static org.junit.Assert.fail;
 
 import java.io.IOException;
 
+import javax.annotation.Resource;
+
+import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import com.invariantproperties.sandbox.student.domain.Section;
+import com.invariantproperties.sandbox.student.domain.TestRun;
 import com.invariantproperties.sandbox.student.webservice.client.ObjectNotFoundException;
 import com.invariantproperties.sandbox.student.webservice.client.SectionRestClient;
 import com.invariantproperties.sandbox.student.webservice.client.SectionRestClientImpl;
+import com.invariantproperties.sandbox.student.webservice.client.TestRunRestClient;
+import com.invariantproperties.sandbox.student.webservice.client.TestRunRestClientImpl;
+import com.invariantproperties.sandbox.student.webservice.config.TestRestApplicationContext;
 
 /**
  * Integration tests for SectionResource
  * 
  * @author bgiles
  */
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(classes = { TestRestApplicationContext.class })
 public class SectionRestServerIntegrationTest {
+    @Resource
+    private String resourceBase;
+    private SectionRestClient client;
+    private TestRunRestClient testClient;
 
-    private final SectionRestClient client = new SectionRestClientImpl("http://localhost:8080/rest/section/");
+    @Before
+    public void init() {
+        this.client = new SectionRestClientImpl(resourceBase + "section/");
+        this.testClient = new TestRunRestClientImpl(resourceBase + "testRun/");
+    }
 
     @Test
     public void testGetAll() throws IOException {
@@ -58,7 +78,9 @@ public class SectionRestServerIntegrationTest {
 
     @Test
     public void testLifecycle() throws IOException {
-        final String physicsFall2013Name = "Physics 201 - Fall 2013";
+        final TestRun testRun = testClient.createTestRun();
+
+        final String physicsFall2013Name = "Physics 201 - Fall 2013 : " + testRun.getUuid();
         final Section expected = client.createSection(physicsFall2013Name);
         assertEquals(physicsFall2013Name, expected.getName());
 
@@ -68,7 +90,7 @@ public class SectionRestServerIntegrationTest {
         final Section[] sections = client.getAllSections();
         assertTrue(sections.length > 0);
 
-        final String physicsFall2014Name = "Physics 201 - Fall 2014";
+        final String physicsFall2014Name = "Physics 201 - Fall 2014 : " + testRun.getUuid();
         final Section actual2 = client.updateSection(actual1.getUuid(), physicsFall2014Name);
         assertEquals(physicsFall2014Name, actual2.getName());
 
@@ -79,5 +101,7 @@ public class SectionRestServerIntegrationTest {
         } catch (ObjectNotFoundException e) {
             // do nothing
         }
+
+        testClient.deleteTestRun(testRun.getUuid());
     }
 }

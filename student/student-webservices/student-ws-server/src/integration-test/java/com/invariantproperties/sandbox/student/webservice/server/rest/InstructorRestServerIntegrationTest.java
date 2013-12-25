@@ -29,21 +29,42 @@ import static org.junit.Assert.fail;
 
 import java.io.IOException;
 
+import javax.annotation.Resource;
+
+import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import com.invariantproperties.sandbox.student.domain.Instructor;
+import com.invariantproperties.sandbox.student.domain.TestRun;
 import com.invariantproperties.sandbox.student.webservice.client.InstructorRestClient;
 import com.invariantproperties.sandbox.student.webservice.client.InstructorRestClientImpl;
 import com.invariantproperties.sandbox.student.webservice.client.ObjectNotFoundException;
+import com.invariantproperties.sandbox.student.webservice.client.TestRunRestClient;
+import com.invariantproperties.sandbox.student.webservice.client.TestRunRestClientImpl;
+import com.invariantproperties.sandbox.student.webservice.config.TestRestApplicationContext;
 
 /**
  * Integration tests for InstructorResource
  * 
  * @author bgiles
  */
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(classes = { TestRestApplicationContext.class })
 public class InstructorRestServerIntegrationTest {
 
-    final InstructorRestClient client = new InstructorRestClientImpl("http://localhost:8080/rest/instructor/");
+    @Resource
+    private String resourceBase;
+    private InstructorRestClient client;
+    private TestRunRestClient testClient;
+
+    @Before
+    public void init() {
+        this.client = new InstructorRestClientImpl(resourceBase + "instructor/");
+        this.testClient = new TestRunRestClientImpl(resourceBase + "testRun/");
+    }
 
     @Test
     public void testGetAll() throws IOException {
@@ -58,8 +79,10 @@ public class InstructorRestServerIntegrationTest {
 
     @Test
     public void testLifecycle() throws IOException {
-        final String davidName = "David";
-        final String davidEmail = "david@example.com";
+        final TestRun testRun = testClient.createTestRun();
+
+        final String davidName = "David : " + testRun.getUuid();
+        final String davidEmail = "david-" + testRun.getUuid() + "@example.com";
         final Instructor expected = client.createInstructor(davidName, davidEmail);
         assertEquals(davidName, expected.getName());
         assertEquals(davidEmail, expected.getEmailAddress());
@@ -71,8 +94,8 @@ public class InstructorRestServerIntegrationTest {
         final Instructor[] instructors = client.getAllInstructors();
         assertTrue(instructors.length > 0);
 
-        final String edithName = "Edith";
-        final String edithEmail = "edith@example.com";
+        final String edithName = "Edith : " + testRun.getUuid();
+        final String edithEmail = "edith-" + testRun.getUuid() + "example.com";
         final Instructor actual2 = client.updateInstructor(actual1.getUuid(), edithName, edithEmail);
         assertEquals(edithName, actual2.getName());
         assertEquals(edithEmail, actual2.getEmailAddress());
@@ -84,5 +107,7 @@ public class InstructorRestServerIntegrationTest {
         } catch (ObjectNotFoundException e) {
             // do nothing
         }
+
+        testClient.deleteTestRun(testRun.getUuid());
     }
 }

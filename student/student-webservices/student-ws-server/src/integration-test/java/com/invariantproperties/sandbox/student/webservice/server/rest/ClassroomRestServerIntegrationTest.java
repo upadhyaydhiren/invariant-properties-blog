@@ -29,21 +29,44 @@ import static org.junit.Assert.fail;
 
 import java.io.IOException;
 
+import javax.annotation.Resource;
+
+import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import com.invariantproperties.sandbox.student.domain.Classroom;
+import com.invariantproperties.sandbox.student.domain.TestRun;
 import com.invariantproperties.sandbox.student.webservice.client.ClassroomRestClient;
 import com.invariantproperties.sandbox.student.webservice.client.ClassroomRestClientImpl;
 import com.invariantproperties.sandbox.student.webservice.client.ObjectNotFoundException;
+import com.invariantproperties.sandbox.student.webservice.client.TestRunRestClient;
+import com.invariantproperties.sandbox.student.webservice.client.TestRunRestClientImpl;
+import com.invariantproperties.sandbox.student.webservice.config.TestRestApplicationContext;
 
 /**
  * Integration tests for ClassroomResource
  * 
  * @author bgiles
  */
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(classes = { TestRestApplicationContext.class })
 public class ClassroomRestServerIntegrationTest {
 
-    private final ClassroomRestClient client = new ClassroomRestClientImpl("http://localhost:8080/rest/classroom/");
+    @Resource
+    private String resourceBase;
+
+    private ClassroomRestClient client;
+
+    private TestRunRestClient testClient;
+
+    @Before
+    public void init() {
+        this.client = new ClassroomRestClientImpl(resourceBase + "classroom/");
+        this.testClient = new TestRunRestClientImpl(resourceBase + "testRun/");
+    }
 
     @Test
     public void testGetAll() throws IOException {
@@ -58,8 +81,10 @@ public class ClassroomRestServerIntegrationTest {
 
     @Test
     public void testLifecycle() throws IOException {
-        final String eng201Name = "Engineering 201";
-        final Classroom expected = client.createClassroom(eng201Name);
+        final TestRun testRun = testClient.createTestRun();
+
+        final String eng201Name = "Engineering 201 : " + testRun.getUuid();
+        final Classroom expected = client.createClassroomForTesting(eng201Name, testRun);
         assertEquals(eng201Name, expected.getName());
 
         final Classroom actual1 = client.getClassroom(expected.getUuid());
@@ -68,7 +93,7 @@ public class ClassroomRestServerIntegrationTest {
         final Classroom[] classrooms = client.getAllClassrooms();
         assertTrue(classrooms.length > 0);
 
-        final String eng202Name = "Engineering 201";
+        final String eng202Name = "Engineering 201 : " + testRun.getUuid();
         final Classroom actual2 = client.updateClassroom(actual1.getUuid(), eng202Name);
         assertEquals(eng202Name, actual2.getName());
 
@@ -79,5 +104,7 @@ public class ClassroomRestServerIntegrationTest {
         } catch (ObjectNotFoundException e) {
             // do nothing
         }
+
+        testClient.deleteTestRun(testRun.getUuid());
     }
 }

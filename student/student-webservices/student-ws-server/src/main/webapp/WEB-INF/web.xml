@@ -12,8 +12,8 @@
     <context-param>
         <param-name>contextConfigLocation</param-name>
         <param-value>
-            com.invariantproperties.sandbox.student.webservice.server.config.RestApplicationContext
-            com.invariantproperties.sandbox.student.webservice.server.config.RestApplicationContextTest
+            com.invariantproperties.sandbox.student.webservice.config.RestApplicationContext
+            com.invariantproperties.sandbox.student.webservice.config.TestRestApplicationContext
         </param-value>
     </context-param>
 

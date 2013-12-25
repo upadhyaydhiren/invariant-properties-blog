@@ -7,28 +7,51 @@
 		<version>0.0.2-SNAPSHOT</version>
 	</parent>
 	<artifactId>student-ws-server</artifactId>
-
-
+	
 	<build>
 		<plugins>
 
 			<!-- Run the application using "mvn jetty:run" -->
 			<plugin>
-				<groupId>org.mortbay.jetty</groupId>
-				<artifactId>maven-jetty-plugin</artifactId>
-				<version>6.1.16</version> <!-- ancient -->
+				<groupId>org.eclipse.jetty</groupId>
+				<artifactId>jetty-maven-plugin</artifactId>
+				<version>9.1.0.v20131115</version>
 				<configuration>
-					<!-- Log to the console. -->
-					<requestLog implementation="org.mortbay.jetty.NCSARequestLog">
-						<!-- This doesn't do anything for Jetty, but is a workaround for a 
-							Maven bug that prevents the requestLog from being set. -->
-						<append>true</append>
-					</requestLog>
-					<webAppConfig>
+					<webApp>
+						<!-- <useTestScope>true</useTestScope> -->
 						<!-- <contextPath>/</contextPath> -->
 						<extraClasspath>${basedir}/target/test-classes/</extraClasspath>
-					</webAppConfig>
+					</webApp>
+					<scanIntervalSeconds>10</scanIntervalSeconds>
+					<stopPort>18005</stopPort>
+					<stopKey>STOP</stopKey>
+					<systemProperties>
+					   <systemProperty>
+					       <name>jetty.port</name>
+					       <value>18080</value>
+					   </systemProperty>
+					</systemProperties>
 				</configuration>
+				<executions>
+					<execution>
+						<id>start-jetty</id>
+						<phase>pre-integration-test</phase>
+						<goals>
+							<goal>run</goal>
+						</goals>
+						<configuration>
+							<scanIntervalSeconds>0</scanIntervalSeconds>
+							<daemon>true</daemon>
+						</configuration>
+					</execution>
+					<execution>
+						<id>stop-jetty</id>
+						<phase>post-integration-test</phase>
+						<goals>
+							<goal>stop</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
 	</build>

@@ -52,7 +52,7 @@ import com.invariantproperties.sandbox.student.domain.TestRun;
 @Path("/testRun")
 public class TestRunResource extends AbstractResource {
     private static final Logger log = Logger.getLogger(TestRunResource.class);
-    private static final TestRun[] EMPTY_TERM_ARRAY = new TestRun[0];
+    private static final TestRun[] EMPTY_TEST_RUN_ARRAY = new TestRun[0];
 
     @Context
     UriInfo uriInfo;
@@ -98,7 +98,7 @@ public class TestRunResource extends AbstractResource {
                 results.add(scrubTestRun(testRun));
             }
 
-            response = Response.ok(results.toArray(EMPTY_TERM_ARRAY)).build();
+            response = Response.ok(results.toArray(EMPTY_TEST_RUN_ARRAY)).build();
         } catch (Exception e) {
             if (!(e instanceof UnitTestException)) {
                 log.info("unhandled exception", e);
@@ -121,15 +121,15 @@ public class TestRunResource extends AbstractResource {
     public Response createTestRun(Name req) {
         log.debug("TestRunResource: createTestRun()");
 
-        final String name = req.getName();
-        if ((name == null) || name.isEmpty()) {
-            return Response.status(Status.BAD_REQUEST).entity("'name' is required'").build();
-        }
-
         Response response = null;
 
         try {
-            TestRun testRun = service.createTestRun(name);
+            TestRun testRun = null;
+            if (req.getName() == null || req.getName().isEmpty()) {
+                testRun = service.createTestRun();
+            } else {
+                testRun = service.createTestRun(req.getName());
+            }
             if (testRun == null) {
                 response = Response.status(Status.INTERNAL_SERVER_ERROR).build();
             } else {

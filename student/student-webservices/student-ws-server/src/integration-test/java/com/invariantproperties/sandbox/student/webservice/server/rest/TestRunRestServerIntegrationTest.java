@@ -15,7 +15,7 @@
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
  * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
+ * specific language governing pestRunissions and limitations
  * under the License.
  * 
  * Copyright (c) 2013 Bear Giles <bgiles@coyotesong.com>
@@ -37,71 +37,57 @@ import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import com.invariantproperties.sandbox.student.domain.Term;
 import com.invariantproperties.sandbox.student.domain.TestRun;
 import com.invariantproperties.sandbox.student.webservice.client.ObjectNotFoundException;
-import com.invariantproperties.sandbox.student.webservice.client.TermRestClient;
-import com.invariantproperties.sandbox.student.webservice.client.TermRestClientImpl;
 import com.invariantproperties.sandbox.student.webservice.client.TestRunRestClient;
 import com.invariantproperties.sandbox.student.webservice.client.TestRunRestClientImpl;
 import com.invariantproperties.sandbox.student.webservice.config.TestRestApplicationContext;
 
 /**
- * Integration tests for TermResource
+ * Integration tests for TestRunResource
  * 
  * @author bgiles
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = { TestRestApplicationContext.class })
-public class TermRestServerIntegrationTest {
+public class TestRunRestServerIntegrationTest {
     @Resource
     private String resourceBase;
-    private TermRestClient client;
-    private TestRunRestClient testClient;
+    private TestRunRestClient client;
 
     @Before
     public void init() {
-        this.client = new TermRestClientImpl(resourceBase + "term/");
-        this.testClient = new TestRunRestClientImpl(resourceBase + "testRun/");
+        this.client = new TestRunRestClientImpl(resourceBase + "testRun/");
     }
 
     @Test
     public void testGetAll() throws IOException {
-        final Term[] terms = client.getAllTerms();
-        assertNotNull(terms);
+        final TestRun[] testRuns = client.getAllTestRuns();
+        assertNotNull(testRuns);
     }
 
     @Test(expected = ObjectNotFoundException.class)
-    public void testUnknownTerm() throws IOException {
-        client.getTerm("missing");
+    public void testUnknownTestRun() throws IOException {
+        client.getTestRun("missing");
     }
 
     @Test
     public void testLifecycle() throws IOException {
-        final TestRun testRun = testClient.createTestRun();
+        final TestRun expected = client.createTestRun();
+        System.out.println("***** test run: " + expected);
 
-        final String fall2013Name = "Fall 2013 : " + testRun.getUuid();
-        final Term expected = client.createTerm(fall2013Name);
-        assertEquals(fall2013Name, expected.getName());
+        final TestRun actual = client.getTestRun(expected.getUuid());
+        assertEquals(expected.getName(), actual.getName());
 
-        final Term actual1 = client.getTerm(expected.getUuid());
-        assertEquals(fall2013Name, actual1.getName());
+        final TestRun[] testRuns = client.getAllTestRuns();
+        assertTrue(testRuns.length > 0);
 
-        final Term[] terms = client.getAllTerms();
-        assertTrue(terms.length > 0);
-
-        final String fall2014Name = "Fall 2014 : " + testRun.getUuid();
-        final Term actual2 = client.updateTerm(actual1.getUuid(), fall2014Name);
-        assertEquals(fall2014Name, actual2.getName());
-
-        client.deleteTerm(actual1.getUuid());
+        client.deleteTestRun(actual.getUuid());
         try {
-            client.getTerm(expected.getUuid());
+            client.getTestRun(expected.getUuid());
             fail("should have thrown exception");
         } catch (ObjectNotFoundException e) {
             // do nothing
         }
-
-        testClient.deleteTestRun(testRun.getUuid());
     }
 }
