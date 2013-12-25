@@ -15,51 +15,45 @@
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
  * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
+ * specific language governing pestRunissions and limitations
  * under the License.
  * 
  * Copyright (c) 2013 Bear Giles <bgiles@coyotesong.com>
  */
 package com.invariantproperties.sandbox.student.webservice.client;
 
-import com.invariantproperties.sandbox.student.domain.PersistentObject;
+import com.invariantproperties.sandbox.student.domain.TestRun;
 
 /**
- * Exception thrown when an expected object is not found.
+ * TestRun REST client.
  * 
  * @author Bear Giles <bgiles@coyotesong.com>
  */
-public class ObjectNotFoundException extends RestClientException {
-    private static final long serialVersionUID = 1L;
-
-    private final Class<? extends PersistentObject> objectClass;
-    private final String resource;
-    private final String uuid;
+public interface TestRunRestClient {
 
     /**
-     * Constructor
+     * Get list of all testRuns.
+     */
+    TestRun[] getAllTestRuns();
+
+    /**
+     * Get details for specific testRun.
      * 
-     * @param resource
-     * @param objectClass
      * @param uuid
      */
-    public ObjectNotFoundException(final String resource, final Class<? extends PersistentObject> objectClass,
-            final String uuid) {
-        super("object not found: " + resource + "[" + uuid + "]");
-        this.resource = resource;
-        this.objectClass = objectClass;
-        this.uuid = uuid;
-    }
+    TestRun getTestRun(String uuid);
 
-    public String getResource() {
-        return resource;
-    }
+    /**
+     * Create specific testRun.
+     * 
+     * @param name
+     */
+    TestRun createTestRun();
 
-    public Class<? extends PersistentObject> getObjectClass() {
-        return objectClass;
-    }
-
-    public String getUuid() {
-        return uuid;
-    }
+    /**
+     * Delete testRun.
+     * 
+     * @param uuid
+     */
+    void deleteTestRun(String uuid);
 }

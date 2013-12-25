@@ -25,7 +25,7 @@ package com.invariantproperties.sandbox.student.webservice.client;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import com.invariantproperties.sandbox.student.domain.TestablePersistentObject;
+import com.invariantproperties.sandbox.student.domain.PersistentObject;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
@@ -35,7 +35,7 @@ import com.sun.jersey.api.client.WebResource;
  * 
  * @author Bear Giles <bgiles@coyotesong.com>
  */
-public class AbstractRestClientImpl<T extends TestablePersistentObject> {
+public class AbstractRestClientImpl<T extends PersistentObject> {
     private final String resource;
     private final Class<T> objectClass;
     private final Class<T[]> objectArrayClass;
@@ -72,10 +72,7 @@ public class AbstractRestClientImpl<T extends TestablePersistentObject> {
             final ClientResponse response = webResource.accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
 
             if (response.getStatus() == Response.Status.OK.getStatusCode()) {
-                T[] entities = response.getEntity(objectArrayClass);
-                // for (T entity : entities) {
-                // entity.setSelf(resource + entity.getUuid());
-                // }
+                final T[] entities = response.getEntity(objectArrayClass);
                 return entities;
             } else {
                 throw new RestClientFailureException(resource, objectClass, "<none>", response);
@@ -103,6 +100,29 @@ public class AbstractRestClientImpl<T extends TestablePersistentObject> {
                 throw new ObjectNotFoundException(resource, objectClass, uuid);
             } else {
                 throw new RestClientFailureException(resource, objectClass, uuid, response);
+            }
+        } finally {
+            client.destroy();
+        }
+    }
+
+    /**
+     * Create an object with default values.
+     */
+    public T createObject() {
+        final Client client = createClient();
+
+        try {
+            final WebResource webResource = client.resource(resource);
+            final ClientResponse response = webResource.type(MediaType.APPLICATION_JSON)
+                    .accept(MediaType.APPLICATION_JSON).post(ClientResponse.class, "");
+
+            if (response.getStatus() == Response.Status.CREATED.getStatusCode()) {
+                final T entity = response.getEntity(objectClass);
+                // entity.setSelf(resource + entity.getUuid());
+                return entity;
+            } else {
+                throw new RestClientFailureException(resource, objectClass, "", response);
             }
         } finally {
             client.destroy();
