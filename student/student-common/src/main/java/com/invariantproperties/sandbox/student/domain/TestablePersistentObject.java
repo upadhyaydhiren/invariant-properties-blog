@@ -23,6 +23,7 @@
 package com.invariantproperties.sandbox.student.domain;
 
 import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.Transient;
@@ -49,6 +50,7 @@ public abstract class TestablePersistentObject extends PersistentObject {
      * @return
      */
     @ManyToOne(fetch = FetchType.LAZY, optional = true)
+    @JoinColumn(name = "test_run_pkey")
     public TestRun getTestRun() {
         return testRun;
     }

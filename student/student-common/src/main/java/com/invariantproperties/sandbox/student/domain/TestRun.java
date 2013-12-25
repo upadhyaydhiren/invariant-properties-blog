@@ -28,14 +28,13 @@ import java.util.List;
 import java.util.UUID;
 
 import javax.persistence.AttributeOverride;
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.OneToMany;
 import javax.persistence.PrePersist;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.persistence.Transient;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
@@ -76,7 +75,7 @@ public class TestRun extends PersistentObject {
         this.testDate = testDate;
     }
 
-    @Column(length = 40, unique = false, updatable = false)
+    @Column(name = "username", length = 40, unique = false, updatable = false)
     public String getUser() {
         return user;
     }
@@ -85,7 +84,8 @@ public class TestRun extends PersistentObject {
         this.user = user;
     }
 
-    @OneToMany(cascade = CascadeType.ALL)
+    // @OneToMany(cascade = CascadeType.ALL)
+    @Transient
     public List<TestablePersistentObject> getObjects() {
         return objects;
     }
