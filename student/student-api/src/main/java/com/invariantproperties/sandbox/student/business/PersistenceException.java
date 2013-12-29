@@ -22,31 +22,71 @@
  */
 package com.invariantproperties.sandbox.student.business;
 
+/**
+ * Exception thrown when there's an unexpected exception from the persistence
+ * layer. This could happen, for example, if the database connection has been
+ * lost.
+ * 
+ * @author Bear Giles <bgiles@coyotesong.com>
+ */
 public class PersistenceException extends RuntimeException {
     private static final long serialVersionUID = 1L;
     private final String uuid;
     private final Integer id;
 
-    public PersistenceException(String message, Throwable cause) {
+    /**
+     * Summary of what was being done when the exception happened. The parameter
+     * is the (internationalized?) exception message to use.
+     * 
+     * @author bgiles
+     */
+    public enum Type {
+        UNABLE_TO_COUNT("unable to count %s by testrun "), UNABLE_TO_FIND_BY_ID("unable to find %s by id"), UNABLE_TO_FIND_BY_UUID(
+                "unable to find %s by uuid"), UNABLE_TO_FIND_BY_EMAIL_ADDRESS("unable to find %s by email address"), UNABLE_TO_LIST(
+                "unable to get list of %s by testrun"), UNABLE_TO_CREATE("unable to create %s"), UNABLE_TO_CREATE_FOR_TESTING(
+                "unable to create %s for testing"), UNABLE_TO_UPDATE("unable to update %s"), UNABLE_TO_DELETE(
+                "unable to delete %s");
+
+        private final String msg;
+
+        private Type(String msg) {
+            this.msg = msg;
+        }
+
+        public String format(String poc) {
+            return String.format(msg, poc);
+        }
+    }
+
+    private final Type type;
+
+    public PersistenceException(Type type, String message, Throwable cause) {
         super(message, cause);
+        this.type = type;
         this.uuid = null;
         this.id = null;
     }
 
-    public PersistenceException(String message, Throwable cause, String uuid) {
+    public PersistenceException(Type type, String message, Throwable cause, String uuid) {
         super(message, cause);
+        this.type = type;
         this.uuid = uuid;
         this.id = null;
     }
 
-    public PersistenceException(String message, Throwable cause, Integer id) {
+    public PersistenceException(Type type, String message, Throwable cause, Integer id) {
         super(message, cause);
+        this.type = type;
         this.uuid = null;
         this.id = id;
     }
 
     public static long getSerialversionuid() {
         return serialVersionUID;
+    }
+
+    public Type getType() {
+        return type;
     }
 
     public String getUuid() {

@@ -22,6 +22,12 @@
  */
 package com.invariantproperties.sandbox.student.business;
 
+import static com.invariantproperties.sandbox.student.business.PersistenceException.Type.UNABLE_TO_CREATE;
+import static com.invariantproperties.sandbox.student.business.PersistenceException.Type.UNABLE_TO_DELETE;
+import static com.invariantproperties.sandbox.student.business.PersistenceException.Type.UNABLE_TO_FIND_BY_ID;
+import static com.invariantproperties.sandbox.student.business.PersistenceException.Type.UNABLE_TO_FIND_BY_UUID;
+import static com.invariantproperties.sandbox.student.business.PersistenceException.Type.UNABLE_TO_LIST;
+
 import java.util.Collections;
 import java.util.List;
 
@@ -43,7 +49,10 @@ import com.invariantproperties.sandbox.student.repository.TestRunRepository;
  */
 @Service
 public class TestRunServiceImpl implements TestRunService {
-    private static final Logger log = LoggerFactory.getLogger(TestRunServiceImpl.class);
+    private static final Logger LOG = LoggerFactory.getLogger(TestRunServiceImpl.class);
+    private static final String TEST_RUN = "testRun";
+    private static final String TEST_RUNS = "testRuns";
+    private static final String COULD_NOT_FIND_MESSAGE = "could not find testRun: ";
 
     @Resource
     private TestRunRepository testRunRepository;
@@ -72,11 +81,13 @@ public class TestRunServiceImpl implements TestRunService {
         List<TestRun> testRuns = Collections.emptyList();
         try {
             testRuns = testRunRepository.findAll();
+        } catch (UnitTestException e) {
+            final String msg = UNABLE_TO_LIST.format(TEST_RUNS);
+            throw new PersistenceException(UNABLE_TO_LIST, msg, e);
         } catch (DataAccessException e) {
-            if (!(e instanceof UnitTestException)) {
-                log.info("error loading list of test runs: " + e.getMessage(), e);
-            }
-            throw new PersistenceException("unable to get list of test runs.", e);
+            final String msg = UNABLE_TO_LIST.format(TEST_RUNS);
+            LOG.info(msg);
+            throw new PersistenceException(UNABLE_TO_LIST, msg, e);
         }
 
         return testRuns;
@@ -92,11 +103,13 @@ public class TestRunServiceImpl implements TestRunService {
         TestRun testRun = null;
         try {
             testRun = testRunRepository.findOne(id);
+        } catch (UnitTestException e) {
+            final String msg = UNABLE_TO_FIND_BY_ID.format(TEST_RUN);
+            throw new PersistenceException(UNABLE_TO_FIND_BY_ID, msg, e, id);
         } catch (DataAccessException e) {
-            if (!(e instanceof UnitTestException)) {
-                log.info("internal error retrieving testRun: " + id, e);
-            }
-            throw new PersistenceException("unable to find testRun by id", e, id);
+            final String msg = UNABLE_TO_FIND_BY_ID.format(TEST_RUN);
+            LOG.info(msg);
+            throw new PersistenceException(UNABLE_TO_FIND_BY_ID, msg, e, id);
         }
 
         if (testRun == null) {
@@ -116,11 +129,13 @@ public class TestRunServiceImpl implements TestRunService {
         TestRun testRun = null;
         try {
             testRun = testRunRepository.findTestRunByUuid(uuid);
+        } catch (UnitTestException e) {
+            final String msg = UNABLE_TO_FIND_BY_UUID.format(TEST_RUN);
+            throw new PersistenceException(UNABLE_TO_FIND_BY_UUID, msg, e, uuid);
         } catch (DataAccessException e) {
-            if (!(e instanceof UnitTestException)) {
-                log.info("internal error retrieving testRun: " + uuid, e);
-            }
-            throw new PersistenceException("unable to find testRun by uuid", e, uuid);
+            final String msg = UNABLE_TO_FIND_BY_UUID.format(TEST_RUN);
+            LOG.info(msg);
+            throw new PersistenceException(UNABLE_TO_FIND_BY_UUID, msg, e, uuid);
         }
 
         if (testRun == null) {
@@ -153,11 +168,13 @@ public class TestRunServiceImpl implements TestRunService {
         TestRun actual = null;
         try {
             actual = testRunRepository.saveAndFlush(testRun);
+        } catch (UnitTestException e) {
+            final String msg = UNABLE_TO_CREATE.format(TEST_RUN);
+            throw new PersistenceException(UNABLE_TO_CREATE, msg, e);
         } catch (DataAccessException e) {
-            if (!(e instanceof UnitTestException)) {
-                log.info("internal error retrieving testRun: " + name, e);
-            }
-            throw new PersistenceException("unable to create testRun", e);
+            final String msg = UNABLE_TO_CREATE.format(TEST_RUN);
+            LOG.info(msg);
+            throw new PersistenceException(UNABLE_TO_CREATE, msg, e);
         }
 
         return actual;
@@ -175,16 +192,18 @@ public class TestRunServiceImpl implements TestRunService {
             testRun = testRunRepository.findTestRunByUuid(uuid);
 
             if (testRun == null) {
-                log.debug("did not find testRun: " + uuid);
+                LOG.debug(COULD_NOT_FIND_MESSAGE + uuid);
                 throw new ObjectNotFoundException(uuid);
             }
             testRunRepository.delete(testRun);
 
+        } catch (UnitTestException e) {
+            final String msg = UNABLE_TO_DELETE.format(TEST_RUN);
+            throw new PersistenceException(UNABLE_TO_DELETE, msg, e, uuid);
         } catch (DataAccessException e) {
-            if (!(e instanceof UnitTestException)) {
-                log.info("internal error deleting testRun: " + uuid, e);
-            }
-            throw new PersistenceException("unable to delete testRun", e, uuid);
+            final String msg = UNABLE_TO_DELETE.format(TEST_RUN);
+            LOG.info(msg);
+            throw new PersistenceException(UNABLE_TO_DELETE, msg, e, uuid);
         }
     }
 
@@ -207,5 +226,4 @@ public class TestRunServiceImpl implements TestRunService {
         }
         return name;
     }
-
 }

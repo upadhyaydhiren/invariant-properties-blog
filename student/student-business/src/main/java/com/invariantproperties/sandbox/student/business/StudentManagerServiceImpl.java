@@ -22,6 +22,11 @@
  */
 package com.invariantproperties.sandbox.student.business;
 
+import static com.invariantproperties.sandbox.student.business.PersistenceException.Type.UNABLE_TO_CREATE;
+import static com.invariantproperties.sandbox.student.business.PersistenceException.Type.UNABLE_TO_CREATE_FOR_TESTING;
+import static com.invariantproperties.sandbox.student.business.PersistenceException.Type.UNABLE_TO_DELETE;
+import static com.invariantproperties.sandbox.student.business.PersistenceException.Type.UNABLE_TO_UPDATE;
+
 import javax.annotation.Resource;
 
 import org.slf4j.Logger;
@@ -41,7 +46,9 @@ import com.invariantproperties.sandbox.student.repository.StudentRepository;
  */
 @Service
 public class StudentManagerServiceImpl implements StudentManagerService {
-    private static final Logger log = LoggerFactory.getLogger(StudentManagerServiceImpl.class);
+    private static final Logger LOG = LoggerFactory.getLogger(StudentManagerServiceImpl.class);
+    private static final String STUDENT = "student";
+    private static final String COULD_NOT_FIND_MESSAGE = "could not find student: ";
 
     @Resource
     private StudentRepository studentRepository;
@@ -74,11 +81,13 @@ public class StudentManagerServiceImpl implements StudentManagerService {
         Student actual = null;
         try {
             actual = studentRepository.saveAndFlush(student);
+        } catch (UnitTestException e) {
+            final String msg = UNABLE_TO_CREATE.format(STUDENT);
+            throw new PersistenceException(UNABLE_TO_CREATE, msg, e);
         } catch (DataAccessException e) {
-            if (!(e instanceof UnitTestException)) {
-                log.info("internal error retrieving student: " + name, e);
-            }
-            throw new PersistenceException("unable to create student", e);
+            final String msg = UNABLE_TO_CREATE.format(STUDENT);
+            LOG.info(msg);
+            throw new PersistenceException(UNABLE_TO_CREATE, msg, e);
         }
 
         return actual;
@@ -100,11 +109,13 @@ public class StudentManagerServiceImpl implements StudentManagerService {
         Student actual = null;
         try {
             actual = studentRepository.saveAndFlush(student);
+        } catch (UnitTestException e) {
+            final String msg = UNABLE_TO_CREATE_FOR_TESTING.format(STUDENT);
+            throw new PersistenceException(UNABLE_TO_CREATE_FOR_TESTING, msg, e);
         } catch (DataAccessException e) {
-            if (!(e instanceof UnitTestException)) {
-                log.info("internal error retrieving student: " + name, e);
-            }
-            throw new PersistenceException("unable to create student", e);
+            final String msg = UNABLE_TO_CREATE_FOR_TESTING.format(STUDENT);
+            LOG.info(msg);
+            throw new PersistenceException(UNABLE_TO_CREATE_FOR_TESTING, msg, e);
         }
 
         return actual;
@@ -123,7 +134,7 @@ public class StudentManagerServiceImpl implements StudentManagerService {
             final Student actual = studentRepository.findStudentByUuid(student.getUuid());
 
             if (actual == null) {
-                log.debug("did not find student: " + student.getUuid());
+                LOG.debug(COULD_NOT_FIND_MESSAGE + student.getUuid());
                 throw new ObjectNotFoundException(student.getUuid());
             }
 
@@ -133,11 +144,13 @@ public class StudentManagerServiceImpl implements StudentManagerService {
             student.setName(name);
             student.setEmailAddress(emailAddress);
 
+        } catch (UnitTestException e) {
+            final String msg = UNABLE_TO_UPDATE.format(STUDENT);
+            throw new PersistenceException(UNABLE_TO_UPDATE, msg, e);
         } catch (DataAccessException e) {
-            if (!(e instanceof UnitTestException)) {
-                log.info("internal error deleting student: " + student.getUuid(), e);
-            }
-            throw new PersistenceException("unable to delete student", e, student.getUuid());
+            final String msg = UNABLE_TO_UPDATE.format(STUDENT);
+            LOG.info(msg);
+            throw new PersistenceException(UNABLE_TO_UPDATE, msg, e);
         }
 
         return updated;
@@ -155,16 +168,18 @@ public class StudentManagerServiceImpl implements StudentManagerService {
             student = studentRepository.findStudentByUuid(uuid);
 
             if (student == null) {
-                log.debug("did not find student: " + uuid);
+                LOG.debug(COULD_NOT_FIND_MESSAGE + uuid);
                 throw new ObjectNotFoundException(uuid);
             }
             studentRepository.delete(student);
 
+        } catch (UnitTestException e) {
+            final String msg = UNABLE_TO_DELETE.format(STUDENT);
+            throw new PersistenceException(UNABLE_TO_DELETE, msg, e);
         } catch (DataAccessException e) {
-            if (!(e instanceof UnitTestException)) {
-                log.info("internal error deleting student: " + uuid, e);
-            }
-            throw new PersistenceException("unable to delete student", e, uuid);
+            final String msg = UNABLE_TO_DELETE.format(STUDENT);
+            LOG.info(msg);
+            throw new PersistenceException(UNABLE_TO_DELETE, msg, e);
         }
     }
 }
