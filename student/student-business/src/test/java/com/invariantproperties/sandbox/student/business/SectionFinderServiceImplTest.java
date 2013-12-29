@@ -43,13 +43,13 @@ import com.invariantproperties.sandbox.student.repository.SectionRepository;
  * @author Bear Giles <bgiles@coyotesong.com>
  */
 public class SectionFinderServiceImplTest {
+    private final Class<Specification<Section>> sClass = null;
 
     @Test
     public void testCount() {
         final long expected = 3;
 
         final SectionRepository repository = Mockito.mock(SectionRepository.class);
-        final Class<Specification<Section>> sClass = null;
         when(repository.count(any(sClass))).thenReturn(expected);
 
         final SectionFinderService service = new SectionFinderServiceImpl(repository);
@@ -64,7 +64,6 @@ public class SectionFinderServiceImplTest {
         final TestRun testRun = new TestRun();
 
         final SectionRepository repository = Mockito.mock(SectionRepository.class);
-        final Class<Specification<Section>> sClass = null;
         when(repository.count(any(sClass))).thenReturn(expected);
 
         final SectionFinderService service = new SectionFinderServiceImpl(repository);
@@ -76,7 +75,6 @@ public class SectionFinderServiceImplTest {
     @Test(expected = PersistenceException.class)
     public void testCountError() {
         final SectionRepository repository = Mockito.mock(SectionRepository.class);
-        final Class<Specification<Section>> sClass = null;
         when(repository.count(any(sClass))).thenThrow(new UnitTestException());
 
         final SectionFinderService service = new SectionFinderServiceImpl(repository);
@@ -88,7 +86,6 @@ public class SectionFinderServiceImplTest {
         final List<Section> expected = Collections.emptyList();
 
         final SectionRepository repository = Mockito.mock(SectionRepository.class);
-        final Class<Specification<Section>> sClass = null;
         when(repository.findAll(any(sClass))).thenReturn(expected);
 
         final SectionFinderService service = new SectionFinderServiceImpl(repository);
@@ -100,7 +97,6 @@ public class SectionFinderServiceImplTest {
     @Test(expected = PersistenceException.class)
     public void testFindAllSectionsError() {
         final SectionRepository repository = Mockito.mock(SectionRepository.class);
-        final Class<Specification<Section>> sClass = null;
         when(repository.findAll(any(sClass))).thenThrow(new UnitTestException());
 
         final SectionFinderService service = new SectionFinderServiceImpl(repository);
@@ -178,7 +174,6 @@ public class SectionFinderServiceImplTest {
         final List<Section> expected = Collections.singletonList(section);
 
         final SectionRepository repository = Mockito.mock(SectionRepository.class);
-        final Class<Specification<Section>> sClass = null;
         when(repository.findAll(any(sClass))).thenReturn(expected);
 
         final SectionFinderService service = new SectionFinderServiceImpl(repository);
@@ -192,7 +187,6 @@ public class SectionFinderServiceImplTest {
         final TestRun testRun = new TestRun();
 
         final SectionRepository repository = Mockito.mock(SectionRepository.class);
-        final Class<Specification<Section>> sClass = null;
         when(repository.findAll(any(sClass))).thenThrow(new UnitTestException());
 
         final SectionFinderService service = new SectionFinderServiceImpl(repository);

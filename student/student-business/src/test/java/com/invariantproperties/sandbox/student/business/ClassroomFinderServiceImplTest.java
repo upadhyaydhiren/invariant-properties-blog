@@ -43,13 +43,13 @@ import com.invariantproperties.sandbox.student.repository.ClassroomRepository;
  * @author Bear Giles <bgiles@coyotesong.com>
  */
 public class ClassroomFinderServiceImplTest {
+    private final Class<Specification<Classroom>> sClass = null;
 
     @Test
     public void testCount() {
         final long expected = 3;
 
         final ClassroomRepository repository = Mockito.mock(ClassroomRepository.class);
-        final Class<Specification<Classroom>> sClass = null;
         when(repository.count(any(sClass))).thenReturn(expected);
 
         final ClassroomFinderService service = new ClassroomFinderServiceImpl(repository);
@@ -64,7 +64,6 @@ public class ClassroomFinderServiceImplTest {
         final TestRun testRun = new TestRun();
 
         final ClassroomRepository repository = Mockito.mock(ClassroomRepository.class);
-        final Class<Specification<Classroom>> sClass = null;
         when(repository.count(any(sClass))).thenReturn(expected);
 
         final ClassroomFinderService service = new ClassroomFinderServiceImpl(repository);
@@ -76,7 +75,6 @@ public class ClassroomFinderServiceImplTest {
     @Test(expected = PersistenceException.class)
     public void testCountError() {
         final ClassroomRepository repository = Mockito.mock(ClassroomRepository.class);
-        final Class<Specification<Classroom>> sClass = null;
         when(repository.count(any(sClass))).thenThrow(new UnitTestException());
 
         final ClassroomFinderService service = new ClassroomFinderServiceImpl(repository);
@@ -88,9 +86,6 @@ public class ClassroomFinderServiceImplTest {
         final List<Classroom> expected = Collections.emptyList();
 
         final ClassroomRepository repository = Mockito.mock(ClassroomRepository.class);
-        final Class<Specification<Classroom>> sClass = null;
-        when(repository.findAll(any(sClass))).thenReturn(expected);
-
         final ClassroomFinderService service = new ClassroomFinderServiceImpl(repository);
         final List<Classroom> actual = service.findAllClassrooms();
 
@@ -100,7 +95,6 @@ public class ClassroomFinderServiceImplTest {
     @Test(expected = PersistenceException.class)
     public void testFindAllClassroomsError() {
         final ClassroomRepository repository = Mockito.mock(ClassroomRepository.class);
-        final Class<Specification<Classroom>> sClass = null;
         when(repository.findAll(any(sClass))).thenThrow(new UnitTestException());
 
         final ClassroomFinderService service = new ClassroomFinderServiceImpl(repository);
@@ -178,7 +172,6 @@ public class ClassroomFinderServiceImplTest {
         final List<Classroom> expected = Collections.singletonList(classroom);
 
         final ClassroomRepository repository = Mockito.mock(ClassroomRepository.class);
-        final Class<Specification<Classroom>> sClass = null;
         when(repository.findAll(any(sClass))).thenReturn(expected);
 
         final ClassroomFinderService service = new ClassroomFinderServiceImpl(repository);
@@ -192,7 +185,6 @@ public class ClassroomFinderServiceImplTest {
         final TestRun testRun = new TestRun();
 
         final ClassroomRepository repository = Mockito.mock(ClassroomRepository.class);
-        final Class<Specification<Classroom>> sClass = null;
         when(repository.findAll(any(sClass))).thenThrow(new UnitTestException());
 
         final ClassroomFinderService service = new ClassroomFinderServiceImpl(repository);

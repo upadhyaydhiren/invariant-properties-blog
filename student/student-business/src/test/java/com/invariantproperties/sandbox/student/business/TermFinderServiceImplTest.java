@@ -45,13 +45,13 @@ import com.invariantproperties.sandbox.student.repository.TermRepository;
  * @author Bear Giles <bgiles@coyotesong.com>
  */
 public class TermFinderServiceImplTest {
+    private final Class<Specification<Term>> sClass = null;
 
     @Test
     public void testCount() {
         final long expected = 3;
 
         final TermRepository repository = Mockito.mock(TermRepository.class);
-        final Class<Specification<Term>> sClass = null;
         when(repository.count(any(sClass))).thenReturn(expected);
 
         final TermFinderService service = new TermFinderServiceImpl(repository);
@@ -66,7 +66,6 @@ public class TermFinderServiceImplTest {
         final TestRun testRun = new TestRun();
 
         final TermRepository repository = Mockito.mock(TermRepository.class);
-        final Class<Specification<Term>> sClass = null;
         when(repository.count(any(sClass))).thenReturn(expected);
 
         final TermFinderService service = new TermFinderServiceImpl(repository);
@@ -78,7 +77,6 @@ public class TermFinderServiceImplTest {
     @Test(expected = PersistenceException.class)
     public void testCountError() {
         final TermRepository repository = Mockito.mock(TermRepository.class);
-        final Class<Specification<Term>> sClass = null;
         when(repository.count(any(sClass))).thenThrow(new UnitTestException());
 
         final TermFinderService service = new TermFinderServiceImpl(repository);
@@ -90,7 +88,6 @@ public class TermFinderServiceImplTest {
         final List<Term> expected = Collections.emptyList();
 
         final TermRepository repository = Mockito.mock(TermRepository.class);
-        final Class<Specification<Term>> sClass = null;
         when(repository.findAll(any(sClass))).thenReturn(expected);
 
         final TermFinderService service = new TermFinderServiceImpl(repository);
@@ -102,7 +99,6 @@ public class TermFinderServiceImplTest {
     @Test(expected = PersistenceException.class)
     public void testFindAllTermsError() {
         final TermRepository repository = Mockito.mock(TermRepository.class);
-        final Class<Specification<Term>> sClass = null;
         when(repository.findAll(any(sClass))).thenThrow(new UnitTestException());
 
         final TermFinderService service = new TermFinderServiceImpl(repository);
@@ -180,7 +176,6 @@ public class TermFinderServiceImplTest {
         final List<Term> expected = Collections.singletonList(term);
 
         final TermRepository repository = Mockito.mock(TermRepository.class);
-        final Class<Specification<Term>> sClass = null;
         when(repository.findAll(any(sClass))).thenReturn(expected);
 
         final TermFinderService service = new TermFinderServiceImpl(repository);
@@ -194,7 +189,6 @@ public class TermFinderServiceImplTest {
         final TestRun testRun = new TestRun();
 
         final TermRepository repository = Mockito.mock(TermRepository.class);
-        final Class<Specification<Term>> sClass = null;
         when(repository.findAll(any(sClass))).thenThrow(new UnitTestException());
 
         final TermFinderService service = new TermFinderServiceImpl(repository);

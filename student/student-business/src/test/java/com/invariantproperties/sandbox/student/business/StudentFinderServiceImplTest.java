@@ -43,13 +43,13 @@ import com.invariantproperties.sandbox.student.repository.StudentRepository;
  * @author Bear Giles <bgiles@coyotesong.com>
  */
 public class StudentFinderServiceImplTest {
+    private final Class<Specification<Student>> sClass = null;
 
     @Test
     public void testCount() {
         final long expected = 3;
 
         final StudentRepository repository = Mockito.mock(StudentRepository.class);
-        final Class<Specification<Student>> sClass = null;
         when(repository.count(any(sClass))).thenReturn(expected);
 
         final StudentFinderService service = new StudentFinderServiceImpl(repository);
@@ -64,7 +64,6 @@ public class StudentFinderServiceImplTest {
         final TestRun testRun = new TestRun();
 
         final StudentRepository repository = Mockito.mock(StudentRepository.class);
-        final Class<Specification<Student>> sClass = null;
         when(repository.count(any(sClass))).thenReturn(expected);
 
         final StudentFinderService service = new StudentFinderServiceImpl(repository);
@@ -76,7 +75,6 @@ public class StudentFinderServiceImplTest {
     @Test(expected = PersistenceException.class)
     public void testCountError() {
         final StudentRepository repository = Mockito.mock(StudentRepository.class);
-        final Class<Specification<Student>> sClass = null;
         when(repository.count(any(sClass))).thenThrow(new UnitTestException());
 
         final StudentFinderService service = new StudentFinderServiceImpl(repository);
@@ -88,7 +86,6 @@ public class StudentFinderServiceImplTest {
         final List<Student> expected = Collections.emptyList();
 
         final StudentRepository repository = Mockito.mock(StudentRepository.class);
-        final Class<Specification<Student>> sClass = null;
         when(repository.findAll(any(sClass))).thenReturn(expected);
 
         final StudentFinderService service = new StudentFinderServiceImpl(repository);
@@ -100,7 +97,6 @@ public class StudentFinderServiceImplTest {
     @Test(expected = PersistenceException.class)
     public void testFindAllStudentsError() {
         final StudentRepository repository = Mockito.mock(StudentRepository.class);
-        final Class<Specification<Student>> sClass = null;
         when(repository.findAll(any(sClass))).thenThrow(new UnitTestException());
 
         final StudentFinderService service = new StudentFinderServiceImpl(repository);
@@ -178,7 +174,6 @@ public class StudentFinderServiceImplTest {
         final List<Student> expected = Collections.singletonList(student);
 
         final StudentRepository repository = Mockito.mock(StudentRepository.class);
-        final Class<Specification<Student>> sClass = null;
         when(repository.findAll(any(sClass))).thenReturn(expected);
 
         final StudentFinderService service = new StudentFinderServiceImpl(repository);
@@ -192,7 +187,6 @@ public class StudentFinderServiceImplTest {
         final TestRun testRun = new TestRun();
 
         final StudentRepository repository = Mockito.mock(StudentRepository.class);
-        final Class<Specification<Student>> sClass = null;
         when(repository.findAll(any(sClass))).thenThrow(new UnitTestException());
 
         final StudentFinderService service = new StudentFinderServiceImpl(repository);
