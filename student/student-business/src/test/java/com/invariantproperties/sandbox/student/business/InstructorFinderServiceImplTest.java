@@ -43,13 +43,13 @@ import com.invariantproperties.sandbox.student.repository.InstructorRepository;
  * @author Bear Giles <bgiles@coyotesong.com>
  */
 public class InstructorFinderServiceImplTest {
+    private final Class<Specification<Instructor>> sClass = null;
 
     @Test
     public void testCount() {
         final long expected = 3;
 
         final InstructorRepository repository = Mockito.mock(InstructorRepository.class);
-        final Class<Specification<Instructor>> sClass = null;
         when(repository.count(any(sClass))).thenReturn(expected);
 
         final InstructorFinderService service = new InstructorFinderServiceImpl(repository);
@@ -64,7 +64,6 @@ public class InstructorFinderServiceImplTest {
         final TestRun testRun = new TestRun();
 
         final InstructorRepository repository = Mockito.mock(InstructorRepository.class);
-        final Class<Specification<Instructor>> sClass = null;
         when(repository.count(any(sClass))).thenReturn(expected);
 
         final InstructorFinderService service = new InstructorFinderServiceImpl(repository);
@@ -76,7 +75,6 @@ public class InstructorFinderServiceImplTest {
     @Test(expected = PersistenceException.class)
     public void testCountError() {
         final InstructorRepository repository = Mockito.mock(InstructorRepository.class);
-        final Class<Specification<Instructor>> sClass = null;
         when(repository.count(any(sClass))).thenThrow(new UnitTestException());
 
         final InstructorFinderService service = new InstructorFinderServiceImpl(repository);
@@ -88,7 +86,6 @@ public class InstructorFinderServiceImplTest {
         final List<Instructor> expected = Collections.emptyList();
 
         final InstructorRepository repository = Mockito.mock(InstructorRepository.class);
-        final Class<Specification<Instructor>> sClass = null;
         when(repository.findAll(any(sClass))).thenReturn(expected);
 
         final InstructorFinderService service = new InstructorFinderServiceImpl(repository);
@@ -100,7 +97,6 @@ public class InstructorFinderServiceImplTest {
     @Test(expected = PersistenceException.class)
     public void testFindAllInstructorsError() {
         final InstructorRepository repository = Mockito.mock(InstructorRepository.class);
-        final Class<Specification<Instructor>> sClass = null;
         when(repository.findAll(any(sClass))).thenThrow(new UnitTestException());
 
         final InstructorFinderService service = new InstructorFinderServiceImpl(repository);
@@ -178,7 +174,6 @@ public class InstructorFinderServiceImplTest {
         final List<Instructor> expected = Collections.singletonList(instructor);
 
         final InstructorRepository repository = Mockito.mock(InstructorRepository.class);
-        final Class<Specification<Instructor>> sClass = null;
         when(repository.findAll(any(sClass))).thenReturn(expected);
 
         final InstructorFinderService service = new InstructorFinderServiceImpl(repository);
@@ -192,7 +187,6 @@ public class InstructorFinderServiceImplTest {
         final TestRun testRun = new TestRun();
 
         final InstructorRepository repository = Mockito.mock(InstructorRepository.class);
-        final Class<Specification<Instructor>> sClass = null;
         when(repository.findAll(any(sClass))).thenThrow(new UnitTestException());
 
         final InstructorFinderService service = new InstructorFinderServiceImpl(repository);

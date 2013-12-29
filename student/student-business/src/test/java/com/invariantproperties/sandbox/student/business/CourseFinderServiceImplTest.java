@@ -43,13 +43,13 @@ import com.invariantproperties.sandbox.student.repository.CourseRepository;
  * @author Bear Giles <bgiles@coyotesong.com>
  */
 public class CourseFinderServiceImplTest {
+    private final Class<Specification<Course>> sClass = null;
 
     @Test
     public void testCount() {
         final long expected = 3;
 
         final CourseRepository repository = Mockito.mock(CourseRepository.class);
-        final Class<Specification<Course>> sClass = null;
         when(repository.count(any(sClass))).thenReturn(expected);
 
         final CourseFinderService service = new CourseFinderServiceImpl(repository);
@@ -64,7 +64,6 @@ public class CourseFinderServiceImplTest {
         final TestRun testRun = new TestRun();
 
         final CourseRepository repository = Mockito.mock(CourseRepository.class);
-        final Class<Specification<Course>> sClass = null;
         when(repository.count(any(sClass))).thenReturn(expected);
 
         final CourseFinderService service = new CourseFinderServiceImpl(repository);
@@ -76,7 +75,6 @@ public class CourseFinderServiceImplTest {
     @Test(expected = PersistenceException.class)
     public void testCountError() {
         final CourseRepository repository = Mockito.mock(CourseRepository.class);
-        final Class<Specification<Course>> sClass = null;
         when(repository.count(any(sClass))).thenThrow(new UnitTestException());
 
         final CourseFinderService service = new CourseFinderServiceImpl(repository);
@@ -88,7 +86,6 @@ public class CourseFinderServiceImplTest {
         final List<Course> expected = Collections.emptyList();
 
         final CourseRepository repository = Mockito.mock(CourseRepository.class);
-        final Class<Specification<Course>> sClass = null;
         when(repository.findAll(any(sClass))).thenReturn(expected);
 
         final CourseFinderService service = new CourseFinderServiceImpl(repository);
@@ -100,7 +97,6 @@ public class CourseFinderServiceImplTest {
     @Test(expected = PersistenceException.class)
     public void testFindAllCoursesError() {
         final CourseRepository repository = Mockito.mock(CourseRepository.class);
-        final Class<Specification<Course>> sClass = null;
         when(repository.findAll(any(sClass))).thenThrow(new UnitTestException());
 
         final CourseFinderService service = new CourseFinderServiceImpl(repository);
@@ -178,7 +174,6 @@ public class CourseFinderServiceImplTest {
         final List<Course> expected = Collections.singletonList(course);
 
         final CourseRepository repository = Mockito.mock(CourseRepository.class);
-        final Class<Specification<Course>> sClass = null;
         when(repository.findAll(any(sClass))).thenReturn(expected);
 
         final CourseFinderService service = new CourseFinderServiceImpl(repository);
@@ -192,7 +187,6 @@ public class CourseFinderServiceImplTest {
         final TestRun testRun = new TestRun();
 
         final CourseRepository repository = Mockito.mock(CourseRepository.class);
-        final Class<Specification<Course>> sClass = null;
         when(repository.findAll(any(sClass))).thenThrow(new UnitTestException());
 
         final CourseFinderService service = new CourseFinderServiceImpl(repository);
@@ -206,7 +200,6 @@ public class CourseFinderServiceImplTest {
         final List<Course> expected = Collections.singletonList(course);
 
         final CourseRepository repository = Mockito.mock(CourseRepository.class);
-        final Class<Specification<Course>> sClass = null;
         when(repository.findAll(any(sClass))).thenReturn(expected);
 
         final CourseFinderService service = new CourseFinderServiceImpl(repository);
@@ -220,7 +213,6 @@ public class CourseFinderServiceImplTest {
         final TestRun testRun = new TestRun();
 
         final CourseRepository repository = Mockito.mock(CourseRepository.class);
-        final Class<Specification<Course>> sClass = null;
         when(repository.findAll(any(sClass))).thenThrow(new UnitTestException());
 
         final CourseFinderService service = new CourseFinderServiceImpl(repository);
