@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>com.invariantproperties.sandbox.student</groupId>
 		<artifactId>student-webservices</artifactId>
-		<version>0.0.2-SNAPSHOT</version>
+		<version>0.0.3-SNAPSHOT</version>
 	</parent>
 	
 	<artifactId>student-ws-client</artifactId>
@@ -19,6 +19,10 @@
 			<groupId>com.invariantproperties.sandbox.student</groupId>
 			<artifactId>student-common</artifactId>
 		</dependency>
+        <dependency>
+            <groupId>com.invariantproperties.sandbox.student</groupId>
+            <artifactId>student-api</artifactId>
+        </dependency>
 		<dependency>
 			<groupId>log4j</groupId>
 			<artifactId>log4j</artifactId>

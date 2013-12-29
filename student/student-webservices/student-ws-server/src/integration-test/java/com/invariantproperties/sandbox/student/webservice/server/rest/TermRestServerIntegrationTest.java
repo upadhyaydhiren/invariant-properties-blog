@@ -40,10 +40,12 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import com.invariantproperties.sandbox.student.domain.Term;
 import com.invariantproperties.sandbox.student.domain.TestRun;
 import com.invariantproperties.sandbox.student.webservice.client.ObjectNotFoundException;
-import com.invariantproperties.sandbox.student.webservice.client.TermRestClient;
-import com.invariantproperties.sandbox.student.webservice.client.TermRestClientImpl;
-import com.invariantproperties.sandbox.student.webservice.client.TestRunRestClient;
-import com.invariantproperties.sandbox.student.webservice.client.TestRunRestClientImpl;
+import com.invariantproperties.sandbox.student.webservice.client.TermFinderRestClient;
+import com.invariantproperties.sandbox.student.webservice.client.TermManagerRestClient;
+import com.invariantproperties.sandbox.student.webservice.client.TestRunManagerRestClient;
+import com.invariantproperties.sandbox.student.webservice.client.impl.TermFinderRestClientImpl;
+import com.invariantproperties.sandbox.student.webservice.client.impl.TermManagerRestClientImpl;
+import com.invariantproperties.sandbox.student.webservice.client.impl.TestRunManagerRestClientImpl;
 import com.invariantproperties.sandbox.student.webservice.config.TestRestApplicationContext;
 
 /**
@@ -56,24 +58,26 @@ import com.invariantproperties.sandbox.student.webservice.config.TestRestApplica
 public class TermRestServerIntegrationTest {
     @Resource
     private String resourceBase;
-    private TermRestClient client;
-    private TestRunRestClient testClient;
+    private TermFinderRestClient finderClient;
+    private TermManagerRestClient managerClient;
+    private TestRunManagerRestClient testClient;
 
     @Before
     public void init() {
-        this.client = new TermRestClientImpl(resourceBase + "term/");
-        this.testClient = new TestRunRestClientImpl(resourceBase + "testRun/");
+        this.finderClient = new TermFinderRestClientImpl(resourceBase + "term/");
+        this.managerClient = new TermManagerRestClientImpl(resourceBase + "term/");
+        this.testClient = new TestRunManagerRestClientImpl(resourceBase + "testRun/");
     }
 
     @Test
     public void testGetAll() throws IOException {
-        final Term[] terms = client.getAllTerms();
+        final Term[] terms = finderClient.getAllTerms();
         assertNotNull(terms);
     }
 
     @Test(expected = ObjectNotFoundException.class)
     public void testUnknownTerm() throws IOException {
-        client.getTerm("missing");
+        finderClient.getTerm("missing");
     }
 
     @Test
@@ -81,22 +85,22 @@ public class TermRestServerIntegrationTest {
         final TestRun testRun = testClient.createTestRun();
 
         final String fall2013Name = "Fall 2013 : " + testRun.getUuid();
-        final Term expected = client.createTerm(fall2013Name);
+        final Term expected = managerClient.createTerm(fall2013Name);
         assertEquals(fall2013Name, expected.getName());
 
-        final Term actual1 = client.getTerm(expected.getUuid());
+        final Term actual1 = finderClient.getTerm(expected.getUuid());
         assertEquals(fall2013Name, actual1.getName());
 
-        final Term[] terms = client.getAllTerms();
+        final Term[] terms = finderClient.getAllTerms();
         assertTrue(terms.length > 0);
 
         final String fall2014Name = "Fall 2014 : " + testRun.getUuid();
-        final Term actual2 = client.updateTerm(actual1.getUuid(), fall2014Name);
+        final Term actual2 = managerClient.updateTerm(actual1.getUuid(), fall2014Name);
         assertEquals(fall2014Name, actual2.getName());
 
-        client.deleteTerm(actual1.getUuid());
+        managerClient.deleteTerm(actual1.getUuid());
         try {
-            client.getTerm(expected.getUuid());
+            finderClient.getTerm(expected.getUuid());
             fail("should have thrown exception");
         } catch (ObjectNotFoundException e) {
             // do nothing

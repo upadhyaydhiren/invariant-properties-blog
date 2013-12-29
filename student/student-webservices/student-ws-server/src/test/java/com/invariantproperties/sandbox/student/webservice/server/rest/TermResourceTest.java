@@ -40,7 +40,8 @@ import org.junit.Test;
 import org.mockito.Mockito;
 
 import com.invariantproperties.sandbox.student.business.ObjectNotFoundException;
-import com.invariantproperties.sandbox.student.business.TermService;
+import com.invariantproperties.sandbox.student.business.TermFinderService;
+import com.invariantproperties.sandbox.student.business.TermManagerService;
 import com.invariantproperties.sandbox.student.business.TestRunService;
 import com.invariantproperties.sandbox.student.domain.Term;
 
@@ -68,12 +69,12 @@ public class TermResourceTest {
     public void testFindAllTerms() {
         final List<Term> expected = Arrays.asList(fall2013);
 
-        final TermService service = Mockito.mock(TermService.class);
-        when(service.findAllTerms()).thenReturn(expected);
+        final TermFinderService finder = Mockito.mock(TermFinderService.class);
+        when(finder.findAllTerms()).thenReturn(expected);
 
         final TestRunService testService = Mockito.mock(TestRunService.class);
 
-        final TermResource resource = new TermResource(service, testService);
+        final TermResource resource = new TermResource(finder, testService);
         final Response response = resource.findAllTerms();
 
         assertEquals(200, response.getStatus());
@@ -88,12 +89,12 @@ public class TermResourceTest {
     public void testFindAllTermsEmpty() {
         final List<Term> expected = new ArrayList<>();
 
-        final TermService service = Mockito.mock(TermService.class);
-        when(service.findAllTerms()).thenReturn(expected);
+        final TermFinderService finder = Mockito.mock(TermFinderService.class);
+        when(finder.findAllTerms()).thenReturn(expected);
 
         final TestRunService testService = Mockito.mock(TestRunService.class);
 
-        final TermResource resource = new TermResource(service, testService);
+        final TermResource resource = new TermResource(finder, testService);
         final Response response = resource.findAllTerms();
 
         assertEquals(200, response.getStatus());
@@ -103,12 +104,12 @@ public class TermResourceTest {
 
     @Test
     public void testFindAllTermsFailure() {
-        final TermService service = Mockito.mock(TermService.class);
-        when(service.findAllTerms()).thenThrow(new UnitTestException());
+        final TermFinderService finder = Mockito.mock(TermFinderService.class);
+        when(finder.findAllTerms()).thenThrow(new UnitTestException());
 
         final TestRunService testService = Mockito.mock(TestRunService.class);
 
-        final TermResource resource = new TermResource(service, testService);
+        final TermResource resource = new TermResource(finder, testService);
         final Response response = resource.findAllTerms();
 
         assertEquals(500, response.getStatus());
@@ -118,12 +119,12 @@ public class TermResourceTest {
     public void testGetTerm() {
         final Term expected = fall2013;
 
-        final TermService service = Mockito.mock(TermService.class);
-        when(service.findTermByUuid(expected.getUuid())).thenReturn(expected);
+        final TermFinderService finder = Mockito.mock(TermFinderService.class);
+        when(finder.findTermByUuid(expected.getUuid())).thenReturn(expected);
 
         final TestRunService testService = Mockito.mock(TestRunService.class);
 
-        final TermResource resource = new TermResource(service, testService);
+        final TermResource resource = new TermResource(finder, testService);
         final Response response = resource.getTerm(expected.getUuid());
 
         assertEquals(200, response.getStatus());
@@ -135,12 +136,12 @@ public class TermResourceTest {
 
     @Test
     public void testGetTermMissing() {
-        final TermService service = Mockito.mock(TermService.class);
-        when(service.findTermByUuid(fall2013.getUuid())).thenThrow(new ObjectNotFoundException(fall2013.getUuid()));
+        final TermFinderService finder = Mockito.mock(TermFinderService.class);
+        when(finder.findTermByUuid(fall2013.getUuid())).thenThrow(new ObjectNotFoundException(fall2013.getUuid()));
 
         final TestRunService testService = Mockito.mock(TestRunService.class);
 
-        final TermResource resource = new TermResource(service, testService);
+        final TermResource resource = new TermResource(finder, testService);
         final Response response = resource.getTerm(fall2013.getUuid());
 
         assertEquals(404, response.getStatus());
@@ -148,12 +149,12 @@ public class TermResourceTest {
 
     @Test
     public void testGetTermFailure() {
-        final TermService service = Mockito.mock(TermService.class);
-        when(service.findTermByUuid(fall2013.getUuid())).thenThrow(new UnitTestException());
+        final TermFinderService finder = Mockito.mock(TermFinderService.class);
+        when(finder.findTermByUuid(fall2013.getUuid())).thenThrow(new UnitTestException());
 
         final TestRunService testService = Mockito.mock(TestRunService.class);
 
-        final TermResource resource = new TermResource(service, testService);
+        final TermResource resource = new TermResource(finder, testService);
         final Response response = resource.getTerm(fall2013.getUuid());
 
         assertEquals(500, response.getStatus());
@@ -165,12 +166,12 @@ public class TermResourceTest {
         final Name name = new Name();
         name.setName(expected.getName());
 
-        final TermService service = Mockito.mock(TermService.class);
-        when(service.createTerm(name.getName())).thenReturn(expected);
+        final TermManagerService manager = Mockito.mock(TermManagerService.class);
+        when(manager.createTerm(name.getName())).thenReturn(expected);
 
         final TestRunService testService = Mockito.mock(TestRunService.class);
 
-        final TermResource resource = new TermResource(service, testService);
+        final TermResource resource = new TermResource(manager, testService);
         final Response response = resource.createTerm(name);
 
         assertEquals(201, response.getStatus());
@@ -183,12 +184,12 @@ public class TermResourceTest {
     public void testCreateTermBlankName() {
         final Name name = new Name();
 
-        final TermService service = Mockito.mock(TermService.class);
-        when(service.createTerm(name.getName())).thenReturn(null);
+        final TermManagerService manager = Mockito.mock(TermManagerService.class);
+        when(manager.createTerm(name.getName())).thenReturn(null);
 
         final TestRunService testService = Mockito.mock(TestRunService.class);
 
-        final TermResource resource = new TermResource(service, testService);
+        final TermResource resource = new TermResource(manager, testService);
         final Response response = resource.createTerm(name);
 
         assertEquals(400, response.getStatus());
@@ -196,7 +197,7 @@ public class TermResourceTest {
 
     /**
      * Test handling when the term can't be created for some reason. For now the
-     * service layer just returns a null value - it should throw an appropriate
+     * manager layer just returns a null value - it should throw an appropriate
      * exception.
      */
     @Test
@@ -205,12 +206,12 @@ public class TermResourceTest {
         final Name name = new Name();
         name.setName(expected.getName());
 
-        final TermService service = Mockito.mock(TermService.class);
-        when(service.createTerm(name.getName())).thenReturn(null);
+        final TermManagerService manager = Mockito.mock(TermManagerService.class);
+        when(manager.createTerm(name.getName())).thenReturn(null);
 
         final TestRunService testService = Mockito.mock(TestRunService.class);
 
-        final TermResource resource = new TermResource(service, testService);
+        final TermResource resource = new TermResource(manager, testService);
         final Response response = resource.createTerm(name);
 
         assertEquals(500, response.getStatus());
@@ -222,12 +223,12 @@ public class TermResourceTest {
         final Name name = new Name();
         name.setName(expected.getName());
 
-        final TermService service = Mockito.mock(TermService.class);
-        when(service.createTerm(name.getName())).thenThrow(new UnitTestException());
+        final TermManagerService manager = Mockito.mock(TermManagerService.class);
+        when(manager.createTerm(name.getName())).thenThrow(new UnitTestException());
 
         final TestRunService testService = Mockito.mock(TestRunService.class);
 
-        final TermResource resource = new TermResource(service, testService);
+        final TermResource resource = new TermResource(manager, testService);
         final Response response = resource.createTerm(name);
 
         assertEquals(500, response.getStatus());
@@ -243,13 +244,14 @@ public class TermResourceTest {
         updated.setName(fall2014.getName());
         updated.setUuid(expected.getUuid());
 
-        final TermService service = Mockito.mock(TermService.class);
-        when(service.findTermByUuid(expected.getUuid())).thenReturn(expected);
-        when(service.updateTerm(expected, name.getName())).thenReturn(updated);
+        final TermFinderService finder = Mockito.mock(TermFinderService.class);
+        final TermManagerService manager = Mockito.mock(TermManagerService.class);
+        when(finder.findTermByUuid(expected.getUuid())).thenReturn(expected);
+        when(manager.updateTerm(expected, name.getName())).thenReturn(updated);
 
         final TestRunService testService = Mockito.mock(TestRunService.class);
 
-        final TermResource resource = new TermResource(service, testService);
+        final TermResource resource = new TermResource(finder, manager, testService);
         final Response response = resource.updateTerm(expected.getUuid(), name);
 
         assertEquals(200, response.getStatus());
@@ -264,12 +266,12 @@ public class TermResourceTest {
         final Term expected = fall2013;
         final Name name = new Name();
 
-        final TermService service = Mockito.mock(TermService.class);
-        when(service.createTerm(name.getName())).thenReturn(null);
+        final TermManagerService manager = Mockito.mock(TermManagerService.class);
+        when(manager.createTerm(name.getName())).thenReturn(null);
 
         final TestRunService testService = Mockito.mock(TestRunService.class);
 
-        final TermResource resource = new TermResource(service, testService);
+        final TermResource resource = new TermResource(manager, testService);
         final Response response = resource.updateTerm(expected.getUuid(), name);
 
         assertEquals(400, response.getStatus());
@@ -277,7 +279,7 @@ public class TermResourceTest {
 
     /**
      * Test handling when the term can't be updated for some reason. For now the
-     * service layer just returns a null value - it should throw an appropriate
+     * manager layer just returns a null value - it should throw an appropriate
      * exception.
      */
     @Test
@@ -286,12 +288,12 @@ public class TermResourceTest {
         final Name name = new Name();
         name.setName(expected.getName());
 
-        final TermService service = Mockito.mock(TermService.class);
-        when(service.updateTerm(expected, name.getName())).thenReturn(null);
+        final TermManagerService manager = Mockito.mock(TermManagerService.class);
+        when(manager.updateTerm(expected, name.getName())).thenReturn(null);
 
         final TestRunService testService = Mockito.mock(TestRunService.class);
 
-        final TermResource resource = new TermResource(service, testService);
+        final TermResource resource = new TermResource(manager, testService);
         final Response response = resource.createTerm(name);
 
         assertEquals(500, response.getStatus());
@@ -303,12 +305,12 @@ public class TermResourceTest {
         final Name name = new Name();
         name.setName(expected.getName());
 
-        final TermService service = Mockito.mock(TermService.class);
-        when(service.updateTerm(expected, name.getName())).thenThrow(new UnitTestException());
+        final TermManagerService manager = Mockito.mock(TermManagerService.class);
+        when(manager.updateTerm(expected, name.getName())).thenThrow(new UnitTestException());
 
         final TestRunService testService = Mockito.mock(TestRunService.class);
 
-        final TermResource resource = new TermResource(service, testService);
+        final TermResource resource = new TermResource(manager, testService);
         final Response response = resource.createTerm(name);
 
         assertEquals(500, response.getStatus());
@@ -318,13 +320,13 @@ public class TermResourceTest {
     public void testDeleteTerm() {
         final Term expected = fall2013;
 
-        final TermService service = Mockito.mock(TermService.class);
-        doNothing().when(service).deleteTerm(expected.getUuid());
+        final TermManagerService manager = Mockito.mock(TermManagerService.class);
+        doNothing().when(manager).deleteTerm(expected.getUuid(), 0);
 
         final TestRunService testService = Mockito.mock(TestRunService.class);
 
-        final TermResource resource = new TermResource(service, testService);
-        final Response response = resource.deleteTerm(expected.getUuid());
+        final TermResource resource = new TermResource(manager, testService);
+        final Response response = resource.deleteTerm(expected.getUuid(), 0);
 
         assertEquals(204, response.getStatus());
     }
@@ -335,13 +337,13 @@ public class TermResourceTest {
         final Name name = new Name();
         name.setName(expected.getName());
 
-        final TermService service = Mockito.mock(TermService.class);
-        doThrow(new ObjectNotFoundException(expected.getUuid())).when(service).deleteTerm(expected.getUuid());
+        final TermManagerService manager = Mockito.mock(TermManagerService.class);
+        doThrow(new ObjectNotFoundException(expected.getUuid())).when(manager).deleteTerm(expected.getUuid(), 0);
 
         final TestRunService testService = Mockito.mock(TestRunService.class);
 
-        final TermResource resource = new TermResource(service, testService);
-        final Response response = resource.deleteTerm(expected.getUuid());
+        final TermResource resource = new TermResource(manager, testService);
+        final Response response = resource.deleteTerm(expected.getUuid(), 0);
 
         assertEquals(204, response.getStatus());
     }
@@ -350,13 +352,13 @@ public class TermResourceTest {
     public void testDeleteTermFailure() {
         final Term expected = fall2013;
 
-        final TermService service = Mockito.mock(TermService.class);
-        doThrow(new UnitTestException()).when(service).deleteTerm(expected.getUuid());
+        final TermManagerService manager = Mockito.mock(TermManagerService.class);
+        doThrow(new UnitTestException()).when(manager).deleteTerm(expected.getUuid(), 0);
 
         final TestRunService testService = Mockito.mock(TestRunService.class);
 
-        final TermResource resource = new TermResource(service, testService);
-        final Response response = resource.deleteTerm(expected.getUuid());
+        final TermResource resource = new TermResource(manager, testService);
+        final Response response = resource.deleteTerm(expected.getUuid(), 0);
 
         assertEquals(500, response.getStatus());
     }

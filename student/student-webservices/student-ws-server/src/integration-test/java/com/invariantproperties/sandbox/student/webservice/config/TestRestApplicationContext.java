@@ -25,8 +25,8 @@ package com.invariantproperties.sandbox.student.webservice.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import com.invariantproperties.sandbox.student.business.ClassroomService;
-import com.invariantproperties.sandbox.student.business.CourseService;
+import com.invariantproperties.sandbox.student.business.ClassroomFinderService;
+import com.invariantproperties.sandbox.student.business.CourseFinderService;
 import com.invariantproperties.sandbox.student.business.DummyClassroomService;
 import com.invariantproperties.sandbox.student.business.DummyCourseService;
 import com.invariantproperties.sandbox.student.business.DummyInstructorService;
@@ -34,15 +34,23 @@ import com.invariantproperties.sandbox.student.business.DummySectionService;
 import com.invariantproperties.sandbox.student.business.DummyStudentService;
 import com.invariantproperties.sandbox.student.business.DummyTermService;
 import com.invariantproperties.sandbox.student.business.DummyTestRunService;
-import com.invariantproperties.sandbox.student.business.InstructorService;
-import com.invariantproperties.sandbox.student.business.SectionService;
-import com.invariantproperties.sandbox.student.business.StudentService;
-import com.invariantproperties.sandbox.student.business.TermService;
+import com.invariantproperties.sandbox.student.business.InstructorFinderService;
+import com.invariantproperties.sandbox.student.business.SectionFinderService;
+import com.invariantproperties.sandbox.student.business.StudentFinderService;
+import com.invariantproperties.sandbox.student.business.TermFinderService;
 import com.invariantproperties.sandbox.student.business.TestRunService;
 
 @Configuration
 // @Profile("test")
 public class TestRestApplicationContext {
+
+    private DummyClassroomService classroomService = new DummyClassroomService();
+    private DummyCourseService courseService = new DummyCourseService();
+    private DummyInstructorService instructorService = new DummyInstructorService();
+    private DummySectionService sectionService = new DummySectionService();
+    private DummyStudentService studentService = new DummyStudentService();
+    private DummyTermService termService = new DummyTermService();
+    private DummyTestRunService testRunService = new DummyTestRunService();
 
     @Bean
     String resourceBase() {
@@ -50,37 +58,67 @@ public class TestRestApplicationContext {
     }
 
     @Bean
-    ClassroomService classroomService() {
-        return new DummyClassroomService();
+    ClassroomFinderService classroomFinderService() {
+        return classroomService;
     }
 
-    @Bean
-    CourseService courseService() {
-        return new DummyCourseService();
-    }
+    // @Bean
+    // ClassroomManagerService classroomManagerService() {
+    // return classroomService;
+    // }
 
     @Bean
-    InstructorService instructorService() {
-        return new DummyInstructorService();
+    CourseFinderService courseFinderService() {
+        return courseService;
     }
 
-    @Bean
-    SectionService sectionService() {
-        return new DummySectionService();
-    }
+    // @Bean
+    // CourseManagerService courseManagerService() {
+    // return courseService;
+    // }
 
     @Bean
-    StudentService studentService() {
-        return new DummyStudentService();
+    InstructorFinderService instructorFinderService() {
+        return instructorService;
     }
 
+    // @Bean
+    // InstructorManagerService instructorManagerService() {
+    // return instructorService;
+    // }
+
     @Bean
-    TermService termService() {
-        return new DummyTermService();
+    SectionFinderService sectionFinderService() {
+        return sectionService;
     }
+
+    // @Bean
+    // SectionManagerService sectionManagerService() {
+    // return sectionService;
+    // }
+
+    @Bean
+    StudentFinderService studentFinderService() {
+        return studentService;
+    }
+
+    // @Bean
+    // StudentManagerService studentManagerService() {
+    // return studentService;
+    // }
+
+    @Bean
+    TermFinderService termFinderService() {
+        return termService;
+    }
+
+    // @Bean
+    // TermManagerService termManagerService() {
+    // return termService;
+    // }
 
     @Bean
     TestRunService testRunService() {
-        return new DummyTestRunService();
+        return testRunService;
     }
 }

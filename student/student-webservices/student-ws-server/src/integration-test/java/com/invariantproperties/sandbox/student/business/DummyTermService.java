@@ -34,9 +34,27 @@ import org.apache.log4j.Logger;
 import com.invariantproperties.sandbox.student.domain.Term;
 import com.invariantproperties.sandbox.student.domain.TestRun;
 
-public class DummyTermService implements TermService {
+public class DummyTermService implements TermFinderService, TermManagerService {
     private static final Logger log = Logger.getLogger(DummyTermService.class);
     private Map<String, Term> cache = Collections.synchronizedMap(new HashMap<String, Term>());
+
+    @Override
+    public long count() {
+        log.debug("TermServer: count()");
+        return countByTestRun(null);
+    }
+
+    @Override
+    public long countByTestRun(TestRun testRun) {
+        log.debug("TermServer: countByTestRun()");
+        long count = 0;
+        for (Term term : cache.values()) {
+            if (testRun.equals(term.getTestRun())) {
+                count++;
+            }
+        }
+        return count;
+    }
 
     @Override
     public List<Term> findAllTerms() {
@@ -103,7 +121,7 @@ public class DummyTermService implements TermService {
     }
 
     @Override
-    public void deleteTerm(String uuid) {
+    public void deleteTerm(String uuid, Integer version) {
         log.debug("TermServer: deleteTerm()");
         if (cache.containsKey(uuid)) {
             cache.remove(uuid);

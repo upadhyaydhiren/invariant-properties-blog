@@ -40,7 +40,8 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.transaction.TransactionConfiguration;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.invariantproperties.sandbox.student.business.CourseService;
+import com.invariantproperties.sandbox.student.business.CourseFinderService;
+import com.invariantproperties.sandbox.student.business.CourseManagerService;
 import com.invariantproperties.sandbox.student.business.ObjectNotFoundException;
 import com.invariantproperties.sandbox.student.business.TestRunService;
 import com.invariantproperties.sandbox.student.config.BusinessApplicationContext;
@@ -60,7 +61,10 @@ import com.invariantproperties.sandbox.student.domain.TestRun;
 public class CourseServiceIntegrationTest {
 
     @Resource
-    private CourseService dao;
+    private CourseFinderService fdao;
+
+    @Resource
+    private CourseManagerService mdao;
 
     @Resource
     private TestRunService testService;
@@ -77,7 +81,7 @@ public class CourseServiceIntegrationTest {
         assertNull(expected.getId());
 
         // create course
-        Course actual = dao.createCourseForTesting(name, testRun);
+        Course actual = mdao.createCourseForTesting(name, testRun);
         expected.setId(actual.getId());
         expected.setUuid(actual.getUuid());
         expected.setCreationDate(actual.getCreationDate());
@@ -87,20 +91,24 @@ public class CourseServiceIntegrationTest {
         assertNotNull(actual.getCreationDate());
 
         // get course by id
-        actual = dao.findCourseById(expected.getId());
+        actual = fdao.findCourseById(expected.getId());
         assertThat(expected, equalTo(actual));
 
         // get course by uuid
-        actual = dao.findCourseByUuid(expected.getUuid());
+        actual = fdao.findCourseByUuid(expected.getUuid());
         assertThat(expected, equalTo(actual));
 
         // get all courses
-        final List<Course> courses = dao.findCoursesByTestRun(testRun);
+        final List<Course> courses = fdao.findCoursesByTestRun(testRun);
         assertTrue(courses.contains(actual));
+
+        // count courses
+        final long count = fdao.countByTestRun(testRun);
+        assertTrue(count > 0);
 
         // update course
         expected.setName("Calculus 102 : " + testRun.getUuid());
-        actual = dao.updateCourse(actual, expected.getName());
+        actual = mdao.updateCourse(actual, expected.getName());
         assertThat(expected, equalTo(actual));
 
         // verify testRun.getObjects
@@ -108,9 +116,9 @@ public class CourseServiceIntegrationTest {
         // assertTrue(objects.contains(actual));
 
         // delete Course
-        dao.deleteCourse(expected.getUuid());
+        mdao.deleteCourse(expected.getUuid(), 0);
         try {
-            dao.findCourseByUuid(expected.getUuid());
+            fdao.findCourseByUuid(expected.getUuid());
             fail("exception expected");
         } catch (ObjectNotFoundException e) {
             // expected
@@ -125,7 +133,7 @@ public class CourseServiceIntegrationTest {
     @Test(expected = ObjectNotFoundException.class)
     public void testfindCourseByIdWhenCourseIsNotKnown() {
         final Integer id = 1;
-        dao.findCourseById(id);
+        fdao.findCourseById(id);
     }
 
     /**
@@ -134,7 +142,7 @@ public class CourseServiceIntegrationTest {
     @Test(expected = ObjectNotFoundException.class)
     public void testfindCourseByUuidWhenCourseIsNotKnown() {
         final String uuid = "missing";
-        dao.findCourseByUuid(uuid);
+        fdao.findCourseByUuid(uuid);
     }
 
     /**
@@ -146,7 +154,7 @@ public class CourseServiceIntegrationTest {
     public void testUpdateCourseWhenCourseIsNotFound() {
         final Course course = new Course();
         course.setUuid("missing");
-        dao.updateCourse(course, "Calculus 102");
+        mdao.updateCourse(course, "Calculus 102");
     }
 
     /**
@@ -156,6 +164,6 @@ public class CourseServiceIntegrationTest {
      */
     @Test(expected = ObjectNotFoundException.class)
     public void testDeleteCourseWhenCourseIsNotFound() {
-        dao.deleteCourse("missing");
+        mdao.deleteCourse("missing", 0);
     }
 }

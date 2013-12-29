@@ -39,11 +39,13 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import com.invariantproperties.sandbox.student.domain.Instructor;
 import com.invariantproperties.sandbox.student.domain.TestRun;
-import com.invariantproperties.sandbox.student.webservice.client.InstructorRestClient;
-import com.invariantproperties.sandbox.student.webservice.client.InstructorRestClientImpl;
+import com.invariantproperties.sandbox.student.webservice.client.InstructorFinderRestClient;
+import com.invariantproperties.sandbox.student.webservice.client.InstructorManagerRestClient;
 import com.invariantproperties.sandbox.student.webservice.client.ObjectNotFoundException;
-import com.invariantproperties.sandbox.student.webservice.client.TestRunRestClient;
-import com.invariantproperties.sandbox.student.webservice.client.TestRunRestClientImpl;
+import com.invariantproperties.sandbox.student.webservice.client.TestRunManagerRestClient;
+import com.invariantproperties.sandbox.student.webservice.client.impl.InstructorFinderRestClientImpl;
+import com.invariantproperties.sandbox.student.webservice.client.impl.InstructorManagerRestClientImpl;
+import com.invariantproperties.sandbox.student.webservice.client.impl.TestRunManagerRestClientImpl;
 import com.invariantproperties.sandbox.student.webservice.config.TestRestApplicationContext;
 
 /**
@@ -57,24 +59,26 @@ public class InstructorRestServerIntegrationTest {
 
     @Resource
     private String resourceBase;
-    private InstructorRestClient client;
-    private TestRunRestClient testClient;
+    private InstructorFinderRestClient finderClient;
+    private InstructorManagerRestClient managerClient;
+    private TestRunManagerRestClient testClient;
 
     @Before
     public void init() {
-        this.client = new InstructorRestClientImpl(resourceBase + "instructor/");
-        this.testClient = new TestRunRestClientImpl(resourceBase + "testRun/");
+        this.finderClient = new InstructorFinderRestClientImpl(resourceBase + "instructor/");
+        this.managerClient = new InstructorManagerRestClientImpl(resourceBase + "instructor/");
+        this.testClient = new TestRunManagerRestClientImpl(resourceBase + "testRun/");
     }
 
     @Test
     public void testGetAll() throws IOException {
-        final Instructor[] instructors = client.getAllInstructors();
+        final Instructor[] instructors = finderClient.getAllInstructors();
         assertNotNull(instructors);
     }
 
     @Test(expected = ObjectNotFoundException.class)
     public void testUnknownInstructor() throws IOException {
-        client.getInstructor("missing");
+        finderClient.getInstructor("missing");
     }
 
     @Test
@@ -83,26 +87,26 @@ public class InstructorRestServerIntegrationTest {
 
         final String davidName = "David : " + testRun.getUuid();
         final String davidEmail = "david-" + testRun.getUuid() + "@example.com";
-        final Instructor expected = client.createInstructor(davidName, davidEmail);
+        final Instructor expected = managerClient.createInstructor(davidName, davidEmail);
         assertEquals(davidName, expected.getName());
         assertEquals(davidEmail, expected.getEmailAddress());
 
-        final Instructor actual1 = client.getInstructor(expected.getUuid());
+        final Instructor actual1 = finderClient.getInstructor(expected.getUuid());
         assertEquals(davidName, actual1.getName());
         assertEquals(davidEmail, actual1.getEmailAddress());
 
-        final Instructor[] instructors = client.getAllInstructors();
+        final Instructor[] instructors = finderClient.getAllInstructors();
         assertTrue(instructors.length > 0);
 
         final String edithName = "Edith : " + testRun.getUuid();
         final String edithEmail = "edith-" + testRun.getUuid() + "example.com";
-        final Instructor actual2 = client.updateInstructor(actual1.getUuid(), edithName, edithEmail);
+        final Instructor actual2 = managerClient.updateInstructor(actual1.getUuid(), edithName, edithEmail);
         assertEquals(edithName, actual2.getName());
         assertEquals(edithEmail, actual2.getEmailAddress());
 
-        client.deleteInstructor(actual1.getUuid());
+        managerClient.deleteInstructor(actual1.getUuid());
         try {
-            client.getInstructor(expected.getUuid());
+            finderClient.getInstructor(expected.getUuid());
             fail("should have thrown exception");
         } catch (ObjectNotFoundException e) {
             // do nothing

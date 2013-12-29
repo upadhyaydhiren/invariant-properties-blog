@@ -39,11 +39,13 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import com.invariantproperties.sandbox.student.domain.Course;
 import com.invariantproperties.sandbox.student.domain.TestRun;
-import com.invariantproperties.sandbox.student.webservice.client.CourseRestClient;
-import com.invariantproperties.sandbox.student.webservice.client.CourseRestClientImpl;
+import com.invariantproperties.sandbox.student.webservice.client.CourseFinderRestClient;
+import com.invariantproperties.sandbox.student.webservice.client.CourseManagerRestClient;
 import com.invariantproperties.sandbox.student.webservice.client.ObjectNotFoundException;
-import com.invariantproperties.sandbox.student.webservice.client.TestRunRestClient;
-import com.invariantproperties.sandbox.student.webservice.client.TestRunRestClientImpl;
+import com.invariantproperties.sandbox.student.webservice.client.TestRunManagerRestClient;
+import com.invariantproperties.sandbox.student.webservice.client.impl.CourseFinderRestClientImpl;
+import com.invariantproperties.sandbox.student.webservice.client.impl.CourseManagerRestClientImpl;
+import com.invariantproperties.sandbox.student.webservice.client.impl.TestRunManagerRestClientImpl;
 import com.invariantproperties.sandbox.student.webservice.config.TestRestApplicationContext;
 
 /**
@@ -57,24 +59,26 @@ public class CourseRestServerIntegrationTest {
 
     @Resource
     private String resourceBase;
-    private CourseRestClient client;
-    private TestRunRestClient testClient;
+    private CourseFinderRestClient finderClient;
+    private CourseManagerRestClient managerClient;
+    private TestRunManagerRestClient testClient;
 
     @Before
     public void init() {
-        this.client = new CourseRestClientImpl(resourceBase + "course/");
-        this.testClient = new TestRunRestClientImpl(resourceBase + "testRun/");
+        this.finderClient = new CourseFinderRestClientImpl(resourceBase + "course/");
+        this.managerClient = new CourseManagerRestClientImpl(resourceBase + "course/");
+        this.testClient = new TestRunManagerRestClientImpl(resourceBase + "testRun/");
     }
 
     @Test
     public void testGetAll() throws IOException {
-        final Course[] courses = client.getAllCourses();
+        final Course[] courses = finderClient.getAllCourses();
         assertNotNull(courses);
     }
 
     @Test(expected = ObjectNotFoundException.class)
     public void testUnknownCourse() throws IOException {
-        client.getCourse("missing");
+        finderClient.getCourse("missing");
     }
 
     @Test
@@ -82,22 +86,22 @@ public class CourseRestServerIntegrationTest {
         final TestRun testRun = testClient.createTestRun();
 
         final String physicsName = "Physics 201 : " + testRun.getUuid();
-        final Course expected = client.createCourse(physicsName);
+        final Course expected = managerClient.createCourse(physicsName);
         assertEquals(physicsName, expected.getName());
 
-        final Course actual1 = client.getCourse(expected.getUuid());
+        final Course actual1 = finderClient.getCourse(expected.getUuid());
         assertEquals(physicsName, actual1.getName());
 
-        final Course[] courses = client.getAllCourses();
+        final Course[] courses = finderClient.getAllCourses();
         assertTrue(courses.length > 0);
 
         final String mechanicsName = "Newtonian Mechanics 201 : " + testRun.getUuid();
-        final Course actual2 = client.updateCourse(actual1.getUuid(), mechanicsName);
+        final Course actual2 = managerClient.updateCourse(actual1.getUuid(), mechanicsName);
         assertEquals(mechanicsName, actual2.getName());
 
-        client.deleteCourse(actual1.getUuid());
+        managerClient.deleteCourse(actual1.getUuid());
         try {
-            client.getCourse(expected.getUuid());
+            finderClient.getCourse(expected.getUuid());
             fail("should have thrown exception");
         } catch (ObjectNotFoundException e) {
             // do nothing

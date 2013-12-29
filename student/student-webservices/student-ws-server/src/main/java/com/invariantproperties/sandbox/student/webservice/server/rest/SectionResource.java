@@ -45,7 +45,8 @@ import org.apache.log4j.Logger;
 import org.springframework.stereotype.Service;
 
 import com.invariantproperties.sandbox.student.business.ObjectNotFoundException;
-import com.invariantproperties.sandbox.student.business.SectionService;
+import com.invariantproperties.sandbox.student.business.SectionFinderService;
+import com.invariantproperties.sandbox.student.business.SectionManagerService;
 import com.invariantproperties.sandbox.student.business.TestRunService;
 import com.invariantproperties.sandbox.student.domain.Section;
 import com.invariantproperties.sandbox.student.domain.TestRun;
@@ -63,7 +64,10 @@ public class SectionResource extends AbstractResource {
     Request request;
 
     @Resource
-    private SectionService service;
+    private SectionFinderService finder;
+
+    @Resource
+    private SectionManagerService manager;
 
     @Resource
     private TestRunService testService;
@@ -80,8 +84,27 @@ public class SectionResource extends AbstractResource {
      * 
      * @param service
      */
-    SectionResource(SectionService service, TestRunService testService) {
-        this.service = service;
+    SectionResource(SectionFinderService finder, TestRunService testService) {
+        this(finder, null, testService);
+    }
+
+    /**
+     * Unit test constructor.
+     * 
+     * @param service
+     */
+    SectionResource(SectionManagerService manager, TestRunService testService) {
+        this(null, manager, testService);
+    }
+
+    /**
+     * Unit test constructor.
+     * 
+     * @param service
+     */
+    SectionResource(SectionFinderService finder, SectionManagerService manager, TestRunService testService) {
+        this.finder = finder;
+        this.manager = manager;
         this.testService = testService;
     }
 
@@ -97,7 +120,7 @@ public class SectionResource extends AbstractResource {
 
         Response response = null;
         try {
-            List<Section> sections = service.findAllSections();
+            List<Section> sections = finder.findAllSections();
 
             List<Section> results = new ArrayList<Section>(sections.size());
             for (Section section : sections) {
@@ -140,12 +163,12 @@ public class SectionResource extends AbstractResource {
             if (req.getTestUuid() != null) {
                 TestRun testRun = testService.findTestRunByUuid(req.getTestUuid());
                 if (testRun != null) {
-                    section = service.createSectionForTesting(name, testRun);
+                    section = manager.createSectionForTesting(name, testRun);
                 } else {
                     response = Response.status(Status.BAD_REQUEST).entity("unknown test UUID").build();
                 }
             } else {
-                section = service.createSection(name);
+                section = manager.createSection(name);
             }
             if (section == null) {
                 response = Response.status(Status.INTERNAL_SERVER_ERROR).build();
@@ -176,7 +199,7 @@ public class SectionResource extends AbstractResource {
 
         Response response = null;
         try {
-            Section section = service.findSectionByUuid(id);
+            Section section = finder.findSectionByUuid(id);
             response = Response.ok(scrubSection(section)).build();
         } catch (ObjectNotFoundException e) {
             response = Response.status(Status.NOT_FOUND).build();
@@ -213,8 +236,8 @@ public class SectionResource extends AbstractResource {
 
         Response response = null;
         try {
-            final Section section = service.findSectionByUuid(id);
-            final Section updatedSection = service.updateSection(section, name);
+            final Section section = finder.findSectionByUuid(id);
+            final Section updatedSection = manager.updateSection(section, name);
             response = Response.ok(scrubSection(updatedSection)).build();
         } catch (ObjectNotFoundException exception) {
             response = Response.status(Status.NOT_FOUND).build();
@@ -236,12 +259,10 @@ public class SectionResource extends AbstractResource {
      */
     @Path("/{sectionId}")
     @DELETE
-    public Response deleteSection(@PathParam("sectionId") String id) {
-        log.debug("SectionResource: deleteSection()");
-
+    public Response deleteSection(@PathParam("sectionId") String id, @PathParam("version") int version) {
         Response response = null;
         try {
-            service.deleteSection(id);
+            manager.deleteSection(id, version);
             response = Response.noContent().build();
         } catch (ObjectNotFoundException exception) {
             response = Response.noContent().build();

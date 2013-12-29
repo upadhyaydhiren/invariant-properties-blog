@@ -27,6 +27,10 @@ import java.util.List;
 import com.invariantproperties.sandbox.student.domain.TestRun;
 
 /**
+ * TestRun service. This interface isn't split because it will only be used
+ * internally. (The REST client implementation is split but only because of the
+ * abstract classes.)
+ * 
  * @author Bear Giles <bgiles@coyotesong.com>
  */
 public interface TestRunService {

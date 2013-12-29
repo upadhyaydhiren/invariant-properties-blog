@@ -35,10 +35,16 @@ import com.invariantproperties.sandbox.student.domain.TestRun;
  */
 public abstract class AbstractResource {
 
+    public String scrubCount(final long count) {
+        return String.format("{ \"count\": %d }", count);
+    }
+
     public Classroom scrubClassroom(final Classroom dirty) {
         final Classroom clean = new Classroom();
         clean.setUuid(dirty.getUuid());
         clean.setName(dirty.getName());
+        clean.setVersion(dirty.getVersion());
+        clean.setCreationDate(dirty.getCreationDate());
         // clean.setSelf("resource/" + dirty.getUuid());
         return clean;
     }
@@ -47,6 +53,8 @@ public abstract class AbstractResource {
         final Course clean = new Course();
         clean.setUuid(dirty.getUuid());
         clean.setName(dirty.getName());
+        clean.setVersion(dirty.getVersion());
+        clean.setCreationDate(dirty.getCreationDate());
         // clean.setSelf("resource/" + dirty.getUuid());
         return clean;
     }
@@ -56,6 +64,8 @@ public abstract class AbstractResource {
         clean.setUuid(dirty.getUuid());
         clean.setName(dirty.getName());
         clean.setEmailAddress(dirty.getEmailAddress());
+        clean.setVersion(dirty.getVersion());
+        clean.setCreationDate(dirty.getCreationDate());
         // clean.setSelf("resource/" + dirty.getUuid());
         return clean;
     }
@@ -64,6 +74,8 @@ public abstract class AbstractResource {
         final Section clean = new Section();
         clean.setUuid(dirty.getUuid());
         clean.setName(dirty.getName());
+        clean.setVersion(dirty.getVersion());
+        clean.setCreationDate(dirty.getCreationDate());
         // clean.setSelf("resource/" + dirty.getUuid());
         return clean;
     }
@@ -73,6 +85,8 @@ public abstract class AbstractResource {
         clean.setUuid(dirty.getUuid());
         clean.setName(dirty.getName());
         clean.setEmailAddress(dirty.getEmailAddress());
+        clean.setVersion(dirty.getVersion());
+        clean.setCreationDate(dirty.getCreationDate());
         // clean.setSelf("resource/" + dirty.getUuid());
         return clean;
     }
@@ -81,6 +95,8 @@ public abstract class AbstractResource {
         final Term clean = new Term();
         clean.setUuid(dirty.getUuid());
         clean.setName(dirty.getName());
+        clean.setVersion(dirty.getVersion());
+        clean.setCreationDate(dirty.getCreationDate());
         // clean.setSelf("resource/" + dirty.getUuid());
         return clean;
     }
@@ -89,6 +105,8 @@ public abstract class AbstractResource {
         final TestRun clean = new TestRun();
         clean.setUuid(dirty.getUuid());
         clean.setName(dirty.getName());
+        clean.setVersion(dirty.getVersion());
+        clean.setCreationDate(dirty.getCreationDate());
         // clean.setSelf("resource/" + dirty.getUuid());
         return clean;
     }

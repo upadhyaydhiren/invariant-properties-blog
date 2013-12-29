@@ -39,11 +39,13 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import com.invariantproperties.sandbox.student.domain.Classroom;
 import com.invariantproperties.sandbox.student.domain.TestRun;
-import com.invariantproperties.sandbox.student.webservice.client.ClassroomRestClient;
-import com.invariantproperties.sandbox.student.webservice.client.ClassroomRestClientImpl;
+import com.invariantproperties.sandbox.student.webservice.client.ClassroomFinderRestClient;
+import com.invariantproperties.sandbox.student.webservice.client.ClassroomManagerRestClient;
 import com.invariantproperties.sandbox.student.webservice.client.ObjectNotFoundException;
-import com.invariantproperties.sandbox.student.webservice.client.TestRunRestClient;
-import com.invariantproperties.sandbox.student.webservice.client.TestRunRestClientImpl;
+import com.invariantproperties.sandbox.student.webservice.client.TestRunManagerRestClient;
+import com.invariantproperties.sandbox.student.webservice.client.impl.ClassroomFinderRestClientImpl;
+import com.invariantproperties.sandbox.student.webservice.client.impl.ClassroomManagerRestClientImpl;
+import com.invariantproperties.sandbox.student.webservice.client.impl.TestRunManagerRestClientImpl;
 import com.invariantproperties.sandbox.student.webservice.config.TestRestApplicationContext;
 
 /**
@@ -58,25 +60,28 @@ public class ClassroomRestServerIntegrationTest {
     @Resource
     private String resourceBase;
 
-    private ClassroomRestClient client;
+    private ClassroomFinderRestClient finderClient;
 
-    private TestRunRestClient testClient;
+    private ClassroomManagerRestClient managerClient;
+
+    private TestRunManagerRestClient testClient;
 
     @Before
     public void init() {
-        this.client = new ClassroomRestClientImpl(resourceBase + "classroom/");
-        this.testClient = new TestRunRestClientImpl(resourceBase + "testRun/");
+        this.finderClient = new ClassroomFinderRestClientImpl(resourceBase + "classroom/");
+        this.managerClient = new ClassroomManagerRestClientImpl(resourceBase + "classroom/");
+        this.testClient = new TestRunManagerRestClientImpl(resourceBase + "testRun/");
     }
 
     @Test
     public void testGetAll() throws IOException {
-        final Classroom[] classrooms = client.getAllClassrooms();
+        final Classroom[] classrooms = finderClient.getAllClassrooms();
         assertNotNull(classrooms);
     }
 
     @Test(expected = ObjectNotFoundException.class)
     public void testUnknownClassroom() throws IOException {
-        client.getClassroom("missing");
+        finderClient.getClassroom("missing");
     }
 
     @Test
@@ -84,22 +89,25 @@ public class ClassroomRestServerIntegrationTest {
         final TestRun testRun = testClient.createTestRun();
 
         final String eng201Name = "Engineering 201 : " + testRun.getUuid();
-        final Classroom expected = client.createClassroomForTesting(eng201Name, testRun);
+        final Classroom expected = managerClient.createClassroomForTesting(eng201Name, testRun);
         assertEquals(eng201Name, expected.getName());
 
-        final Classroom actual1 = client.getClassroom(expected.getUuid());
+        final Classroom actual1 = finderClient.getClassroom(expected.getUuid());
         assertEquals(eng201Name, actual1.getName());
 
-        final Classroom[] classrooms = client.getAllClassrooms();
+        final Classroom[] classrooms = finderClient.getAllClassrooms();
         assertTrue(classrooms.length > 0);
 
+        // final int count = finderClient.getCount();
+        // assertTrue(count > 0);
+
         final String eng202Name = "Engineering 201 : " + testRun.getUuid();
-        final Classroom actual2 = client.updateClassroom(actual1.getUuid(), eng202Name);
+        final Classroom actual2 = managerClient.updateClassroom(actual1.getUuid(), eng202Name);
         assertEquals(eng202Name, actual2.getName());
 
-        client.deleteClassroom(actual1.getUuid());
+        managerClient.deleteClassroom(actual1.getUuid());
         try {
-            client.getClassroom(expected.getUuid());
+            finderClient.getClassroom(expected.getUuid());
             fail("should have thrown exception");
         } catch (ObjectNotFoundException e) {
             // do nothing

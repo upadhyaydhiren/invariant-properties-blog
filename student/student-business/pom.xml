@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>com.invariantproperties.sandbox.student</groupId>
 		<artifactId>student</artifactId>
-		<version>0.0.2-SNAPSHOT</version>
+		<version>0.0.3-SNAPSHOT</version>
 	</parent>
 	<artifactId>student-business</artifactId>
 
@@ -112,4 +112,5 @@
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
+	<name>Project Student: business layer</name>
 </project>

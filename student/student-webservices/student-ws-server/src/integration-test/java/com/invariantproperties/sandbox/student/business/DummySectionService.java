@@ -34,9 +34,27 @@ import org.apache.log4j.Logger;
 import com.invariantproperties.sandbox.student.domain.Section;
 import com.invariantproperties.sandbox.student.domain.TestRun;
 
-public class DummySectionService implements SectionService {
+public class DummySectionService implements SectionFinderService, SectionManagerService {
     private static final Logger log = Logger.getLogger(DummySectionService.class);
     private Map<String, Section> cache = Collections.synchronizedMap(new HashMap<String, Section>());
+
+    @Override
+    public long count() {
+        log.debug("SectionServer: count()");
+        return countByTestRun(null);
+    }
+
+    @Override
+    public long countByTestRun(TestRun testRun) {
+        log.debug("SectionServer: countByTestRun()");
+        long count = 0;
+        for (Section section : cache.values()) {
+            if (testRun.equals(section.getTestRun())) {
+                count++;
+            }
+        }
+        return count;
+    }
 
     @Override
     public List<Section> findAllSections() {
@@ -101,7 +119,7 @@ public class DummySectionService implements SectionService {
     }
 
     @Override
-    public void deleteSection(String uuid) {
+    public void deleteSection(String uuid, Integer version) {
         log.debug("SectionServer: deleteSection()");
         if (cache.containsKey(uuid)) {
             cache.remove(uuid);

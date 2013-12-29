@@ -25,19 +25,19 @@ package com.invariantproperties.sandbox.student.repository;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
 import com.invariantproperties.sandbox.student.domain.Student;
-import com.invariantproperties.sandbox.student.domain.TestRun;
 
 /**
  * @author Bear Giles <bgiles@coyotesong.com>
  */
 @Repository
-public interface StudentRepository extends JpaRepository<Student, Integer> {
+public interface StudentRepository extends JpaRepository<Student, Integer>, JpaSpecificationExecutor<Student> {
     Student findStudentByUuid(String uuid);
 
-    List<Student> findStudentsByTestRun(TestRun testRun);
+    List<Student> findStudentsByTestRunUuid(String uuid);
 
     Student findStudentByEmailAddress(String emailAddress);
 }

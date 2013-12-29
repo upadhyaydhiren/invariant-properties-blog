@@ -44,7 +44,8 @@ import javax.ws.rs.core.UriInfo;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Service;
 
-import com.invariantproperties.sandbox.student.business.CourseService;
+import com.invariantproperties.sandbox.student.business.CourseFinderService;
+import com.invariantproperties.sandbox.student.business.CourseManagerService;
 import com.invariantproperties.sandbox.student.business.ObjectNotFoundException;
 import com.invariantproperties.sandbox.student.business.TestRunService;
 import com.invariantproperties.sandbox.student.domain.Course;
@@ -63,7 +64,10 @@ public class CourseResource extends AbstractResource {
     Request request;
 
     @Resource
-    private CourseService service;
+    private CourseFinderService finder;
+
+    @Resource
+    private CourseManagerService manager;
 
     @Resource
     private TestRunService testRunService;
@@ -78,10 +82,29 @@ public class CourseResource extends AbstractResource {
     /**
      * Unit test constructor.
      * 
+     * @param finder
+     */
+    CourseResource(CourseFinderService finder, TestRunService testRunService) {
+        this(finder, null, testRunService);
+    }
+
+    /**
+     * Unit test constructor.
+     * 
      * @param service
      */
-    CourseResource(CourseService service, TestRunService testRunService) {
-        this.service = service;
+    CourseResource(CourseManagerService manager, TestRunService testRunService) {
+        this(null, manager, testRunService);
+    }
+
+    /**
+     * Unit test constructor.
+     * 
+     * @param service
+     */
+    CourseResource(CourseFinderService finder, CourseManagerService manager, TestRunService testRunService) {
+        this.finder = finder;
+        this.manager = manager;
         this.testRunService = testRunService;
     }
 
@@ -97,7 +120,7 @@ public class CourseResource extends AbstractResource {
 
         Response response = null;
         try {
-            List<Course> courses = service.findAllCourses();
+            List<Course> courses = finder.findAllCourses();
 
             List<Course> results = new ArrayList<Course>(courses.size());
             for (Course course : courses) {
@@ -140,12 +163,12 @@ public class CourseResource extends AbstractResource {
             if (req.getTestUuid() != null) {
                 TestRun testRun = testRunService.findTestRunByUuid(req.getTestUuid());
                 if (testRun != null) {
-                    course = service.createCourseForTesting(name, testRun);
+                    course = manager.createCourseForTesting(name, testRun);
                 } else {
                     response = Response.status(Status.BAD_REQUEST).entity("unknown test UUID").build();
                 }
             } else {
-                course = service.createCourse(name);
+                course = manager.createCourse(name);
             }
             if (course == null) {
                 response = Response.status(Status.INTERNAL_SERVER_ERROR).build();
@@ -176,7 +199,7 @@ public class CourseResource extends AbstractResource {
 
         Response response = null;
         try {
-            Course course = service.findCourseByUuid(id);
+            Course course = finder.findCourseByUuid(id);
             response = Response.ok(scrubCourse(course)).build();
         } catch (ObjectNotFoundException e) {
             response = Response.status(Status.NOT_FOUND).build();
@@ -213,8 +236,8 @@ public class CourseResource extends AbstractResource {
 
         Response response = null;
         try {
-            final Course course = service.findCourseByUuid(id);
-            final Course updatedCourse = service.updateCourse(course, name);
+            final Course course = finder.findCourseByUuid(id);
+            final Course updatedCourse = manager.updateCourse(course, name);
             response = Response.ok(scrubCourse(updatedCourse)).build();
         } catch (ObjectNotFoundException exception) {
             response = Response.status(Status.NOT_FOUND).build();
@@ -236,12 +259,12 @@ public class CourseResource extends AbstractResource {
      */
     @Path("/{courseId}")
     @DELETE
-    public Response deleteCourse(@PathParam("courseId") String id) {
+    public Response deleteCourse(@PathParam("courseId") String id, @PathParam("version") int version) {
         log.debug("CourseResource: deleteCourse()");
 
         Response response = null;
         try {
-            service.deleteCourse(id);
+            manager.deleteCourse(id, version);
             response = Response.noContent().build();
         } catch (ObjectNotFoundException exception) {
             response = Response.noContent().build();

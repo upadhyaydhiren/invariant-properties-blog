@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>com.invariantproperties.sandbox.student</groupId>
 		<artifactId>student</artifactId>
-		<version>0.0.2-SNAPSHOT</version>
+		<version>0.0.3-SNAPSHOT</version>
 	</parent>
 	<artifactId>student-common</artifactId>
 
@@ -22,4 +22,5 @@
 			<artifactId>hamcrest-core</artifactId>
 		</dependency>
 	</dependencies>
+	<name>Project Student: common classes</name>
 </project>

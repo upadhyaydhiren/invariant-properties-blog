@@ -25,17 +25,17 @@ package com.invariantproperties.sandbox.student.repository;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
 import com.invariantproperties.sandbox.student.domain.Section;
-import com.invariantproperties.sandbox.student.domain.TestRun;
 
 /**
  * @author Bear Giles <bgiles@coyotesong.com>
  */
 @Repository
-public interface SectionRepository extends JpaRepository<Section, Integer> {
+public interface SectionRepository extends JpaRepository<Section, Integer>, JpaSpecificationExecutor<Section> {
     Section findSectionByUuid(String uuid);
 
-    List<Section> findSectionsByTestRun(TestRun testRun);
+    List<Section> findSectionsByTestRunUuid(String uuid);
 }

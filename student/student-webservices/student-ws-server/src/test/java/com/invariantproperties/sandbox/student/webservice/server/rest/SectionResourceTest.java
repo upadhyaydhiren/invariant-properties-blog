@@ -40,7 +40,8 @@ import org.junit.Test;
 import org.mockito.Mockito;
 
 import com.invariantproperties.sandbox.student.business.ObjectNotFoundException;
-import com.invariantproperties.sandbox.student.business.SectionService;
+import com.invariantproperties.sandbox.student.business.SectionFinderService;
+import com.invariantproperties.sandbox.student.business.SectionManagerService;
 import com.invariantproperties.sandbox.student.business.TestRunService;
 import com.invariantproperties.sandbox.student.domain.Section;
 
@@ -68,12 +69,12 @@ public class SectionResourceTest {
     public void testFindAllSections() {
         final List<Section> expected = Arrays.asList(physicsFall2013);
 
-        final SectionService service = Mockito.mock(SectionService.class);
-        when(service.findAllSections()).thenReturn(expected);
+        final SectionFinderService finder = Mockito.mock(SectionFinderService.class);
+        when(finder.findAllSections()).thenReturn(expected);
 
         final TestRunService testService = Mockito.mock(TestRunService.class);
 
-        final SectionResource resource = new SectionResource(service, testService);
+        final SectionResource resource = new SectionResource(finder, testService);
         final Response response = resource.findAllSections();
 
         assertEquals(200, response.getStatus());
@@ -88,12 +89,12 @@ public class SectionResourceTest {
     public void testFindAllSectionsEmpty() {
         final List<Section> expected = new ArrayList<>();
 
-        final SectionService service = Mockito.mock(SectionService.class);
-        when(service.findAllSections()).thenReturn(expected);
+        final SectionFinderService finder = Mockito.mock(SectionFinderService.class);
+        when(finder.findAllSections()).thenReturn(expected);
 
         final TestRunService testService = Mockito.mock(TestRunService.class);
 
-        final SectionResource resource = new SectionResource(service, testService);
+        final SectionResource resource = new SectionResource(finder, testService);
         final Response response = resource.findAllSections();
 
         assertEquals(200, response.getStatus());
@@ -103,12 +104,12 @@ public class SectionResourceTest {
 
     @Test
     public void testFindAllSectionsFailure() {
-        final SectionService service = Mockito.mock(SectionService.class);
-        when(service.findAllSections()).thenThrow(new UnitTestException());
+        final SectionFinderService finder = Mockito.mock(SectionFinderService.class);
+        when(finder.findAllSections()).thenThrow(new UnitTestException());
 
         final TestRunService testService = Mockito.mock(TestRunService.class);
 
-        final SectionResource resource = new SectionResource(service, testService);
+        final SectionResource resource = new SectionResource(finder, testService);
         final Response response = resource.findAllSections();
 
         assertEquals(500, response.getStatus());
@@ -118,12 +119,12 @@ public class SectionResourceTest {
     public void testGetSection() {
         final Section expected = physicsFall2013;
 
-        final SectionService service = Mockito.mock(SectionService.class);
-        when(service.findSectionByUuid(expected.getUuid())).thenReturn(expected);
+        final SectionFinderService finder = Mockito.mock(SectionFinderService.class);
+        when(finder.findSectionByUuid(expected.getUuid())).thenReturn(expected);
 
         final TestRunService testService = Mockito.mock(TestRunService.class);
 
-        final SectionResource resource = new SectionResource(service, testService);
+        final SectionResource resource = new SectionResource(finder, testService);
         final Response response = resource.getSection(expected.getUuid());
 
         assertEquals(200, response.getStatus());
@@ -135,13 +136,13 @@ public class SectionResourceTest {
 
     @Test
     public void testGetSectionMissing() {
-        final SectionService service = Mockito.mock(SectionService.class);
-        when(service.findSectionByUuid(physicsFall2013.getUuid())).thenThrow(
+        final SectionFinderService finder = Mockito.mock(SectionFinderService.class);
+        when(finder.findSectionByUuid(physicsFall2013.getUuid())).thenThrow(
                 new ObjectNotFoundException(physicsFall2013.getUuid()));
 
         final TestRunService testService = Mockito.mock(TestRunService.class);
 
-        final SectionResource resource = new SectionResource(service, testService);
+        final SectionResource resource = new SectionResource(finder, testService);
         final Response response = resource.getSection(physicsFall2013.getUuid());
 
         assertEquals(404, response.getStatus());
@@ -149,12 +150,12 @@ public class SectionResourceTest {
 
     @Test
     public void testGetSectionFailure() {
-        final SectionService service = Mockito.mock(SectionService.class);
-        when(service.findSectionByUuid(physicsFall2013.getUuid())).thenThrow(new UnitTestException());
+        final SectionFinderService finder = Mockito.mock(SectionFinderService.class);
+        when(finder.findSectionByUuid(physicsFall2013.getUuid())).thenThrow(new UnitTestException());
 
         final TestRunService testService = Mockito.mock(TestRunService.class);
 
-        final SectionResource resource = new SectionResource(service, testService);
+        final SectionResource resource = new SectionResource(finder, testService);
         final Response response = resource.getSection(physicsFall2013.getUuid());
 
         assertEquals(500, response.getStatus());
@@ -166,12 +167,12 @@ public class SectionResourceTest {
         final Name name = new Name();
         name.setName(expected.getName());
 
-        final SectionService service = Mockito.mock(SectionService.class);
-        when(service.createSection(name.getName())).thenReturn(expected);
+        final SectionManagerService manager = Mockito.mock(SectionManagerService.class);
+        when(manager.createSection(name.getName())).thenReturn(expected);
 
         final TestRunService testService = Mockito.mock(TestRunService.class);
 
-        final SectionResource resource = new SectionResource(service, testService);
+        final SectionResource resource = new SectionResource(manager, testService);
         final Response response = resource.createSection(name);
 
         assertEquals(201, response.getStatus());
@@ -184,12 +185,12 @@ public class SectionResourceTest {
     public void testCreateSectionBlankName() {
         final Name name = new Name();
 
-        final SectionService service = Mockito.mock(SectionService.class);
-        when(service.createSection(name.getName())).thenReturn(null);
+        final SectionManagerService manager = Mockito.mock(SectionManagerService.class);
+        when(manager.createSection(name.getName())).thenReturn(null);
 
         final TestRunService testService = Mockito.mock(TestRunService.class);
 
-        final SectionResource resource = new SectionResource(service, testService);
+        final SectionResource resource = new SectionResource(manager, testService);
         final Response response = resource.createSection(name);
 
         assertEquals(400, response.getStatus());
@@ -206,12 +207,12 @@ public class SectionResourceTest {
         final Name name = new Name();
         name.setName(expected.getName());
 
-        final SectionService service = Mockito.mock(SectionService.class);
-        when(service.createSection(name.getName())).thenReturn(null);
+        final SectionManagerService manager = Mockito.mock(SectionManagerService.class);
+        when(manager.createSection(name.getName())).thenReturn(null);
 
         final TestRunService testService = Mockito.mock(TestRunService.class);
 
-        final SectionResource resource = new SectionResource(service, testService);
+        final SectionResource resource = new SectionResource(manager, testService);
         final Response response = resource.createSection(name);
 
         assertEquals(500, response.getStatus());
@@ -223,12 +224,12 @@ public class SectionResourceTest {
         final Name name = new Name();
         name.setName(expected.getName());
 
-        final SectionService service = Mockito.mock(SectionService.class);
-        when(service.createSection(name.getName())).thenThrow(new UnitTestException());
+        final SectionManagerService manager = Mockito.mock(SectionManagerService.class);
+        when(manager.createSection(name.getName())).thenThrow(new UnitTestException());
 
         final TestRunService testService = Mockito.mock(TestRunService.class);
 
-        final SectionResource resource = new SectionResource(service, testService);
+        final SectionResource resource = new SectionResource(manager, testService);
         final Response response = resource.createSection(name);
 
         assertEquals(500, response.getStatus());
@@ -244,13 +245,14 @@ public class SectionResourceTest {
         updated.setName(physicsFall2014.getName());
         updated.setUuid(expected.getUuid());
 
-        final SectionService service = Mockito.mock(SectionService.class);
-        when(service.findSectionByUuid(expected.getUuid())).thenReturn(expected);
-        when(service.updateSection(expected, name.getName())).thenReturn(updated);
+        final SectionFinderService finder = Mockito.mock(SectionFinderService.class);
+        final SectionManagerService manager = Mockito.mock(SectionManagerService.class);
+        when(finder.findSectionByUuid(expected.getUuid())).thenReturn(expected);
+        when(manager.updateSection(expected, name.getName())).thenReturn(updated);
 
         final TestRunService testService = Mockito.mock(TestRunService.class);
 
-        final SectionResource resource = new SectionResource(service, testService);
+        final SectionResource resource = new SectionResource(finder, manager, testService);
         final Response response = resource.updateSection(expected.getUuid(), name);
 
         assertEquals(200, response.getStatus());
@@ -265,12 +267,12 @@ public class SectionResourceTest {
         final Section expected = physicsFall2013;
         final Name name = new Name();
 
-        final SectionService service = Mockito.mock(SectionService.class);
-        when(service.createSection(name.getName())).thenReturn(null);
+        final SectionManagerService manager = Mockito.mock(SectionManagerService.class);
+        when(manager.createSection(name.getName())).thenReturn(null);
 
         final TestRunService testService = Mockito.mock(TestRunService.class);
 
-        final SectionResource resource = new SectionResource(service, testService);
+        final SectionResource resource = new SectionResource(manager, testService);
         final Response response = resource.updateSection(expected.getUuid(), name);
 
         assertEquals(400, response.getStatus());
@@ -287,12 +289,12 @@ public class SectionResourceTest {
         final Name name = new Name();
         name.setName(expected.getName());
 
-        final SectionService service = Mockito.mock(SectionService.class);
-        when(service.updateSection(expected, name.getName())).thenReturn(null);
+        final SectionManagerService manager = Mockito.mock(SectionManagerService.class);
+        when(manager.updateSection(expected, name.getName())).thenReturn(null);
 
         final TestRunService testService = Mockito.mock(TestRunService.class);
 
-        final SectionResource resource = new SectionResource(service, testService);
+        final SectionResource resource = new SectionResource(manager, testService);
         final Response response = resource.createSection(name);
 
         assertEquals(500, response.getStatus());
@@ -304,12 +306,12 @@ public class SectionResourceTest {
         final Name name = new Name();
         name.setName(expected.getName());
 
-        final SectionService service = Mockito.mock(SectionService.class);
-        when(service.updateSection(expected, name.getName())).thenThrow(new UnitTestException());
+        final SectionManagerService manager = Mockito.mock(SectionManagerService.class);
+        when(manager.updateSection(expected, name.getName())).thenThrow(new UnitTestException());
 
         final TestRunService testService = Mockito.mock(TestRunService.class);
 
-        final SectionResource resource = new SectionResource(service, testService);
+        final SectionResource resource = new SectionResource(manager, testService);
         final Response response = resource.createSection(name);
 
         assertEquals(500, response.getStatus());
@@ -319,13 +321,13 @@ public class SectionResourceTest {
     public void testDeleteSection() {
         final Section expected = physicsFall2013;
 
-        final SectionService service = Mockito.mock(SectionService.class);
-        doNothing().when(service).deleteSection(expected.getUuid());
+        final SectionManagerService manager = Mockito.mock(SectionManagerService.class);
+        doNothing().when(manager).deleteSection(expected.getUuid(), 0);
 
         final TestRunService testService = Mockito.mock(TestRunService.class);
 
-        final SectionResource resource = new SectionResource(service, testService);
-        final Response response = resource.deleteSection(expected.getUuid());
+        final SectionResource resource = new SectionResource(manager, testService);
+        final Response response = resource.deleteSection(expected.getUuid(), 0);
 
         assertEquals(204, response.getStatus());
     }
@@ -336,13 +338,13 @@ public class SectionResourceTest {
         final Name name = new Name();
         name.setName(expected.getName());
 
-        final SectionService service = Mockito.mock(SectionService.class);
-        doThrow(new ObjectNotFoundException(expected.getUuid())).when(service).deleteSection(expected.getUuid());
+        final SectionManagerService manager = Mockito.mock(SectionManagerService.class);
+        doThrow(new ObjectNotFoundException(expected.getUuid())).when(manager).deleteSection(expected.getUuid(), 0);
 
         final TestRunService testService = Mockito.mock(TestRunService.class);
 
-        final SectionResource resource = new SectionResource(service, testService);
-        final Response response = resource.deleteSection(expected.getUuid());
+        final SectionResource resource = new SectionResource(manager, testService);
+        final Response response = resource.deleteSection(expected.getUuid(), 0);
 
         assertEquals(204, response.getStatus());
     }
@@ -351,13 +353,13 @@ public class SectionResourceTest {
     public void testDeleteSectionFailure() {
         final Section expected = physicsFall2013;
 
-        final SectionService service = Mockito.mock(SectionService.class);
-        doThrow(new UnitTestException()).when(service).deleteSection(expected.getUuid());
+        final SectionManagerService manager = Mockito.mock(SectionManagerService.class);
+        doThrow(new UnitTestException()).when(manager).deleteSection(expected.getUuid(), 0);
 
         final TestRunService testService = Mockito.mock(TestRunService.class);
 
-        final SectionResource resource = new SectionResource(service, testService);
-        final Response response = resource.deleteSection(expected.getUuid());
+        final SectionResource resource = new SectionResource(manager, testService);
+        final Response response = resource.deleteSection(expected.getUuid(), 0);
 
         assertEquals(500, response.getStatus());
     }

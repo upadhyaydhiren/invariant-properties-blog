@@ -40,10 +40,12 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import com.invariantproperties.sandbox.student.domain.Section;
 import com.invariantproperties.sandbox.student.domain.TestRun;
 import com.invariantproperties.sandbox.student.webservice.client.ObjectNotFoundException;
-import com.invariantproperties.sandbox.student.webservice.client.SectionRestClient;
-import com.invariantproperties.sandbox.student.webservice.client.SectionRestClientImpl;
-import com.invariantproperties.sandbox.student.webservice.client.TestRunRestClient;
-import com.invariantproperties.sandbox.student.webservice.client.TestRunRestClientImpl;
+import com.invariantproperties.sandbox.student.webservice.client.SectionFinderRestClient;
+import com.invariantproperties.sandbox.student.webservice.client.SectionManagerRestClient;
+import com.invariantproperties.sandbox.student.webservice.client.TestRunManagerRestClient;
+import com.invariantproperties.sandbox.student.webservice.client.impl.SectionFinderRestClientImpl;
+import com.invariantproperties.sandbox.student.webservice.client.impl.SectionManagerRestClientImpl;
+import com.invariantproperties.sandbox.student.webservice.client.impl.TestRunManagerRestClientImpl;
 import com.invariantproperties.sandbox.student.webservice.config.TestRestApplicationContext;
 
 /**
@@ -56,24 +58,26 @@ import com.invariantproperties.sandbox.student.webservice.config.TestRestApplica
 public class SectionRestServerIntegrationTest {
     @Resource
     private String resourceBase;
-    private SectionRestClient client;
-    private TestRunRestClient testClient;
+    private SectionFinderRestClient finderClient;
+    private SectionManagerRestClient managerClient;
+    private TestRunManagerRestClient testClient;
 
     @Before
     public void init() {
-        this.client = new SectionRestClientImpl(resourceBase + "section/");
-        this.testClient = new TestRunRestClientImpl(resourceBase + "testRun/");
+        this.finderClient = new SectionFinderRestClientImpl(resourceBase + "section/");
+        this.managerClient = new SectionManagerRestClientImpl(resourceBase + "section/");
+        this.testClient = new TestRunManagerRestClientImpl(resourceBase + "testRun/");
     }
 
     @Test
     public void testGetAll() throws IOException {
-        final Section[] sections = client.getAllSections();
+        final Section[] sections = finderClient.getAllSections();
         assertNotNull(sections);
     }
 
     @Test(expected = ObjectNotFoundException.class)
     public void testUnknownSection() throws IOException {
-        client.getSection("missing");
+        finderClient.getSection("missing");
     }
 
     @Test
@@ -81,22 +85,22 @@ public class SectionRestServerIntegrationTest {
         final TestRun testRun = testClient.createTestRun();
 
         final String physicsFall2013Name = "Physics 201 - Fall 2013 : " + testRun.getUuid();
-        final Section expected = client.createSection(physicsFall2013Name);
+        final Section expected = managerClient.createSection(physicsFall2013Name);
         assertEquals(physicsFall2013Name, expected.getName());
 
-        final Section actual1 = client.getSection(expected.getUuid());
+        final Section actual1 = finderClient.getSection(expected.getUuid());
         assertEquals(physicsFall2013Name, actual1.getName());
 
-        final Section[] sections = client.getAllSections();
+        final Section[] sections = finderClient.getAllSections();
         assertTrue(sections.length > 0);
 
         final String physicsFall2014Name = "Physics 201 - Fall 2014 : " + testRun.getUuid();
-        final Section actual2 = client.updateSection(actual1.getUuid(), physicsFall2014Name);
+        final Section actual2 = managerClient.updateSection(actual1.getUuid(), physicsFall2014Name);
         assertEquals(physicsFall2014Name, actual2.getName());
 
-        client.deleteSection(actual1.getUuid());
+        managerClient.deleteSection(actual1.getUuid());
         try {
-            client.getSection(expected.getUuid());
+            finderClient.getSection(expected.getUuid());
             fail("should have thrown exception");
         } catch (ObjectNotFoundException e) {
             // do nothing
