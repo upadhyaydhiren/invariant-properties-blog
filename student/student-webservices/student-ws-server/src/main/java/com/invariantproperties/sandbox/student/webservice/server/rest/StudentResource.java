@@ -45,7 +45,8 @@ import org.apache.log4j.Logger;
 import org.springframework.stereotype.Service;
 
 import com.invariantproperties.sandbox.student.business.ObjectNotFoundException;
-import com.invariantproperties.sandbox.student.business.StudentService;
+import com.invariantproperties.sandbox.student.business.StudentFinderService;
+import com.invariantproperties.sandbox.student.business.StudentManagerService;
 import com.invariantproperties.sandbox.student.business.TestRunService;
 import com.invariantproperties.sandbox.student.domain.Student;
 import com.invariantproperties.sandbox.student.domain.TestRun;
@@ -63,7 +64,10 @@ public class StudentResource extends AbstractResource {
     Request request;
 
     @Resource
-    private StudentService service;
+    private StudentFinderService finder;
+
+    @Resource
+    private StudentManagerService manager;
 
     @Resource
     private TestRunService testService;
@@ -80,8 +84,27 @@ public class StudentResource extends AbstractResource {
      * 
      * @param service
      */
-    StudentResource(StudentService service, TestRunService testService) {
-        this.service = service;
+    StudentResource(StudentFinderService finder, TestRunService testService) {
+        this(finder, null, testService);
+    }
+
+    /**
+     * Unit test constructor.
+     * 
+     * @param service
+     */
+    StudentResource(StudentManagerService manager, TestRunService testService) {
+        this(null, manager, testService);
+    }
+
+    /**
+     * Unit test constructor.
+     * 
+     * @param service
+     */
+    StudentResource(StudentFinderService finder, StudentManagerService manager, TestRunService testService) {
+        this.finder = finder;
+        this.manager = manager;
         this.testService = testService;
     }
 
@@ -97,7 +120,7 @@ public class StudentResource extends AbstractResource {
 
         Response response = null;
         try {
-            List<Student> students = service.findAllStudents();
+            List<Student> students = finder.findAllStudents();
 
             List<Student> results = new ArrayList<Student>(students.size());
             for (Student student : students) {
@@ -145,12 +168,12 @@ public class StudentResource extends AbstractResource {
             if (req.getTestUuid() != null) {
                 TestRun testRun = testService.findTestRunByUuid(req.getTestUuid());
                 if (testRun != null) {
-                    student = service.createStudentForTesting(name, email, testRun);
+                    student = manager.createStudentForTesting(name, email, testRun);
                 } else {
                     response = Response.status(Status.BAD_REQUEST).entity("unknown test UUID").build();
                 }
             } else {
-                student = service.createStudent(name, email);
+                student = manager.createStudent(name, email);
             }
 
             if (student == null) {
@@ -182,7 +205,7 @@ public class StudentResource extends AbstractResource {
 
         Response response = null;
         try {
-            Student student = service.findStudentByUuid(id);
+            Student student = finder.findStudentByUuid(id);
             response = Response.ok(scrubStudent(student)).build();
         } catch (ObjectNotFoundException e) {
             response = Response.status(Status.NOT_FOUND).build();
@@ -224,8 +247,8 @@ public class StudentResource extends AbstractResource {
 
         Response response = null;
         try {
-            final Student student = service.findStudentByUuid(id);
-            final Student updatedStudent = service.updateStudent(student, name, email);
+            final Student student = finder.findStudentByUuid(id);
+            final Student updatedStudent = manager.updateStudent(student, name, email);
             response = Response.ok(scrubStudent(updatedStudent)).build();
         } catch (ObjectNotFoundException exception) {
             response = Response.status(Status.NOT_FOUND).build();
@@ -247,12 +270,12 @@ public class StudentResource extends AbstractResource {
      */
     @Path("/{studentId}")
     @DELETE
-    public Response deleteStudent(@PathParam("studentId") String id) {
+    public Response deleteStudent(@PathParam("studentId") String id, @PathParam("version") int version) {
         log.debug("StudentResource: deleteStudent()");
 
         Response response = null;
         try {
-            service.deleteStudent(id);
+            manager.deleteStudent(id, version);
             response = Response.noContent().build();
         } catch (ObjectNotFoundException exception) {
             response = Response.noContent().build();

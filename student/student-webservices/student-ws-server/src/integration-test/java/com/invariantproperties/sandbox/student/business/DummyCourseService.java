@@ -34,9 +34,27 @@ import org.apache.log4j.Logger;
 import com.invariantproperties.sandbox.student.domain.Course;
 import com.invariantproperties.sandbox.student.domain.TestRun;
 
-public class DummyCourseService implements CourseService {
+public class DummyCourseService implements CourseFinderService, CourseManagerService {
     private static final Logger log = Logger.getLogger(DummyCourseService.class);
     private Map<String, Course> cache = Collections.synchronizedMap(new HashMap<String, Course>());
+
+    @Override
+    public long count() {
+        log.debug("CourseServer: count()");
+        return countByTestRun(null);
+    }
+
+    @Override
+    public long countByTestRun(TestRun testRun) {
+        log.debug("CourseServer: countByTestRun()");
+        long count = 0;
+        for (Course classroom : cache.values()) {
+            if (testRun.equals(classroom.getTestRun())) {
+                count++;
+            }
+        }
+        return count;
+    }
 
     @Override
     public List<Course> findAllCourses() {
@@ -109,7 +127,7 @@ public class DummyCourseService implements CourseService {
     }
 
     @Override
-    public void deleteCourse(String uuid) {
+    public void deleteCourse(String uuid, Integer version) {
         log.debug("CourseServer: deleteCourse()");
         if (cache.containsKey(uuid)) {
             cache.remove(uuid);

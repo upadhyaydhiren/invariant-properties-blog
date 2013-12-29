@@ -45,7 +45,8 @@ import org.apache.log4j.Logger;
 import org.springframework.stereotype.Service;
 
 import com.invariantproperties.sandbox.student.business.ObjectNotFoundException;
-import com.invariantproperties.sandbox.student.business.TermService;
+import com.invariantproperties.sandbox.student.business.TermFinderService;
+import com.invariantproperties.sandbox.student.business.TermManagerService;
 import com.invariantproperties.sandbox.student.business.TestRunService;
 import com.invariantproperties.sandbox.student.domain.Term;
 import com.invariantproperties.sandbox.student.domain.TestRun;
@@ -63,7 +64,10 @@ public class TermResource extends AbstractResource {
     Request request;
 
     @Resource
-    private TermService service;
+    private TermFinderService finder;
+
+    @Resource
+    private TermManagerService manager;
 
     @Resource
     private TestRunService testService;
@@ -78,10 +82,29 @@ public class TermResource extends AbstractResource {
     /**
      * Unit test constructor.
      * 
-     * @param service
+     * @param finder
      */
-    TermResource(TermService service, TestRunService testService) {
-        this.service = service;
+    TermResource(TermFinderService finder, TestRunService testService) {
+        this(finder, null, testService);
+    }
+
+    /**
+     * Unit test constructor.
+     * 
+     * @param finder
+     */
+    TermResource(TermManagerService manager, TestRunService testService) {
+        this(null, manager, testService);
+    }
+
+    /**
+     * Unit test constructor.
+     * 
+     * @param finder
+     */
+    TermResource(TermFinderService finder, TermManagerService manager, TestRunService testService) {
+        this.finder = finder;
+        this.manager = manager;
         this.testService = testService;
     }
 
@@ -97,7 +120,7 @@ public class TermResource extends AbstractResource {
 
         Response response = null;
         try {
-            List<Term> terms = service.findAllTerms();
+            List<Term> terms = finder.findAllTerms();
 
             List<Term> results = new ArrayList<Term>(terms.size());
             for (Term term : terms) {
@@ -140,12 +163,12 @@ public class TermResource extends AbstractResource {
             if (req.getTestUuid() != null) {
                 TestRun testRun = testService.findTestRunByUuid(req.getTestUuid());
                 if (testRun != null) {
-                    term = service.createTermForTesting(name, testRun);
+                    term = manager.createTermForTesting(name, testRun);
                 } else {
                     response = Response.status(Status.BAD_REQUEST).entity("unknown test UUID").build();
                 }
             } else {
-                term = service.createTerm(name);
+                term = manager.createTerm(name);
             }
 
             if (term == null) {
@@ -177,7 +200,7 @@ public class TermResource extends AbstractResource {
 
         Response response = null;
         try {
-            Term term = service.findTermByUuid(id);
+            Term term = finder.findTermByUuid(id);
             response = Response.ok(scrubTerm(term)).build();
         } catch (ObjectNotFoundException e) {
             response = Response.status(Status.NOT_FOUND).build();
@@ -214,8 +237,8 @@ public class TermResource extends AbstractResource {
 
         Response response = null;
         try {
-            final Term term = service.findTermByUuid(id);
-            final Term updatedTerm = service.updateTerm(term, name);
+            final Term term = finder.findTermByUuid(id);
+            final Term updatedTerm = manager.updateTerm(term, name);
             response = Response.ok(scrubTerm(updatedTerm)).build();
         } catch (ObjectNotFoundException exception) {
             response = Response.status(Status.NOT_FOUND).build();
@@ -237,12 +260,12 @@ public class TermResource extends AbstractResource {
      */
     @Path("/{termId}")
     @DELETE
-    public Response deleteTerm(@PathParam("termId") String id) {
+    public Response deleteTerm(@PathParam("termId") String id, @PathParam("version") int version) {
         log.debug("TermResource: deleteTerm()");
 
         Response response = null;
         try {
-            service.deleteTerm(id);
+            manager.deleteTerm(id, version);
             response = Response.noContent().build();
         } catch (ObjectNotFoundException exception) {
             response = Response.noContent().build();

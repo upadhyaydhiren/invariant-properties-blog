@@ -32,8 +32,24 @@ import java.util.UUID;
 import com.invariantproperties.sandbox.student.domain.Instructor;
 import com.invariantproperties.sandbox.student.domain.TestRun;
 
-public class DummyInstructorService implements InstructorService {
+public class DummyInstructorService implements InstructorFinderService, InstructorManagerService {
     private Map<String, Instructor> cache = Collections.synchronizedMap(new HashMap<String, Instructor>());
+
+    @Override
+    public long count() {
+        return countByTestRun(null);
+    }
+
+    @Override
+    public long countByTestRun(TestRun testRun) {
+        long count = 0;
+        for (Instructor instructor : cache.values()) {
+            if (testRun.equals(instructor.getTestRun())) {
+                count++;
+            }
+        }
+        return count;
+    }
 
     @Override
     public List<Instructor> findAllInstructors() {
@@ -101,7 +117,7 @@ public class DummyInstructorService implements InstructorService {
     }
 
     @Override
-    public void deleteInstructor(String uuid) {
+    public void deleteInstructor(String uuid, Integer version) {
         if (cache.containsKey(uuid)) {
             cache.remove(uuid);
         }

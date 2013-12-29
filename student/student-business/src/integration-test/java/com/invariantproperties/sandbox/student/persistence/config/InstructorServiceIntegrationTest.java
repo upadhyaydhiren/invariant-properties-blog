@@ -40,7 +40,8 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.transaction.TransactionConfiguration;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.invariantproperties.sandbox.student.business.InstructorService;
+import com.invariantproperties.sandbox.student.business.InstructorFinderService;
+import com.invariantproperties.sandbox.student.business.InstructorManagerService;
 import com.invariantproperties.sandbox.student.business.ObjectNotFoundException;
 import com.invariantproperties.sandbox.student.business.TestRunService;
 import com.invariantproperties.sandbox.student.config.BusinessApplicationContext;
@@ -60,7 +61,10 @@ import com.invariantproperties.sandbox.student.domain.TestRun;
 public class InstructorServiceIntegrationTest {
 
     @Resource
-    private InstructorService dao;
+    private InstructorFinderService fdao;
+
+    @Resource
+    private InstructorManagerService mdao;
 
     @Resource
     TestRunService testService;
@@ -79,7 +83,7 @@ public class InstructorServiceIntegrationTest {
         assertNull(expected.getId());
 
         // create instructor
-        Instructor actual = dao.createInstructor(name, email);
+        Instructor actual = mdao.createInstructorForTesting(name, email, testRun);
         expected.setId(actual.getId());
         expected.setUuid(actual.getUuid());
         expected.setCreationDate(actual.getCreationDate());
@@ -89,21 +93,25 @@ public class InstructorServiceIntegrationTest {
         assertNotNull(actual.getCreationDate());
 
         // get instructor by id
-        actual = dao.findInstructorById(expected.getId());
+        actual = fdao.findInstructorById(expected.getId());
         assertThat(expected, equalTo(actual));
 
         // get instructor by uuid
-        actual = dao.findInstructorByUuid(expected.getUuid());
+        actual = fdao.findInstructorByUuid(expected.getUuid());
         assertThat(expected, equalTo(actual));
 
         // get all instructors
-        final List<Instructor> instructors = dao.findInstructorsByTestRun(testRun);
+        final List<Instructor> instructors = fdao.findInstructorsByTestRun(testRun);
         assertTrue(instructors.contains(actual));
+
+        // count instructors
+        final long count = fdao.countByTestRun(testRun);
+        assertTrue(count > 0);
 
         // update instructor
         expected.setName("Bob : " + testRun.getUuid());
         expected.setEmailAddress("bob-" + testRun.getUuid() + "@example.com");
-        actual = dao.updateInstructor(actual, expected.getName(), expected.getEmailAddress());
+        actual = mdao.updateInstructor(actual, expected.getName(), expected.getEmailAddress());
         assertThat(expected, equalTo(actual));
 
         // verify testRun.getObjects
@@ -111,9 +119,9 @@ public class InstructorServiceIntegrationTest {
         // assertTrue(objects.contains(actual));
 
         // delete Instructor
-        dao.deleteInstructor(expected.getUuid());
+        mdao.deleteInstructor(expected.getUuid(), 0);
         try {
-            dao.findInstructorByUuid(expected.getUuid());
+            fdao.findInstructorByUuid(expected.getUuid());
             fail("exception expected");
         } catch (ObjectNotFoundException e) {
             // expected
@@ -128,7 +136,7 @@ public class InstructorServiceIntegrationTest {
     @Test(expected = ObjectNotFoundException.class)
     public void testfindInstructorByIdWhenInstructorIsNotKnown() {
         final Integer id = 1;
-        dao.findInstructorById(id);
+        fdao.findInstructorById(id);
     }
 
     /**
@@ -137,7 +145,7 @@ public class InstructorServiceIntegrationTest {
     @Test(expected = ObjectNotFoundException.class)
     public void testfindInstructorByUuidWhenInstructorIsNotKnown() {
         final String uuid = "missing";
-        dao.findInstructorByUuid(uuid);
+        fdao.findInstructorByUuid(uuid);
     }
 
     /**
@@ -149,7 +157,7 @@ public class InstructorServiceIntegrationTest {
     public void testUpdateInstructorWhenInstructorIsNotFound() {
         final Instructor instructor = new Instructor();
         instructor.setUuid("missing");
-        dao.updateInstructor(instructor, "Alice", "alice@example.com");
+        mdao.updateInstructor(instructor, "Alice", "alice@example.com");
     }
 
     /**
@@ -159,6 +167,6 @@ public class InstructorServiceIntegrationTest {
      */
     @Test(expected = ObjectNotFoundException.class)
     public void testDeleteInstructorWhenInstructorIsNotFound() {
-        dao.deleteInstructor("missing");
+        mdao.deleteInstructor("missing", 0);
     }
 }

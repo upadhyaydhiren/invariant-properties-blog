@@ -44,7 +44,8 @@ import javax.ws.rs.core.UriInfo;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Service;
 
-import com.invariantproperties.sandbox.student.business.InstructorService;
+import com.invariantproperties.sandbox.student.business.InstructorFinderService;
+import com.invariantproperties.sandbox.student.business.InstructorManagerService;
 import com.invariantproperties.sandbox.student.business.ObjectNotFoundException;
 import com.invariantproperties.sandbox.student.business.TestRunService;
 import com.invariantproperties.sandbox.student.domain.Instructor;
@@ -63,7 +64,10 @@ public class InstructorResource extends AbstractResource {
     Request request;
 
     @Resource
-    private InstructorService service;
+    private InstructorFinderService finder;
+
+    @Resource
+    private InstructorManagerService manager;
 
     @Resource
     private TestRunService testService;
@@ -78,10 +82,29 @@ public class InstructorResource extends AbstractResource {
     /**
      * Unit test constructor.
      * 
-     * @param service
+     * @param manager
      */
-    InstructorResource(InstructorService service, TestRunService testService) {
-        this.service = service;
+    InstructorResource(InstructorFinderService finder, TestRunService testService) {
+        this(finder, null, testService);
+    }
+
+    /**
+     * Unit test constructor.
+     * 
+     * @param manager
+     */
+    InstructorResource(InstructorManagerService manager, TestRunService testService) {
+        this(null, manager, testService);
+    }
+
+    /**
+     * Unit test constructor.
+     * 
+     * @param manager
+     */
+    InstructorResource(InstructorFinderService finder, InstructorManagerService manager, TestRunService testService) {
+        this.finder = finder;
+        this.manager = manager;
         this.testService = testService;
     }
 
@@ -97,7 +120,7 @@ public class InstructorResource extends AbstractResource {
 
         Response response = null;
         try {
-            List<Instructor> instructors = service.findAllInstructors();
+            List<Instructor> instructors = finder.findAllInstructors();
 
             List<Instructor> results = new ArrayList<Instructor>(instructors.size());
             for (Instructor instructor : instructors) {
@@ -145,12 +168,12 @@ public class InstructorResource extends AbstractResource {
             if (req.getTestUuid() != null) {
                 TestRun testRun = testService.findTestRunByUuid(req.getTestUuid());
                 if (testRun != null) {
-                    instructor = service.createInstructorForTesting(name, email, testRun);
+                    instructor = manager.createInstructorForTesting(name, email, testRun);
                 } else {
                     response = Response.status(Status.BAD_REQUEST).entity("unknown test UUID").build();
                 }
             } else {
-                instructor = service.createInstructor(name, email);
+                instructor = manager.createInstructor(name, email);
             }
 
             if (instructor == null) {
@@ -183,7 +206,7 @@ public class InstructorResource extends AbstractResource {
 
         Response response = null;
         try {
-            Instructor instructor = service.findInstructorByUuid(id);
+            Instructor instructor = finder.findInstructorByUuid(id);
             response = Response.ok(scrubInstructor(instructor)).build();
         } catch (ObjectNotFoundException e) {
             response = Response.status(Status.NOT_FOUND).build();
@@ -225,8 +248,8 @@ public class InstructorResource extends AbstractResource {
 
         Response response = null;
         try {
-            final Instructor instructor = service.findInstructorByUuid(id);
-            final Instructor updatedInstructor = service.updateInstructor(instructor, name, email);
+            final Instructor instructor = finder.findInstructorByUuid(id);
+            final Instructor updatedInstructor = manager.updateInstructor(instructor, name, email);
             response = Response.ok(scrubInstructor(updatedInstructor)).build();
         } catch (ObjectNotFoundException exception) {
             response = Response.status(Status.NOT_FOUND).build();
@@ -248,12 +271,12 @@ public class InstructorResource extends AbstractResource {
      */
     @Path("/{instructorId}")
     @DELETE
-    public Response deleteInstructor(@PathParam("instructorId") String id) {
+    public Response deleteInstructor(@PathParam("instructorId") String id, @PathParam("version") int version) {
         log.debug("InstructorResource: deleteInstructor()");
 
         Response response = null;
         try {
-            service.deleteInstructor(id);
+            manager.deleteInstructor(id, version);
             response = Response.noContent().build();
         } catch (ObjectNotFoundException exception) {
             response = Response.noContent().build();

@@ -3,7 +3,7 @@
   <parent>
     <groupId>com.invariantproperties.sandbox.student</groupId>
     <artifactId>student</artifactId>
-    <version>0.0.2-SNAPSHOT</version>
+    <version>0.0.3-SNAPSHOT</version>
   </parent>
   <artifactId>student-webservices</artifactId>
   <packaging>pom</packaging>
@@ -12,4 +12,5 @@
   	<module>student-ws-client</module>
   	<module>student-ws-webapp</module>
   </modules>
+  <name>Project Student: webservices</name>
 </project>

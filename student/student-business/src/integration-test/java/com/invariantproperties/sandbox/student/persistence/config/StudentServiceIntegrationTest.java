@@ -41,7 +41,8 @@ import org.springframework.test.context.transaction.TransactionConfiguration;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.invariantproperties.sandbox.student.business.ObjectNotFoundException;
-import com.invariantproperties.sandbox.student.business.StudentService;
+import com.invariantproperties.sandbox.student.business.StudentFinderService;
+import com.invariantproperties.sandbox.student.business.StudentManagerService;
 import com.invariantproperties.sandbox.student.business.TestRunService;
 import com.invariantproperties.sandbox.student.config.BusinessApplicationContext;
 import com.invariantproperties.sandbox.student.config.TestBusinessApplicationContext;
@@ -60,7 +61,10 @@ import com.invariantproperties.sandbox.student.domain.TestRun;
 public class StudentServiceIntegrationTest {
 
     @Resource
-    private StudentService dao;
+    private StudentFinderService fdao;
+
+    @Resource
+    private StudentManagerService mdao;
 
     @Resource
     TestRunService testService;
@@ -79,7 +83,7 @@ public class StudentServiceIntegrationTest {
         assertNull(expected.getId());
 
         // create student
-        Student actual = dao.createStudent(name, email);
+        Student actual = mdao.createStudentForTesting(name, email, testRun);
         expected.setId(actual.getId());
         expected.setUuid(actual.getUuid());
         expected.setCreationDate(actual.getCreationDate());
@@ -89,21 +93,25 @@ public class StudentServiceIntegrationTest {
         assertNotNull(actual.getCreationDate());
 
         // get student by id
-        actual = dao.findStudentById(expected.getId());
+        actual = fdao.findStudentById(expected.getId());
         assertThat(expected, equalTo(actual));
 
         // get student by uuid
-        actual = dao.findStudentByUuid(expected.getUuid());
+        actual = fdao.findStudentByUuid(expected.getUuid());
         assertThat(expected, equalTo(actual));
 
         // get all students
-        final List<Student> students = dao.findStudentsByTestRun(testRun);
+        final List<Student> students = fdao.findStudentsByTestRun(testRun);
         assertTrue(students.contains(actual));
+
+        // count students
+        final long count = fdao.countByTestRun(testRun);
+        assertTrue(count > 0);
 
         // update student
         expected.setName("Bob : " + testRun.getUuid());
         expected.setEmailAddress("bob-" + testRun.getUuid() + "@example.com");
-        actual = dao.updateStudent(actual, expected.getName(), expected.getEmailAddress());
+        actual = mdao.updateStudent(actual, expected.getName(), expected.getEmailAddress());
         assertThat(expected, equalTo(actual));
 
         // verify testRun.getObjects
@@ -111,9 +119,9 @@ public class StudentServiceIntegrationTest {
         // assertTrue(objects.contains(actual));
 
         // delete Student
-        dao.deleteStudent(expected.getUuid());
+        mdao.deleteStudent(expected.getUuid(), 0);
         try {
-            dao.findStudentByUuid(expected.getUuid());
+            fdao.findStudentByUuid(expected.getUuid());
             fail("exception expected");
         } catch (ObjectNotFoundException e) {
             // expected
@@ -128,7 +136,7 @@ public class StudentServiceIntegrationTest {
     @Test(expected = ObjectNotFoundException.class)
     public void testfindStudentByIdWhenStudentIsNotKnown() {
         final Integer id = 1;
-        dao.findStudentById(id);
+        fdao.findStudentById(id);
     }
 
     /**
@@ -137,7 +145,7 @@ public class StudentServiceIntegrationTest {
     @Test(expected = ObjectNotFoundException.class)
     public void testfindStudentByUuidWhenStudentIsNotKnown() {
         final String uuid = "missing";
-        dao.findStudentByUuid(uuid);
+        fdao.findStudentByUuid(uuid);
     }
 
     /**
@@ -149,7 +157,7 @@ public class StudentServiceIntegrationTest {
     public void testUpdateStudentWhenStudentIsNotFound() {
         final Student student = new Student();
         student.setUuid("missing");
-        dao.updateStudent(student, "Alice", "alice@example.com");
+        mdao.updateStudent(student, "Alice", "alice@example.com");
     }
 
     /**
@@ -159,6 +167,6 @@ public class StudentServiceIntegrationTest {
      */
     @Test(expected = ObjectNotFoundException.class)
     public void testDeleteStudentWhenStudentIsNotFound() {
-        dao.deleteStudent("missing");
+        mdao.deleteStudent("missing", 0);
     }
 }

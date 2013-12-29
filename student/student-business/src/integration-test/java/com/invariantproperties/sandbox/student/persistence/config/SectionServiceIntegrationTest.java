@@ -41,7 +41,8 @@ import org.springframework.test.context.transaction.TransactionConfiguration;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.invariantproperties.sandbox.student.business.ObjectNotFoundException;
-import com.invariantproperties.sandbox.student.business.SectionService;
+import com.invariantproperties.sandbox.student.business.SectionFinderService;
+import com.invariantproperties.sandbox.student.business.SectionManagerService;
 import com.invariantproperties.sandbox.student.business.TestRunService;
 import com.invariantproperties.sandbox.student.config.BusinessApplicationContext;
 import com.invariantproperties.sandbox.student.config.TestBusinessApplicationContext;
@@ -60,7 +61,10 @@ import com.invariantproperties.sandbox.student.domain.TestRun;
 public class SectionServiceIntegrationTest {
 
     @Resource
-    private SectionService dao;
+    private SectionFinderService fdao;
+
+    @Resource
+    private SectionManagerService mdao;
 
     @Resource
     TestRunService testService;
@@ -77,7 +81,7 @@ public class SectionServiceIntegrationTest {
         assertNull(expected.getId());
 
         // create section
-        Section actual = dao.createSection(name);
+        Section actual = mdao.createSectionForTesting(name, testRun);
         expected.setId(actual.getId());
         expected.setUuid(actual.getUuid());
         expected.setCreationDate(actual.getCreationDate());
@@ -87,20 +91,24 @@ public class SectionServiceIntegrationTest {
         assertNotNull(actual.getCreationDate());
 
         // get section by id
-        actual = dao.findSectionById(expected.getId());
+        actual = fdao.findSectionById(expected.getId());
         assertThat(expected, equalTo(actual));
 
         // get section by uuid
-        actual = dao.findSectionByUuid(expected.getUuid());
+        actual = fdao.findSectionByUuid(expected.getUuid());
         assertThat(expected, equalTo(actual));
 
         // get all sections
-        final List<Section> sections = dao.findSectionsByTestRun(testRun);
+        final List<Section> sections = fdao.findSectionsByTestRun(testRun);
         assertTrue(sections.contains(actual));
+
+        // count sections
+        final long count = fdao.countByTestRun(testRun);
+        assertTrue(count > 0);
 
         // update section
         expected.setName("Calculus 101 - Fall 2014 : " + testRun.getUuid());
-        actual = dao.updateSection(actual, expected.getName());
+        actual = mdao.updateSection(actual, expected.getName());
         assertThat(expected, equalTo(actual));
 
         // verify testRun.getObjects
@@ -108,9 +116,9 @@ public class SectionServiceIntegrationTest {
         // assertTrue(objects.contains(actual));
 
         // delete Section
-        dao.deleteSection(expected.getUuid());
+        mdao.deleteSection(expected.getUuid(), 0);
         try {
-            dao.findSectionByUuid(expected.getUuid());
+            fdao.findSectionByUuid(expected.getUuid());
             fail("exception expected");
         } catch (ObjectNotFoundException e) {
             // expected
@@ -125,7 +133,7 @@ public class SectionServiceIntegrationTest {
     @Test(expected = ObjectNotFoundException.class)
     public void testfindSectionByIdWhenSectionIsNotKnown() {
         final Integer id = 1;
-        dao.findSectionById(id);
+        fdao.findSectionById(id);
     }
 
     /**
@@ -134,7 +142,7 @@ public class SectionServiceIntegrationTest {
     @Test(expected = ObjectNotFoundException.class)
     public void testfindSectionByUuidWhenSectionIsNotKnown() {
         final String uuid = "missing";
-        dao.findSectionByUuid(uuid);
+        fdao.findSectionByUuid(uuid);
     }
 
     /**
@@ -146,7 +154,7 @@ public class SectionServiceIntegrationTest {
     public void testUpdateSectionWhenSectionIsNotFound() {
         final Section section = new Section();
         section.setUuid("missing");
-        dao.updateSection(section, "Calculus 101 - Fall 2014");
+        mdao.updateSection(section, "Calculus 101 - Fall 2014");
     }
 
     /**
@@ -156,6 +164,6 @@ public class SectionServiceIntegrationTest {
      */
     @Test(expected = ObjectNotFoundException.class)
     public void testDeleteSectionWhenSectionIsNotFound() {
-        dao.deleteSection("missing");
+        mdao.deleteSection("missing", 0);
     }
 }

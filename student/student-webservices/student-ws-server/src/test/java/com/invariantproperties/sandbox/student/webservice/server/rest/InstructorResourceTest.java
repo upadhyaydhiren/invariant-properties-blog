@@ -39,7 +39,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-import com.invariantproperties.sandbox.student.business.InstructorService;
+import com.invariantproperties.sandbox.student.business.InstructorFinderService;
+import com.invariantproperties.sandbox.student.business.InstructorManagerService;
 import com.invariantproperties.sandbox.student.business.ObjectNotFoundException;
 import com.invariantproperties.sandbox.student.business.TestRunService;
 import com.invariantproperties.sandbox.student.domain.Instructor;
@@ -70,12 +71,12 @@ public class InstructorResourceTest {
     public void testFindAllInstructors() {
         final List<Instructor> expected = Arrays.asList(david);
 
-        final InstructorService service = Mockito.mock(InstructorService.class);
-        when(service.findAllInstructors()).thenReturn(expected);
+        final InstructorFinderService finder = Mockito.mock(InstructorFinderService.class);
+        when(finder.findAllInstructors()).thenReturn(expected);
 
         final TestRunService testService = Mockito.mock(TestRunService.class);
 
-        final InstructorResource resource = new InstructorResource(service, testService);
+        final InstructorResource resource = new InstructorResource(finder, testService);
         final Response response = resource.findAllInstructors();
 
         assertEquals(200, response.getStatus());
@@ -91,12 +92,12 @@ public class InstructorResourceTest {
     public void testFindAllInstructorsEmpty() {
         final List<Instructor> expected = new ArrayList<>();
 
-        final InstructorService service = Mockito.mock(InstructorService.class);
-        when(service.findAllInstructors()).thenReturn(expected);
+        final InstructorFinderService finder = Mockito.mock(InstructorFinderService.class);
+        when(finder.findAllInstructors()).thenReturn(expected);
 
         final TestRunService testService = Mockito.mock(TestRunService.class);
 
-        final InstructorResource resource = new InstructorResource(service, testService);
+        final InstructorResource resource = new InstructorResource(finder, testService);
         final Response response = resource.findAllInstructors();
 
         assertEquals(200, response.getStatus());
@@ -106,12 +107,12 @@ public class InstructorResourceTest {
 
     @Test
     public void testFindAllInstructorsFailure() {
-        final InstructorService service = Mockito.mock(InstructorService.class);
-        when(service.findAllInstructors()).thenThrow(new UnitTestException());
+        final InstructorFinderService finder = Mockito.mock(InstructorFinderService.class);
+        when(finder.findAllInstructors()).thenThrow(new UnitTestException());
 
         final TestRunService testService = Mockito.mock(TestRunService.class);
 
-        final InstructorResource resource = new InstructorResource(service, testService);
+        final InstructorResource resource = new InstructorResource(finder, testService);
         final Response response = resource.findAllInstructors();
 
         assertEquals(500, response.getStatus());
@@ -121,12 +122,12 @@ public class InstructorResourceTest {
     public void testGetInstructor() {
         final Instructor expected = david;
 
-        final InstructorService service = Mockito.mock(InstructorService.class);
-        when(service.findInstructorByUuid(expected.getUuid())).thenReturn(expected);
+        final InstructorFinderService finder = Mockito.mock(InstructorFinderService.class);
+        when(finder.findInstructorByUuid(expected.getUuid())).thenReturn(expected);
 
         final TestRunService testService = Mockito.mock(TestRunService.class);
 
-        final InstructorResource resource = new InstructorResource(service, testService);
+        final InstructorResource resource = new InstructorResource(finder, testService);
         final Response response = resource.getInstructor(expected.getUuid());
 
         assertEquals(200, response.getStatus());
@@ -139,12 +140,12 @@ public class InstructorResourceTest {
 
     @Test
     public void testGetInstructorMissing() {
-        final InstructorService service = Mockito.mock(InstructorService.class);
-        when(service.findInstructorByUuid(david.getUuid())).thenThrow(new ObjectNotFoundException(david.getUuid()));
+        final InstructorFinderService finder = Mockito.mock(InstructorFinderService.class);
+        when(finder.findInstructorByUuid(david.getUuid())).thenThrow(new ObjectNotFoundException(david.getUuid()));
 
         final TestRunService testService = Mockito.mock(TestRunService.class);
 
-        final InstructorResource resource = new InstructorResource(service, testService);
+        final InstructorResource resource = new InstructorResource(finder, testService);
         final Response response = resource.getInstructor(david.getUuid());
 
         assertEquals(404, response.getStatus());
@@ -152,12 +153,12 @@ public class InstructorResourceTest {
 
     @Test
     public void testGetInstructorFailure() {
-        final InstructorService service = Mockito.mock(InstructorService.class);
-        when(service.findInstructorByUuid(david.getUuid())).thenThrow(new UnitTestException());
+        final InstructorFinderService finder = Mockito.mock(InstructorFinderService.class);
+        when(finder.findInstructorByUuid(david.getUuid())).thenThrow(new UnitTestException());
 
         final TestRunService testService = Mockito.mock(TestRunService.class);
 
-        final InstructorResource resource = new InstructorResource(service, testService);
+        final InstructorResource resource = new InstructorResource(finder, testService);
         final Response response = resource.getInstructor(david.getUuid());
 
         assertEquals(500, response.getStatus());
@@ -170,12 +171,12 @@ public class InstructorResourceTest {
         req.setName(expected.getName());
         req.setEmailAddress(expected.getEmailAddress());
 
-        final InstructorService service = Mockito.mock(InstructorService.class);
-        when(service.createInstructor(req.getName(), req.getEmailAddress())).thenReturn(expected);
+        final InstructorManagerService manager = Mockito.mock(InstructorManagerService.class);
+        when(manager.createInstructor(req.getName(), req.getEmailAddress())).thenReturn(expected);
 
         final TestRunService testService = Mockito.mock(TestRunService.class);
 
-        final InstructorResource resource = new InstructorResource(service, testService);
+        final InstructorResource resource = new InstructorResource(manager, testService);
         final Response response = resource.createInstructor(req);
 
         assertEquals(201, response.getStatus());
@@ -197,12 +198,12 @@ public class InstructorResourceTest {
         req.setName(expected.getName());
         req.setEmailAddress(expected.getEmailAddress());
 
-        final InstructorService service = Mockito.mock(InstructorService.class);
-        when(service.createInstructor(req.getName(), req.getEmailAddress())).thenReturn(null);
+        final InstructorManagerService manager = Mockito.mock(InstructorManagerService.class);
+        when(manager.createInstructor(req.getName(), req.getEmailAddress())).thenReturn(null);
 
         final TestRunService testService = Mockito.mock(TestRunService.class);
 
-        final InstructorResource resource = new InstructorResource(service, testService);
+        final InstructorResource resource = new InstructorResource(manager, testService);
         final Response response = resource.createInstructor(req);
 
         assertEquals(500, response.getStatus());
@@ -215,12 +216,12 @@ public class InstructorResourceTest {
         req.setName(expected.getName());
         req.setEmailAddress(expected.getEmailAddress());
 
-        final InstructorService service = Mockito.mock(InstructorService.class);
-        when(service.createInstructor(req.getName(), req.getEmailAddress())).thenThrow(new UnitTestException());
+        final InstructorManagerService manager = Mockito.mock(InstructorManagerService.class);
+        when(manager.createInstructor(req.getName(), req.getEmailAddress())).thenThrow(new UnitTestException());
 
         final TestRunService testService = Mockito.mock(TestRunService.class);
 
-        final InstructorResource resource = new InstructorResource(service, testService);
+        final InstructorResource resource = new InstructorResource(manager, testService);
         final Response response = resource.createInstructor(req);
 
         assertEquals(500, response.getStatus());
@@ -238,13 +239,14 @@ public class InstructorResourceTest {
         updated.setEmailAddress(edith.getEmailAddress());
         updated.setUuid(expected.getUuid());
 
-        final InstructorService service = Mockito.mock(InstructorService.class);
-        when(service.findInstructorByUuid(expected.getUuid())).thenReturn(expected);
-        when(service.updateInstructor(expected, req.getName(), req.getEmailAddress())).thenReturn(updated);
+        final InstructorFinderService finder = Mockito.mock(InstructorFinderService.class);
+        final InstructorManagerService manager = Mockito.mock(InstructorManagerService.class);
+        when(finder.findInstructorByUuid(expected.getUuid())).thenReturn(expected);
+        when(manager.updateInstructor(expected, req.getName(), req.getEmailAddress())).thenReturn(updated);
 
         final TestRunService testService = Mockito.mock(TestRunService.class);
 
-        final InstructorResource resource = new InstructorResource(service, testService);
+        final InstructorResource resource = new InstructorResource(finder, manager, testService);
         final Response response = resource.updateInstructor(expected.getUuid(), req);
 
         assertEquals(200, response.getStatus());
@@ -266,12 +268,12 @@ public class InstructorResourceTest {
         req.setName(expected.getName());
         req.setEmailAddress(expected.getEmailAddress());
 
-        final InstructorService service = Mockito.mock(InstructorService.class);
-        when(service.updateInstructor(expected, req.getName(), req.getEmailAddress())).thenReturn(null);
+        final InstructorManagerService manager = Mockito.mock(InstructorManagerService.class);
+        when(manager.updateInstructor(expected, req.getName(), req.getEmailAddress())).thenReturn(null);
 
         final TestRunService testService = Mockito.mock(TestRunService.class);
 
-        final InstructorResource resource = new InstructorResource(service, testService);
+        final InstructorResource resource = new InstructorResource(manager, testService);
         final Response response = resource.createInstructor(req);
 
         assertEquals(500, response.getStatus());
@@ -284,13 +286,13 @@ public class InstructorResourceTest {
         req.setName(expected.getName());
         req.setEmailAddress(expected.getEmailAddress());
 
-        final InstructorService service = Mockito.mock(InstructorService.class);
-        when(service.updateInstructor(expected, req.getName(), req.getEmailAddress())).thenThrow(
+        final InstructorManagerService manager = Mockito.mock(InstructorManagerService.class);
+        when(manager.updateInstructor(expected, req.getName(), req.getEmailAddress())).thenThrow(
                 new UnitTestException());
 
         final TestRunService testService = Mockito.mock(TestRunService.class);
 
-        final InstructorResource resource = new InstructorResource(service, testService);
+        final InstructorResource resource = new InstructorResource(manager, testService);
         final Response response = resource.createInstructor(req);
 
         assertEquals(500, response.getStatus());
@@ -300,13 +302,13 @@ public class InstructorResourceTest {
     public void testDeleteInstructor() {
         final Instructor expected = david;
 
-        final InstructorService service = Mockito.mock(InstructorService.class);
-        doNothing().when(service).deleteInstructor(expected.getUuid());
+        final InstructorManagerService manager = Mockito.mock(InstructorManagerService.class);
+        doNothing().when(manager).deleteInstructor(expected.getUuid(), 0);
 
         final TestRunService testService = Mockito.mock(TestRunService.class);
 
-        final InstructorResource resource = new InstructorResource(service, testService);
-        final Response response = resource.deleteInstructor(expected.getUuid());
+        final InstructorResource resource = new InstructorResource(manager, testService);
+        final Response response = resource.deleteInstructor(expected.getUuid(), 0);
 
         assertEquals(204, response.getStatus());
     }
@@ -317,13 +319,13 @@ public class InstructorResourceTest {
         final Name name = new Name();
         name.setName(expected.getName());
 
-        final InstructorService service = Mockito.mock(InstructorService.class);
-        doThrow(new ObjectNotFoundException(expected.getUuid())).when(service).deleteInstructor(expected.getUuid());
+        final InstructorManagerService manager = Mockito.mock(InstructorManagerService.class);
+        doThrow(new ObjectNotFoundException(expected.getUuid())).when(manager).deleteInstructor(expected.getUuid(), 0);
 
         final TestRunService testService = Mockito.mock(TestRunService.class);
 
-        final InstructorResource resource = new InstructorResource(service, testService);
-        final Response response = resource.deleteInstructor(expected.getUuid());
+        final InstructorResource resource = new InstructorResource(manager, testService);
+        final Response response = resource.deleteInstructor(expected.getUuid(), 0);
 
         assertEquals(204, response.getStatus());
     }
@@ -332,13 +334,13 @@ public class InstructorResourceTest {
     public void testDeleteInstructorFailure() {
         final Instructor expected = david;
 
-        final InstructorService service = Mockito.mock(InstructorService.class);
-        doThrow(new UnitTestException()).when(service).deleteInstructor(expected.getUuid());
+        final InstructorManagerService manager = Mockito.mock(InstructorManagerService.class);
+        doThrow(new UnitTestException()).when(manager).deleteInstructor(expected.getUuid(), 0);
 
         final TestRunService testService = Mockito.mock(TestRunService.class);
 
-        final InstructorResource resource = new InstructorResource(service, testService);
-        final Response response = resource.deleteInstructor(expected.getUuid());
+        final InstructorResource resource = new InstructorResource(manager, testService);
+        final Response response = resource.deleteInstructor(expected.getUuid(), 0);
 
         assertEquals(500, response.getStatus());
     }

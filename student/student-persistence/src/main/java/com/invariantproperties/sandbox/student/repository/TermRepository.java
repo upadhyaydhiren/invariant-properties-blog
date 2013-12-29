@@ -25,17 +25,17 @@ package com.invariantproperties.sandbox.student.repository;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
 import com.invariantproperties.sandbox.student.domain.Term;
-import com.invariantproperties.sandbox.student.domain.TestRun;
 
 /**
  * @author Bear Giles <bgiles@coyotesong.com>
  */
 @Repository
-public interface TermRepository extends JpaRepository<Term, Integer> {
+public interface TermRepository extends JpaRepository<Term, Integer>, JpaSpecificationExecutor<Term> {
     Term findTermByUuid(String uuid);
 
-    List<Term> findTermsByTestRun(TestRun testRun);
+    List<Term> findTermsByTestRun_Uuid(String uuid);
 }

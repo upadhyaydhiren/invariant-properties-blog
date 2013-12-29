@@ -40,7 +40,8 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.transaction.TransactionConfiguration;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.invariantproperties.sandbox.student.business.ClassroomService;
+import com.invariantproperties.sandbox.student.business.ClassroomFinderService;
+import com.invariantproperties.sandbox.student.business.ClassroomManagerService;
 import com.invariantproperties.sandbox.student.business.ObjectNotFoundException;
 import com.invariantproperties.sandbox.student.business.TestRunService;
 import com.invariantproperties.sandbox.student.config.BusinessApplicationContext;
@@ -60,7 +61,10 @@ import com.invariantproperties.sandbox.student.domain.TestRun;
 public class ClassroomServiceIntegrationTest {
 
     @Resource
-    private ClassroomService dao;
+    private ClassroomFinderService fdao;
+
+    @Resource
+    private ClassroomManagerService mdao;
 
     @Resource
     private TestRunService testService;
@@ -77,7 +81,7 @@ public class ClassroomServiceIntegrationTest {
         assertNull(expected.getId());
 
         // create classroom
-        Classroom actual = dao.createClassroom(name);
+        Classroom actual = mdao.createClassroomForTesting(name, testRun);
         expected.setId(actual.getId());
         expected.setUuid(actual.getUuid());
         expected.setCreationDate(actual.getCreationDate());
@@ -87,20 +91,24 @@ public class ClassroomServiceIntegrationTest {
         assertNotNull(actual.getCreationDate());
 
         // get classroom by id
-        actual = dao.findClassroomById(expected.getId());
+        actual = fdao.findClassroomById(expected.getId());
         assertThat(expected, equalTo(actual));
 
         // get classroom by uuid
-        actual = dao.findClassroomByUuid(expected.getUuid());
+        actual = fdao.findClassroomByUuid(expected.getUuid());
         assertThat(expected, equalTo(actual));
 
         // get all classrooms
-        final List<Classroom> classrooms = dao.findClassroomsByTestRun(testRun);
+        final List<Classroom> classrooms = fdao.findClassroomsByTestRun(testRun);
         assertTrue(classrooms.contains(actual));
+
+        // count classrooms
+        final long count = fdao.countByTestRun(testRun);
+        assertTrue(count > 0);
 
         // update classroom
         expected.setName("Eng 102 : " + testRun.getUuid());
-        actual = dao.updateClassroom(actual, expected.getName());
+        actual = mdao.updateClassroom(actual, expected.getName());
         assertThat(expected, equalTo(actual));
 
         // verify testRun.getObjects
@@ -108,9 +116,9 @@ public class ClassroomServiceIntegrationTest {
         // assertTrue(objects.contains(actual));
 
         // delete Classroom
-        dao.deleteClassroom(expected.getUuid());
+        mdao.deleteClassroom(expected.getUuid(), 0);
         try {
-            dao.findClassroomByUuid(expected.getUuid());
+            fdao.findClassroomByUuid(expected.getUuid());
             fail("exception expected");
         } catch (ObjectNotFoundException e) {
             // expected
@@ -125,7 +133,7 @@ public class ClassroomServiceIntegrationTest {
     @Test(expected = ObjectNotFoundException.class)
     public void testfindClassroomByIdWhenClassroomIsNotKnown() {
         final Integer id = 1;
-        dao.findClassroomById(id);
+        fdao.findClassroomById(id);
     }
 
     /**
@@ -134,7 +142,7 @@ public class ClassroomServiceIntegrationTest {
     @Test(expected = ObjectNotFoundException.class)
     public void testfindClassroomByUuidWhenClassroomIsNotKnown() {
         final String uuid = "missing";
-        dao.findClassroomByUuid(uuid);
+        fdao.findClassroomByUuid(uuid);
     }
 
     /**
@@ -146,7 +154,7 @@ public class ClassroomServiceIntegrationTest {
     public void testUpdateClassroomWhenClassroomIsNotFound() {
         final Classroom classroom = new Classroom();
         classroom.setUuid("missing");
-        dao.updateClassroom(classroom, "Eng 102");
+        mdao.updateClassroom(classroom, "Eng 102");
     }
 
     /**
@@ -156,6 +164,6 @@ public class ClassroomServiceIntegrationTest {
      */
     @Test(expected = ObjectNotFoundException.class)
     public void testDeleteClassroomWhenClassroomIsNotFound() {
-        dao.deleteClassroom("missing");
+        mdao.deleteClassroom("missing", 0);
     }
 }

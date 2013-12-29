@@ -4,10 +4,10 @@
 	<parent>
 		<groupId>com.invariantproperties.sandbox.student</groupId>
 		<artifactId>student-webservices</artifactId>
-		<version>0.0.2-SNAPSHOT</version>
+		<version>0.0.3-SNAPSHOT</version>
 	</parent>
 	<artifactId>student-ws-server</artifactId>
-	
+
 	<build>
 		<plugins>
 
@@ -26,10 +26,10 @@
 					<stopPort>18005</stopPort>
 					<stopKey>STOP</stopKey>
 					<systemProperties>
-					   <systemProperty>
-					       <name>jetty.port</name>
-					       <value>18080</value>
-					   </systemProperty>
+						<systemProperty>
+							<name>jetty.port</name>
+							<value>18080</value>
+						</systemProperty>
 					</systemProperties>
 				</configuration>
 				<executions>
@@ -219,4 +219,5 @@
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
+	<name>Project Student: webservice server</name>
 </project>

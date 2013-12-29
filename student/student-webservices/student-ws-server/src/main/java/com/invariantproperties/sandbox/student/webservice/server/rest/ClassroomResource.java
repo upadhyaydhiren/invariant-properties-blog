@@ -44,7 +44,8 @@ import javax.ws.rs.core.UriInfo;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Service;
 
-import com.invariantproperties.sandbox.student.business.ClassroomService;
+import com.invariantproperties.sandbox.student.business.ClassroomFinderService;
+import com.invariantproperties.sandbox.student.business.ClassroomManagerService;
 import com.invariantproperties.sandbox.student.business.ObjectNotFoundException;
 import com.invariantproperties.sandbox.student.business.TestRunService;
 import com.invariantproperties.sandbox.student.domain.Classroom;
@@ -63,7 +64,10 @@ public class ClassroomResource extends AbstractResource {
     Request request;
 
     @Resource
-    private ClassroomService service;
+    private ClassroomFinderService finder;
+
+    @Resource
+    private ClassroomManagerService manager;
 
     @Resource
     private TestRunService testService;
@@ -80,8 +84,27 @@ public class ClassroomResource extends AbstractResource {
      * 
      * @param service
      */
-    ClassroomResource(ClassroomService service, TestRunService testService) {
-        this.service = service;
+    ClassroomResource(ClassroomFinderService finder, TestRunService testService) {
+        this(finder, null, testService);
+    }
+
+    /**
+     * Unit test constructor.
+     * 
+     * @param service
+     */
+    ClassroomResource(ClassroomManagerService manager, TestRunService testService) {
+        this(null, manager, testService);
+    }
+
+    /**
+     * Unit test constructor.
+     * 
+     * @param service
+     */
+    ClassroomResource(ClassroomFinderService finder, ClassroomManagerService manager, TestRunService testService) {
+        this.finder = finder;
+        this.manager = manager;
         this.testService = testService;
     }
 
@@ -97,7 +120,7 @@ public class ClassroomResource extends AbstractResource {
 
         Response response = null;
         try {
-            List<Classroom> classrooms = service.findAllClassrooms();
+            List<Classroom> classrooms = finder.findAllClassrooms();
 
             List<Classroom> results = new ArrayList<Classroom>(classrooms.size());
             for (Classroom classroom : classrooms) {
@@ -140,12 +163,12 @@ public class ClassroomResource extends AbstractResource {
             if (req.getTestUuid() != null) {
                 TestRun testRun = testService.findTestRunByUuid(req.getTestUuid());
                 if (testRun != null) {
-                    classroom = service.createClassroomForTesting(name, testRun);
+                    classroom = manager.createClassroomForTesting(name, testRun);
                 } else {
                     response = Response.status(Status.BAD_REQUEST).entity("unknown test UUID").build();
                 }
             } else {
-                classroom = service.createClassroom(name);
+                classroom = manager.createClassroom(name);
             }
 
             if (classroom == null) {
@@ -177,7 +200,7 @@ public class ClassroomResource extends AbstractResource {
 
         Response response = null;
         try {
-            Classroom classroom = service.findClassroomByUuid(id);
+            Classroom classroom = finder.findClassroomByUuid(id);
             response = Response.ok(scrubClassroom(classroom)).build();
         } catch (ObjectNotFoundException e) {
             response = Response.status(Status.NOT_FOUND).build();
@@ -214,8 +237,8 @@ public class ClassroomResource extends AbstractResource {
 
         Response response = null;
         try {
-            final Classroom classroom = service.findClassroomByUuid(id);
-            final Classroom updatedClassroom = service.updateClassroom(classroom, name);
+            final Classroom classroom = finder.findClassroomByUuid(id);
+            final Classroom updatedClassroom = manager.updateClassroom(classroom, name);
             response = Response.ok(scrubClassroom(updatedClassroom)).build();
         } catch (ObjectNotFoundException exception) {
             response = Response.status(Status.NOT_FOUND).build();
@@ -237,12 +260,12 @@ public class ClassroomResource extends AbstractResource {
      */
     @Path("/{classroomId}")
     @DELETE
-    public Response deleteClassroom(@PathParam("classroomId") String id) {
+    public Response deleteClassroom(@PathParam("classroomId") String id, @PathParam("version") int version) {
         log.debug("ClassroomResource: deleteClassroom()");
 
         Response response = null;
         try {
-            service.deleteClassroom(id);
+            manager.deleteClassroom(id, version);
             response = Response.noContent().build();
         } catch (ObjectNotFoundException exception) {
             response = Response.noContent().build();

@@ -41,7 +41,8 @@ import org.springframework.test.context.transaction.TransactionConfiguration;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.invariantproperties.sandbox.student.business.ObjectNotFoundException;
-import com.invariantproperties.sandbox.student.business.TermService;
+import com.invariantproperties.sandbox.student.business.TermFinderService;
+import com.invariantproperties.sandbox.student.business.TermManagerService;
 import com.invariantproperties.sandbox.student.business.TestRunService;
 import com.invariantproperties.sandbox.student.config.BusinessApplicationContext;
 import com.invariantproperties.sandbox.student.config.TestBusinessApplicationContext;
@@ -60,7 +61,10 @@ import com.invariantproperties.sandbox.student.domain.TestRun;
 public class TermServiceIntegrationTest {
 
     @Resource
-    private TermService dao;
+    private TermFinderService fdao;
+
+    @Resource
+    private TermManagerService mdao;
 
     @Resource
     TestRunService testService;
@@ -77,7 +81,7 @@ public class TermServiceIntegrationTest {
         assertNull(expected.getId());
 
         // create term
-        Term actual = dao.createTerm(name);
+        Term actual = mdao.createTermForTesting(name, testRun);
         expected.setId(actual.getId());
         expected.setUuid(actual.getUuid());
         expected.setCreationDate(actual.getCreationDate());
@@ -87,20 +91,24 @@ public class TermServiceIntegrationTest {
         assertNotNull(actual.getCreationDate());
 
         // get term by id
-        actual = dao.findTermById(expected.getId());
+        actual = fdao.findTermById(expected.getId());
         assertThat(expected, equalTo(actual));
 
         // get term by uuid
-        actual = dao.findTermByUuid(expected.getUuid());
+        actual = fdao.findTermByUuid(expected.getUuid());
         assertThat(expected, equalTo(actual));
 
         // get all terms
-        final List<Term> terms = dao.findTermsByTestRun(testRun);
+        final List<Term> terms = fdao.findTermsByTestRun(testRun);
         assertTrue(terms.contains(actual));
+
+        // count terms
+        final long count = fdao.countByTestRun(testRun);
+        assertTrue(count > 0);
 
         // update term
         expected.setName("Fall 2014 : " + testRun.getUuid());
-        actual = dao.updateTerm(actual, expected.getName());
+        actual = mdao.updateTerm(actual, expected.getName());
         assertThat(expected, equalTo(actual));
 
         // verify testRun.getObjects
@@ -108,9 +116,9 @@ public class TermServiceIntegrationTest {
         // assertTrue(objects.contains(actual));
 
         // delete Term
-        dao.deleteTerm(expected.getUuid());
+        mdao.deleteTerm(expected.getUuid(), 0);
         try {
-            dao.findTermByUuid(expected.getUuid());
+            fdao.findTermByUuid(expected.getUuid());
             fail("exception expected");
         } catch (ObjectNotFoundException e) {
             // expected
@@ -125,7 +133,7 @@ public class TermServiceIntegrationTest {
     @Test(expected = ObjectNotFoundException.class)
     public void testfindTermByIdWhenTermIsNotKnown() {
         final Integer id = 1;
-        dao.findTermById(id);
+        fdao.findTermById(id);
     }
 
     /**
@@ -134,7 +142,7 @@ public class TermServiceIntegrationTest {
     @Test(expected = ObjectNotFoundException.class)
     public void testfindTermByUuidWhenTermIsNotKnown() {
         final String uuid = "missing";
-        dao.findTermByUuid(uuid);
+        fdao.findTermByUuid(uuid);
     }
 
     /**
@@ -146,7 +154,7 @@ public class TermServiceIntegrationTest {
     public void testUpdateTermWhenTermIsNotFound() {
         final Term term = new Term();
         term.setUuid("missing");
-        dao.updateTerm(term, "Fall 2014");
+        mdao.updateTerm(term, "Fall 2014");
     }
 
     /**
@@ -156,6 +164,6 @@ public class TermServiceIntegrationTest {
      */
     @Test(expected = ObjectNotFoundException.class)
     public void testDeleteTermWhenTermIsNotFound() {
-        dao.deleteTerm("missing");
+        mdao.deleteTerm("missing", 0);
     }
 }

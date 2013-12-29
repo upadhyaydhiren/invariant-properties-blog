@@ -39,8 +39,10 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import com.invariantproperties.sandbox.student.domain.TestRun;
 import com.invariantproperties.sandbox.student.webservice.client.ObjectNotFoundException;
-import com.invariantproperties.sandbox.student.webservice.client.TestRunRestClient;
-import com.invariantproperties.sandbox.student.webservice.client.TestRunRestClientImpl;
+import com.invariantproperties.sandbox.student.webservice.client.TestRunFinderRestClient;
+import com.invariantproperties.sandbox.student.webservice.client.TestRunManagerRestClient;
+import com.invariantproperties.sandbox.student.webservice.client.impl.TestRunFinderRestClientImpl;
+import com.invariantproperties.sandbox.student.webservice.client.impl.TestRunManagerRestClientImpl;
 import com.invariantproperties.sandbox.student.webservice.config.TestRestApplicationContext;
 
 /**
@@ -53,38 +55,40 @@ import com.invariantproperties.sandbox.student.webservice.config.TestRestApplica
 public class TestRunRestServerIntegrationTest {
     @Resource
     private String resourceBase;
-    private TestRunRestClient client;
+    private TestRunFinderRestClient finderClient;
+    private TestRunManagerRestClient managerClient;
 
     @Before
     public void init() {
-        this.client = new TestRunRestClientImpl(resourceBase + "testRun/");
+        this.finderClient = new TestRunFinderRestClientImpl(resourceBase + "testRun/");
+        this.managerClient = new TestRunManagerRestClientImpl(resourceBase + "testRun/");
     }
 
     @Test
     public void testGetAll() throws IOException {
-        final TestRun[] testRuns = client.getAllTestRuns();
+        final TestRun[] testRuns = finderClient.getAllTestRuns();
         assertNotNull(testRuns);
     }
 
     @Test(expected = ObjectNotFoundException.class)
     public void testUnknownTestRun() throws IOException {
-        client.getTestRun("missing");
+        finderClient.getTestRun("missing");
     }
 
     @Test
     public void testLifecycle() throws IOException {
-        final TestRun expected = client.createTestRun();
+        final TestRun expected = managerClient.createTestRun();
         System.out.println("***** test run: " + expected);
 
-        final TestRun actual = client.getTestRun(expected.getUuid());
+        final TestRun actual = finderClient.getTestRun(expected.getUuid());
         assertEquals(expected.getName(), actual.getName());
 
-        final TestRun[] testRuns = client.getAllTestRuns();
+        final TestRun[] testRuns = finderClient.getAllTestRuns();
         assertTrue(testRuns.length > 0);
 
-        client.deleteTestRun(actual.getUuid());
+        managerClient.deleteTestRun(actual.getUuid());
         try {
-            client.getTestRun(expected.getUuid());
+            finderClient.getTestRun(expected.getUuid());
             fail("should have thrown exception");
         } catch (ObjectNotFoundException e) {
             // do nothing
