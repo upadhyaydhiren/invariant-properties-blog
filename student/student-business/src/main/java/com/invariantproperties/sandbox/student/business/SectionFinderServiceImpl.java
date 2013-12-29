@@ -22,6 +22,10 @@
  */
 package com.invariantproperties.sandbox.student.business;
 
+import static com.invariantproperties.sandbox.student.business.PersistenceException.Type.UNABLE_TO_COUNT;
+import static com.invariantproperties.sandbox.student.business.PersistenceException.Type.UNABLE_TO_FIND_BY_ID;
+import static com.invariantproperties.sandbox.student.business.PersistenceException.Type.UNABLE_TO_FIND_BY_UUID;
+import static com.invariantproperties.sandbox.student.business.PersistenceException.Type.UNABLE_TO_LIST;
 import static com.invariantproperties.sandbox.student.specification.SectionSpecifications.testRunIs;
 
 import java.util.List;
@@ -45,7 +49,9 @@ import com.invariantproperties.sandbox.student.repository.SectionRepository;
  */
 @Service
 public class SectionFinderServiceImpl implements SectionFinderService {
-    private static final Logger log = LoggerFactory.getLogger(SectionFinderServiceImpl.class);
+    private static final Logger LOG = LoggerFactory.getLogger(SectionFinderServiceImpl.class);
+    private static final String SECTION = "section";
+    private static final String SECTIONS = "sections";
 
     @Resource
     private SectionRepository sectionRepository;
@@ -84,11 +90,13 @@ public class SectionFinderServiceImpl implements SectionFinderService {
         long count = 0;
         try {
             count = sectionRepository.count(testRunIs(testRun));
+        } catch (UnitTestException e) {
+            final String msg = UNABLE_TO_COUNT.format(SECTIONS) + testRun;
+            throw new PersistenceException(UNABLE_TO_COUNT, msg, e, 0);
         } catch (DataAccessException e) {
-            if (!(e instanceof UnitTestException)) {
-                log.info("internal error retrieving classroom count by " + testRun, e);
-            }
-            throw new PersistenceException("unable to count classrooms by " + testRun, e, 0);
+            final String msg = UNABLE_TO_COUNT.format(SECTIONS) + testRun;
+            LOG.info(msg);
+            throw new PersistenceException(UNABLE_TO_COUNT, msg, e, 0);
         }
 
         return count;
@@ -114,11 +122,13 @@ public class SectionFinderServiceImpl implements SectionFinderService {
         Section section = null;
         try {
             section = sectionRepository.findOne(id);
+        } catch (UnitTestException e) {
+            final String msg = UNABLE_TO_FIND_BY_ID.format(SECTION);
+            throw new PersistenceException(UNABLE_TO_FIND_BY_ID, msg, e, id);
         } catch (DataAccessException e) {
-            if (!(e instanceof UnitTestException)) {
-                log.info("internal error retrieving section: " + id, e);
-            }
-            throw new PersistenceException("unable to find section by id", e, id);
+            final String msg = UNABLE_TO_FIND_BY_ID.format(SECTION);
+            LOG.info(msg);
+            throw new PersistenceException(UNABLE_TO_FIND_BY_ID, msg, e, id);
         }
 
         if (section == null) {
@@ -138,11 +148,13 @@ public class SectionFinderServiceImpl implements SectionFinderService {
         Section section = null;
         try {
             section = sectionRepository.findSectionByUuid(uuid);
+        } catch (UnitTestException e) {
+            final String msg = UNABLE_TO_FIND_BY_UUID.format(SECTION);
+            throw new PersistenceException(UNABLE_TO_FIND_BY_UUID, msg, e, uuid);
         } catch (DataAccessException e) {
-            if (!(e instanceof UnitTestException)) {
-                log.info("internal error retrieving section: " + uuid, e);
-            }
-            throw new PersistenceException("unable to find section by uuid", e, uuid);
+            final String msg = UNABLE_TO_FIND_BY_UUID.format(SECTION);
+            LOG.info(msg);
+            throw new PersistenceException(UNABLE_TO_FIND_BY_UUID, msg, e, uuid);
         }
 
         if (section == null) {
@@ -163,11 +175,13 @@ public class SectionFinderServiceImpl implements SectionFinderService {
 
         try {
             sections = sectionRepository.findAll(testRunIs(testRun));
+        } catch (UnitTestException e) {
+            final String msg = UNABLE_TO_LIST.format(SECTION);
+            throw new PersistenceException(UNABLE_TO_LIST, msg, e);
         } catch (DataAccessException e) {
-            if (!(e instanceof UnitTestException)) {
-                log.info("error loading list of sections: " + e.getMessage(), e);
-            }
-            throw new PersistenceException("unable to get list of sections.", e);
+            final String msg = UNABLE_TO_LIST.format(SECTION);
+            LOG.info(msg);
+            throw new PersistenceException(UNABLE_TO_LIST, msg, e);
         }
 
         return sections;

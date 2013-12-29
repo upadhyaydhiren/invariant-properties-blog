@@ -22,6 +22,11 @@
  */
 package com.invariantproperties.sandbox.student.business;
 
+import static com.invariantproperties.sandbox.student.business.PersistenceException.Type.UNABLE_TO_COUNT;
+import static com.invariantproperties.sandbox.student.business.PersistenceException.Type.UNABLE_TO_FIND_BY_EMAIL_ADDRESS;
+import static com.invariantproperties.sandbox.student.business.PersistenceException.Type.UNABLE_TO_FIND_BY_ID;
+import static com.invariantproperties.sandbox.student.business.PersistenceException.Type.UNABLE_TO_FIND_BY_UUID;
+import static com.invariantproperties.sandbox.student.business.PersistenceException.Type.UNABLE_TO_LIST;
 import static com.invariantproperties.sandbox.student.specification.InstructorSpecifications.testRunIs;
 
 import java.util.List;
@@ -45,7 +50,9 @@ import com.invariantproperties.sandbox.student.repository.InstructorRepository;
  */
 @Service
 public class InstructorFinderServiceImpl implements InstructorFinderService {
-    private static final Logger log = LoggerFactory.getLogger(InstructorFinderServiceImpl.class);
+    private static final Logger LOG = LoggerFactory.getLogger(InstructorFinderServiceImpl.class);
+    private static final String INSTRUCTOR = "instructor";
+    private static final String INSTRUCTORS = "instructors";
 
     @Resource
     private InstructorRepository instructorRepository;
@@ -84,11 +91,13 @@ public class InstructorFinderServiceImpl implements InstructorFinderService {
         long count = 0;
         try {
             count = instructorRepository.count(testRunIs(testRun));
+        } catch (UnitTestException e) {
+            String msg = UNABLE_TO_COUNT.format(INSTRUCTORS) + testRun;
+            throw new PersistenceException(UNABLE_TO_COUNT, msg, e, 0);
         } catch (DataAccessException e) {
-            if (!(e instanceof UnitTestException)) {
-                log.info("internal error retrieving classroom count by " + testRun, e);
-            }
-            throw new PersistenceException("unable to count classrooms by " + testRun, e, 0);
+            String msg = UNABLE_TO_COUNT.format(INSTRUCTORS) + testRun;
+            LOG.info(msg);
+            throw new PersistenceException(UNABLE_TO_COUNT, msg, e, 0);
         }
 
         return count;
@@ -114,11 +123,13 @@ public class InstructorFinderServiceImpl implements InstructorFinderService {
         Instructor instructor = null;
         try {
             instructor = instructorRepository.findOne(id);
+        } catch (UnitTestException e) {
+            String msg = UNABLE_TO_FIND_BY_ID.format(INSTRUCTOR);
+            throw new PersistenceException(UNABLE_TO_FIND_BY_ID, msg, e, id);
         } catch (DataAccessException e) {
-            if (!(e instanceof UnitTestException)) {
-                log.info("internal error retrieving instructor: " + id, e);
-            }
-            throw new PersistenceException("unable to find instructor by id", e, id);
+            String msg = UNABLE_TO_FIND_BY_ID.format(INSTRUCTOR);
+            LOG.info(msg);
+            throw new PersistenceException(UNABLE_TO_FIND_BY_ID, msg, e, id);
         }
 
         if (instructor == null) {
@@ -138,11 +149,13 @@ public class InstructorFinderServiceImpl implements InstructorFinderService {
         Instructor instructor = null;
         try {
             instructor = instructorRepository.findInstructorByUuid(uuid);
+        } catch (UnitTestException e) {
+            String msg = UNABLE_TO_FIND_BY_UUID.format(INSTRUCTOR);
+            throw new PersistenceException(UNABLE_TO_FIND_BY_UUID, msg, e, uuid);
         } catch (DataAccessException e) {
-            if (!(e instanceof UnitTestException)) {
-                log.info("internal error retrieving instructor: " + uuid, e);
-            }
-            throw new PersistenceException("unable to find instructor by uuid", e, uuid);
+            String msg = UNABLE_TO_FIND_BY_UUID.format(INSTRUCTOR);
+            LOG.info(msg);
+            throw new PersistenceException(UNABLE_TO_FIND_BY_UUID, msg, e, uuid);
         }
 
         if (instructor == null) {
@@ -163,11 +176,13 @@ public class InstructorFinderServiceImpl implements InstructorFinderService {
 
         try {
             instructors = instructorRepository.findAll(testRunIs(testRun));
+        } catch (UnitTestException e) {
+            String msg = UNABLE_TO_LIST.format(INSTRUCTORS);
+            throw new PersistenceException(UNABLE_TO_LIST, msg, e);
         } catch (DataAccessException e) {
-            if (!(e instanceof UnitTestException)) {
-                log.info("error loading list of instructors: " + e.getMessage(), e);
-            }
-            throw new PersistenceException("unable to get list of instructors.", e);
+            String msg = UNABLE_TO_LIST.format(INSTRUCTORS);
+            LOG.info(msg);
+            throw new PersistenceException(UNABLE_TO_LIST, msg, e);
         }
 
         return instructors;
@@ -183,11 +198,13 @@ public class InstructorFinderServiceImpl implements InstructorFinderService {
         Instructor instructor = null;
         try {
             instructor = instructorRepository.findInstructorByEmailAddress(emailAddress);
+        } catch (UnitTestException e) {
+            String msg = UNABLE_TO_FIND_BY_UUID.format(INSTRUCTOR);
+            throw new PersistenceException(UNABLE_TO_FIND_BY_EMAIL_ADDRESS, msg, e, emailAddress);
         } catch (DataAccessException e) {
-            if (!(e instanceof UnitTestException)) {
-                log.info("internal error retrieving instructor: " + emailAddress, e);
-            }
-            throw new PersistenceException("unable to find instructor by email address", e, emailAddress);
+            String msg = UNABLE_TO_FIND_BY_UUID.format(INSTRUCTOR);
+            LOG.info(msg);
+            throw new PersistenceException(UNABLE_TO_FIND_BY_EMAIL_ADDRESS, msg, e, emailAddress);
         }
 
         if (instructor == null) {

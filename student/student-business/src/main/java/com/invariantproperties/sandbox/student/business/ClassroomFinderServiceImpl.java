@@ -22,6 +22,10 @@
  */
 package com.invariantproperties.sandbox.student.business;
 
+import static com.invariantproperties.sandbox.student.business.PersistenceException.Type.UNABLE_TO_COUNT;
+import static com.invariantproperties.sandbox.student.business.PersistenceException.Type.UNABLE_TO_FIND_BY_ID;
+import static com.invariantproperties.sandbox.student.business.PersistenceException.Type.UNABLE_TO_FIND_BY_UUID;
+import static com.invariantproperties.sandbox.student.business.PersistenceException.Type.UNABLE_TO_LIST;
 import static com.invariantproperties.sandbox.student.specification.ClassroomSpecifications.testRunIs;
 
 import java.util.List;
@@ -45,7 +49,9 @@ import com.invariantproperties.sandbox.student.repository.ClassroomRepository;
  */
 @Service
 public class ClassroomFinderServiceImpl implements ClassroomFinderService {
-    private static final Logger log = LoggerFactory.getLogger(ClassroomFinderServiceImpl.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ClassroomFinderServiceImpl.class);
+    private static final String CLASSROOM = "classroom";
+    private static final String CLASSROOMS = "classrooms";
 
     @Resource
     private ClassroomRepository classroomRepository;
@@ -84,11 +90,13 @@ public class ClassroomFinderServiceImpl implements ClassroomFinderService {
         long count = 0;
         try {
             count = classroomRepository.count(testRunIs(testRun));
+        } catch (UnitTestException e) {
+            final String msg = UNABLE_TO_COUNT.format(CLASSROOMS) + testRun;
+            throw new PersistenceException(UNABLE_TO_COUNT, msg, e, 0);
         } catch (DataAccessException e) {
-            if (!(e instanceof UnitTestException)) {
-                log.info("internal error retrieving classroom count by " + testRun, e);
-            }
-            throw new PersistenceException("unable to count classrooms by " + testRun, e, 0);
+            final String msg = UNABLE_TO_COUNT.format(CLASSROOMS) + testRun;
+            LOG.info(msg);
+            throw new PersistenceException(UNABLE_TO_COUNT, msg, e, 0);
         }
 
         return count;
@@ -114,11 +122,13 @@ public class ClassroomFinderServiceImpl implements ClassroomFinderService {
         Classroom classroom = null;
         try {
             classroom = classroomRepository.findOne(id);
+        } catch (UnitTestException e) {
+            final String msg = UNABLE_TO_FIND_BY_ID.format(CLASSROOM);
+            throw new PersistenceException(UNABLE_TO_FIND_BY_ID, msg, e, id);
         } catch (DataAccessException e) {
-            if (!(e instanceof UnitTestException)) {
-                log.info("internal error retrieving classroom: " + id, e);
-            }
-            throw new PersistenceException("unable to find classroom by id", e, id);
+            final String msg = UNABLE_TO_FIND_BY_ID.format(CLASSROOM);
+            LOG.info(msg);
+            throw new PersistenceException(UNABLE_TO_FIND_BY_ID, msg, e, id);
         }
 
         if (classroom == null) {
@@ -138,11 +148,13 @@ public class ClassroomFinderServiceImpl implements ClassroomFinderService {
         Classroom classroom = null;
         try {
             classroom = classroomRepository.findClassroomByUuid(uuid);
+        } catch (UnitTestException e) {
+            final String msg = UNABLE_TO_FIND_BY_UUID.format(CLASSROOM);
+            throw new PersistenceException(UNABLE_TO_FIND_BY_UUID, msg, e, uuid);
         } catch (DataAccessException e) {
-            if (!(e instanceof UnitTestException)) {
-                log.info("internal error retrieving classroom: " + uuid, e);
-            }
-            throw new PersistenceException("unable to find classroom by uuid", e, uuid);
+            final String msg = UNABLE_TO_FIND_BY_UUID.format(CLASSROOM);
+            LOG.info(msg);
+            throw new PersistenceException(UNABLE_TO_FIND_BY_UUID, msg, e, uuid);
         }
 
         if (classroom == null) {
@@ -163,11 +175,13 @@ public class ClassroomFinderServiceImpl implements ClassroomFinderService {
 
         try {
             classrooms = classroomRepository.findAll(testRunIs(testRun));
+        } catch (UnitTestException e) {
+            final String msg = UNABLE_TO_LIST.format(CLASSROOMS);
+            throw new PersistenceException(UNABLE_TO_LIST, msg, e);
         } catch (DataAccessException e) {
-            if (!(e instanceof UnitTestException)) {
-                log.info("error loading list of classrooms: " + e.getMessage(), e);
-            }
-            throw new PersistenceException("unable to get list of classrooms.", e);
+            final String msg = UNABLE_TO_LIST.format(CLASSROOMS);
+            LOG.info(msg);
+            throw new PersistenceException(UNABLE_TO_LIST, msg, e);
         }
 
         return classrooms;

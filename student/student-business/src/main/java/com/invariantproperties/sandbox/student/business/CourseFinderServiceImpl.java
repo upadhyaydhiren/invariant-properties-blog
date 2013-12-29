@@ -22,6 +22,10 @@
  */
 package com.invariantproperties.sandbox.student.business;
 
+import static com.invariantproperties.sandbox.student.business.PersistenceException.Type.UNABLE_TO_COUNT;
+import static com.invariantproperties.sandbox.student.business.PersistenceException.Type.UNABLE_TO_FIND_BY_ID;
+import static com.invariantproperties.sandbox.student.business.PersistenceException.Type.UNABLE_TO_FIND_BY_UUID;
+import static com.invariantproperties.sandbox.student.business.PersistenceException.Type.UNABLE_TO_LIST;
 import static com.invariantproperties.sandbox.student.specification.CourseSpecifications.testRunIs;
 
 import java.util.List;
@@ -45,7 +49,9 @@ import com.invariantproperties.sandbox.student.repository.CourseRepository;
  */
 @Service
 public class CourseFinderServiceImpl implements CourseFinderService {
-    private static final Logger log = LoggerFactory.getLogger(CourseFinderServiceImpl.class);
+    private static final Logger LOG = LoggerFactory.getLogger(CourseFinderServiceImpl.class);
+    private static final String COURSE = "course";
+    private static final String COURSES = "courses";
 
     @Resource
     private CourseRepository courseRepository;
@@ -84,11 +90,13 @@ public class CourseFinderServiceImpl implements CourseFinderService {
         long count = 0;
         try {
             count = courseRepository.count(testRunIs(testRun));
+        } catch (UnitTestException e) {
+            final String msg = UNABLE_TO_COUNT.format(COURSES) + testRun;
+            throw new PersistenceException(UNABLE_TO_COUNT, msg, e);
         } catch (DataAccessException e) {
-            if (!(e instanceof UnitTestException)) {
-                log.info("internal error retrieving classroom count by " + testRun, e);
-            }
-            throw new PersistenceException("unable to count classrooms by " + testRun, e, 0);
+            final String msg = UNABLE_TO_COUNT.format(COURSES) + testRun;
+            LOG.info(msg);
+            throw new PersistenceException(UNABLE_TO_COUNT, msg, e);
         }
 
         return count;
@@ -114,11 +122,13 @@ public class CourseFinderServiceImpl implements CourseFinderService {
         Course course = null;
         try {
             course = courseRepository.findOne(id);
+        } catch (UnitTestException e) {
+            final String msg = UNABLE_TO_FIND_BY_ID.format(COURSE);
+            throw new PersistenceException(UNABLE_TO_FIND_BY_ID, msg, e, id);
         } catch (DataAccessException e) {
-            if (!(e instanceof UnitTestException)) {
-                log.info("internal error retrieving course: " + id, e);
-            }
-            throw new PersistenceException("unable to find course by id", e, id);
+            final String msg = UNABLE_TO_FIND_BY_ID.format(COURSE);
+            LOG.info(msg);
+            throw new PersistenceException(UNABLE_TO_FIND_BY_ID, msg, e, id);
         }
 
         if (course == null) {
@@ -138,11 +148,13 @@ public class CourseFinderServiceImpl implements CourseFinderService {
         Course course = null;
         try {
             course = courseRepository.findCourseByUuid(uuid);
+        } catch (UnitTestException e) {
+            final String msg = UNABLE_TO_FIND_BY_UUID.format(COURSE);
+            throw new PersistenceException(UNABLE_TO_FIND_BY_UUID, msg, e, uuid);
         } catch (DataAccessException e) {
-            if (!(e instanceof UnitTestException)) {
-                log.info("internal error retrieving course: " + uuid, e);
-            }
-            throw new PersistenceException("unable to find course by uuid", e, uuid);
+            final String msg = UNABLE_TO_FIND_BY_UUID.format(COURSE);
+            LOG.info(msg);
+            throw new PersistenceException(UNABLE_TO_FIND_BY_UUID, msg, e, uuid);
         }
 
         if (course == null) {
@@ -163,11 +175,13 @@ public class CourseFinderServiceImpl implements CourseFinderService {
 
         try {
             courses = courseRepository.findAll(testRunIs(testRun));
+        } catch (UnitTestException e) {
+            final String msg = UNABLE_TO_LIST.format(COURSES);
+            throw new PersistenceException(UNABLE_TO_LIST, msg, e);
         } catch (DataAccessException e) {
-            if (!(e instanceof UnitTestException)) {
-                log.info("error loading list of courses: " + e.getMessage(), e);
-            }
-            throw new PersistenceException("unable to get list of courses.", e);
+            final String msg = UNABLE_TO_LIST.format(COURSES);
+            LOG.info(msg);
+            throw new PersistenceException(UNABLE_TO_LIST, msg, e);
         }
 
         return courses;

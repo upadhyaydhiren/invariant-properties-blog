@@ -22,6 +22,11 @@
  */
 package com.invariantproperties.sandbox.student.business;
 
+import static com.invariantproperties.sandbox.student.business.PersistenceException.Type.UNABLE_TO_CREATE;
+import static com.invariantproperties.sandbox.student.business.PersistenceException.Type.UNABLE_TO_CREATE_FOR_TESTING;
+import static com.invariantproperties.sandbox.student.business.PersistenceException.Type.UNABLE_TO_DELETE;
+import static com.invariantproperties.sandbox.student.business.PersistenceException.Type.UNABLE_TO_UPDATE;
+
 import javax.annotation.Resource;
 
 import org.slf4j.Logger;
@@ -41,7 +46,9 @@ import com.invariantproperties.sandbox.student.repository.TermRepository;
  */
 @Service
 public class TermManagerServiceImpl implements TermManagerService {
-    private static final Logger log = LoggerFactory.getLogger(TermManagerServiceImpl.class);
+    private static final Logger LOG = LoggerFactory.getLogger(TermManagerServiceImpl.class);
+    private static final String TERM = "term";
+    private static final String COULD_NOT_FIND_MESSAGE = "could not find term: ";
 
     @Resource
     private TermRepository termRepository;
@@ -61,7 +68,7 @@ public class TermManagerServiceImpl implements TermManagerService {
     }
 
     /**
-     * @see com.invariantproperties.sandbox.student.business.TermFinderService#
+     * @see com.invariantproperties.sandbox.term.business.TermFinderService#
      *      createTerm(java.lang.String)
      */
     @Transactional
@@ -73,20 +80,22 @@ public class TermManagerServiceImpl implements TermManagerService {
         Term actual = null;
         try {
             actual = termRepository.saveAndFlush(term);
+        } catch (UnitTestException e) {
+            final String msg = UNABLE_TO_CREATE.format(TERM);
+            throw new PersistenceException(UNABLE_TO_CREATE, msg, e);
         } catch (DataAccessException e) {
-            if (!(e instanceof UnitTestException)) {
-                log.info("internal error retrieving term: " + name, e);
-            }
-            throw new PersistenceException("unable to create term", e);
+            final String msg = UNABLE_TO_CREATE.format(TERM);
+            LOG.info(msg);
+            throw new PersistenceException(UNABLE_TO_CREATE, msg, e);
         }
 
         return actual;
     }
 
     /**
-     * @see com.invariantproperties.sandbox.student.business.TermFinderService#
+     * @see com.invariantproperties.sandbox.term.business.TermFinderService#
      *      createTermForTesting(java.lang.String,
-     *      com.invariantproperties.sandbox.student.common.TestRun)
+     *      com.invariantproperties.sandbox.term.common.TestRun)
      */
     @Transactional
     @Override
@@ -98,11 +107,13 @@ public class TermManagerServiceImpl implements TermManagerService {
         Term actual = null;
         try {
             actual = termRepository.saveAndFlush(term);
+        } catch (UnitTestException e) {
+            final String msg = UNABLE_TO_CREATE_FOR_TESTING.format(TERM);
+            throw new PersistenceException(UNABLE_TO_CREATE_FOR_TESTING, msg, e);
         } catch (DataAccessException e) {
-            if (!(e instanceof UnitTestException)) {
-                log.info("internal error retrieving term: " + name, e);
-            }
-            throw new PersistenceException("unable to create term", e);
+            final String msg = UNABLE_TO_CREATE_FOR_TESTING.format(TERM);
+            LOG.info(msg);
+            throw new PersistenceException(UNABLE_TO_CREATE_FOR_TESTING, msg, e);
         }
 
         return actual;
@@ -121,7 +132,7 @@ public class TermManagerServiceImpl implements TermManagerService {
             final Term actual = termRepository.findTermByUuid(term.getUuid());
 
             if (actual == null) {
-                log.debug("did not find term: " + term.getUuid());
+                LOG.debug(COULD_NOT_FIND_MESSAGE + term.getUuid());
                 throw new ObjectNotFoundException(term.getUuid());
             }
 
@@ -129,18 +140,20 @@ public class TermManagerServiceImpl implements TermManagerService {
             updated = termRepository.saveAndFlush(actual);
             term.setName(name);
 
+        } catch (UnitTestException e) {
+            final String msg = UNABLE_TO_UPDATE.format(TERM);
+            throw new PersistenceException(UNABLE_TO_UPDATE, msg, e);
         } catch (DataAccessException e) {
-            if (!(e instanceof UnitTestException)) {
-                log.info("internal error deleting term: " + term.getUuid(), e);
-            }
-            throw new PersistenceException("unable to delete term", e, term.getUuid());
+            final String msg = UNABLE_TO_UPDATE.format(TERM);
+            LOG.info(msg);
+            throw new PersistenceException(UNABLE_TO_UPDATE, msg, e);
         }
 
         return updated;
     }
 
     /**
-     * @see com.invariantproperties.sandbox.student.business.TermFinderService#
+     * @see com.invariantproperties.sandbox.term.business.TermFinderService#
      *      deleteTerm(java.lang.String, java.lang.Integer)
      */
     @Transactional
@@ -151,16 +164,18 @@ public class TermManagerServiceImpl implements TermManagerService {
             term = termRepository.findTermByUuid(uuid);
 
             if (term == null) {
-                log.debug("did not find term: " + uuid);
+                LOG.debug(COULD_NOT_FIND_MESSAGE + uuid);
                 throw new ObjectNotFoundException(uuid);
             }
             termRepository.delete(term);
 
+        } catch (UnitTestException e) {
+            final String msg = UNABLE_TO_DELETE.format(TERM);
+            throw new PersistenceException(UNABLE_TO_DELETE, msg, e);
         } catch (DataAccessException e) {
-            if (!(e instanceof UnitTestException)) {
-                log.info("internal error deleting term: " + uuid, e);
-            }
-            throw new PersistenceException("unable to delete term", e, uuid);
+            final String msg = UNABLE_TO_DELETE.format(TERM);
+            LOG.info(msg);
+            throw new PersistenceException(UNABLE_TO_DELETE, msg, e);
         }
     }
 }

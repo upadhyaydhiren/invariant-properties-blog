@@ -22,6 +22,9 @@
  */
 package com.invariantproperties.sandbox.student.business;
 
+import static com.invariantproperties.sandbox.student.business.PersistenceException.Type.UNABLE_TO_COUNT;
+import static com.invariantproperties.sandbox.student.business.PersistenceException.Type.UNABLE_TO_FIND_BY_ID;
+import static com.invariantproperties.sandbox.student.business.PersistenceException.Type.UNABLE_TO_FIND_BY_UUID;
 import static com.invariantproperties.sandbox.student.specification.TermSpecifications.testRunIs;
 
 import java.util.List;
@@ -45,7 +48,9 @@ import com.invariantproperties.sandbox.student.repository.TermRepository;
  */
 @Service
 public class TermFinderServiceImpl implements TermFinderService {
-    private static final Logger log = LoggerFactory.getLogger(TermFinderServiceImpl.class);
+    private static final Logger LOG = LoggerFactory.getLogger(TermFinderServiceImpl.class);
+    private static final String TERM = "term";
+    private static final String TERMS = "terms";
 
     @Resource
     private TermRepository termRepository;
@@ -84,11 +89,13 @@ public class TermFinderServiceImpl implements TermFinderService {
         long count = 0;
         try {
             count = termRepository.count(testRunIs(testRun));
+        } catch (UnitTestException e) {
+            final String msg = UNABLE_TO_COUNT.format(TERMS) + testRun;
+            throw new PersistenceException(UNABLE_TO_COUNT, msg, e, 0);
         } catch (DataAccessException e) {
-            if (!(e instanceof UnitTestException)) {
-                log.info("internal error retrieving classroom count by " + testRun, e);
-            }
-            throw new PersistenceException("unable to count classrooms by " + testRun, e, 0);
+            final String msg = UNABLE_TO_COUNT.format(TERMS) + testRun;
+            LOG.info(msg);
+            throw new PersistenceException(UNABLE_TO_COUNT, msg, e, 0);
         }
 
         return count;
@@ -114,11 +121,13 @@ public class TermFinderServiceImpl implements TermFinderService {
         Term term = null;
         try {
             term = termRepository.findOne(id);
+        } catch (UnitTestException e) {
+            final String msg = UNABLE_TO_FIND_BY_ID.format(TERM);
+            throw new PersistenceException(UNABLE_TO_FIND_BY_ID, msg, e, id);
         } catch (DataAccessException e) {
-            if (!(e instanceof UnitTestException)) {
-                log.info("internal error retrieving term: " + id, e);
-            }
-            throw new PersistenceException("unable to find term by id", e, id);
+            final String msg = UNABLE_TO_FIND_BY_ID.format(TERM);
+            LOG.info(msg);
+            throw new PersistenceException(UNABLE_TO_FIND_BY_ID, msg, e, id);
         }
 
         if (term == null) {
@@ -138,11 +147,13 @@ public class TermFinderServiceImpl implements TermFinderService {
         Term term = null;
         try {
             term = termRepository.findTermByUuid(uuid);
+        } catch (UnitTestException e) {
+            final String msg = UNABLE_TO_FIND_BY_UUID.format(TERM);
+            throw new PersistenceException(UNABLE_TO_FIND_BY_UUID, msg, e, uuid);
         } catch (DataAccessException e) {
-            if (!(e instanceof UnitTestException)) {
-                log.info("internal error retrieving term: " + uuid, e);
-            }
-            throw new PersistenceException("unable to find term by uuid", e, uuid);
+            final String msg = UNABLE_TO_FIND_BY_UUID.format(TERM);
+            LOG.info(msg);
+            throw new PersistenceException(UNABLE_TO_FIND_BY_UUID, msg, e, uuid);
         }
 
         if (term == null) {
@@ -163,11 +174,13 @@ public class TermFinderServiceImpl implements TermFinderService {
 
         try {
             terms = termRepository.findAll(testRunIs(testRun));
+        } catch (UnitTestException e) {
+            final String msg = UNABLE_TO_COUNT.format(TERMS);
+            throw new PersistenceException(UNABLE_TO_COUNT, msg, e);
         } catch (DataAccessException e) {
-            if (!(e instanceof UnitTestException)) {
-                log.info("error loading list of terms: " + e.getMessage(), e);
-            }
-            throw new PersistenceException("unable to get list of terms.", e);
+            final String msg = UNABLE_TO_COUNT.format(TERMS);
+            LOG.info(msg);
+            throw new PersistenceException(UNABLE_TO_COUNT, msg, e);
         }
 
         return terms;
