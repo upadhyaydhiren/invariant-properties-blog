@@ -5,16 +5,23 @@
 	<parent>
 		<artifactId>student-maintenance</artifactId>
 		<groupId>com.invariantproperties.sandbox.student</groupId>
-		<version>0.0.2-SNAPSHOT</version>
+		<version>0.0.3-SNAPSHOT</version>
 	</parent>
-	<groupId>com.invariantproperties.sandbox.student</groupId>
 	<artifactId>student-maintenance-webapp</artifactId>
-	<version>0.0.2-SNAPSHOT</version>
 	<packaging>war</packaging>
 
-	<name>student-maintenance-webapp Tapestry 5 Application</name>
+	<name>Project Student: maintenance webapp</name>
 
 	<dependencies>
+		<dependency>
+			<groupId>com.invariantproperties.sandbox.student</groupId>
+			<artifactId>student-common</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.invariantproperties.sandbox.student</groupId>
+			<artifactId>student-ws-client</artifactId>
+		</dependency>
+
 		<!-- Too set up an application with a database, change the artifactId below 
 			to tapestry-hibernate, and add a dependency on your JDBC driver. You'll also 
 			need to add Hibernate configuration files, such as hibernate.cfg.xml. -->

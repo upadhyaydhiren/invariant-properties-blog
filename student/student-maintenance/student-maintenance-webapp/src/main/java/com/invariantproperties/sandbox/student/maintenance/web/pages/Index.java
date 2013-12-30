@@ -1,4 +1,4 @@
-package com.invariantproperties.sandbox.student.maintenance.pages;
+package com.invariantproperties.sandbox.student.maintenance.web.pages;
 
 import java.util.Date;
 import org.apache.tapestry5.annotations.*;

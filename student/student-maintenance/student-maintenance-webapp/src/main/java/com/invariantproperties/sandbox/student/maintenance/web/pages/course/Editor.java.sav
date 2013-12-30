@@ -1,0 +1,394 @@
+/*
+ * This code was written by Bear Giles <bgiles@coyotesong.com> and he
+ * licenses this file to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance with the
+ * License.  You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Any contributions made by others are licensed to this project under
+ * one or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.
+ * 
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ * 
+ * Copyright (c) 2013 Bear Giles <bgiles@coyotesong.com>
+ */
+package com.invariantproperties.sandbox.student.maintenance.web.pages.course;
+
+import java.text.Format;
+import java.text.SimpleDateFormat;
+
+import org.apache.tapestry5.ComponentResources;
+import org.apache.tapestry5.PersistenceConstants;
+import org.apache.tapestry5.annotations.Component;
+import org.apache.tapestry5.annotations.Events;
+import org.apache.tapestry5.annotations.Parameter;
+import org.apache.tapestry5.annotations.Persist;
+import org.apache.tapestry5.annotations.Property;
+import org.apache.tapestry5.ioc.Messages;
+import org.apache.tapestry5.ioc.annotations.Inject;
+
+import com.invariantproperties.sandbox.student.business.CourseFinderService;
+import com.invariantproperties.sandbox.student.business.CourseManagerService;
+import com.invariantproperties.sandbox.student.domain.Course;
+import com.invariantproperties.sandbox.student.maintenance.util.ExceptionUtil;
+import com.invariantproperties.sandbox.student.maintenance.web.components.CustomForm;
+
+/**
+ * This component will trigger the following events on its container (which in
+ * this example is the page):
+ * {@link jumpstart.web.components.examples.component.crud.Editor#CANCEL_CREATE}
+ * ,
+ * {@link jumpstart.web.components.examples.component.crud.Editor#SUCCESSFUL_CREATE}
+ * (Long courseUuid),
+ * {@link jumpstart.web.components.examples.component.crud.Editor#FAILED_CREATE}
+ * , {@link jumpstart.web.components.examples.component.crud.Editor#TO_UPDATE}
+ * (Long courseUuid),
+ * {@link jumpstart.web.components.examples.component.crud.Editor#SUCCESSFUL_UPDATE}
+ * (Long courseUuid),
+ * {@link jumpstart.web.components.examples.component.crud.Editor#FAILED_UPDATE}
+ * (Long courseUuid),
+ * {@link jumpstart.web.components.examples.component.crud.Editor#SUCCESSFUL_DELETE}
+ * (Long courseUuid),
+ * {@link jumpstart.web.components.examples.component.crud.Editor#FAILED_DELETE}
+ * (Long courseUuid).
+ */
+// @Events is applied to a component solely to document what events it may
+// trigger. It is not checked at runtime.
+@Events({ Editor.CANCEL_CREATE, Editor.SUCCESSFUL_CREATE, Editor.FAILED_CREATE, Editor.TO_UPDATE, Editor.CANCEL_UPDATE,
+        Editor.SUCCESSFUL_UPDATE, Editor.FAILED_UPDATE, Editor.SUCCESFUL_DELETE, Editor.FAILED_DELETE })
+public class Editor {
+    public static final String CANCEL_CREATE = "cancelCreate";
+    public static final String SUCCESSFUL_CREATE = "successfulCreate";
+    public static final String FAILED_CREATE = "failedCreate";
+    public static final String TO_UPDATE = "toUpdate";
+    public static final String CANCEL_UPDATE = "cancelUpdate";
+    public static final String SUCCESSFUL_UPDATE = "successfulUpdate";
+    public static final String FAILED_UPDATE = "failedUpdate";
+    public static final String SUCCESFUL_DELETE = "successfulDelete";
+    public static final String FAILED_DELETE = "failedDelete";
+
+    private final String demoModeStr = System.getProperty("jumpstart.demo-mode");
+
+    public enum Mode {
+        CREATE, REVIEW, UPDATE;
+    }
+
+    // Parameters
+
+    @Parameter
+    // @Parameter(required = true)
+    @Property
+    private Mode mode = Mode.CREATE;
+
+    @Parameter
+    // @Parameter(required = true)
+    @Property
+    private String courseUuid;
+
+    // Screen fields
+
+    @Property
+    private Course course;
+
+    @Property
+    @Persist(PersistenceConstants.FLASH)
+    private String deleteMessage;
+
+    // Work fields
+
+    // This carries version through the redirect that follows a server-side
+    // validation failure.
+    @Persist(PersistenceConstants.FLASH)
+    private Integer versionFlash;
+
+    // Generally useful bits and pieces
+
+    @Inject
+    private CourseFinderService courseFinderService;
+
+    @Inject
+    private CourseManagerService courseManagerService;
+
+    @Component
+    private CustomForm createForm;
+
+    @Component
+    private CustomForm updateForm;
+
+    @Inject
+    private ComponentResources componentResources;
+
+    @Inject
+    private Messages messages;
+
+    // The code
+
+    // setupRender() is called by Tapestry right before it starts rendering the
+    // component.
+
+    void setupRender() {
+
+        if (mode == Mode.REVIEW) {
+            if (courseUuid == null) {
+                course = null;
+                // Handle null course in the template.
+            } else {
+                if (course == null) {
+                    course = courseFinderService.findCourse(courseUuid);
+                    // Handle null course in the template.
+                }
+            }
+        }
+
+    }
+
+    // /////////////////////////////////////////////////////////////////////
+    // CREATE
+    // /////////////////////////////////////////////////////////////////////
+
+    // Handle event "cancelCreate"
+
+    boolean onCancelCreate() {
+        // Return false, which means we haven't handled the event so bubble it
+        // up.
+        // This method is here solely as documentation, because without this
+        // method the event would bubble up anyway.
+        return false;
+    }
+
+    // Component "createForm" bubbles up the PREPARE event when it is rendered
+    // or submitted
+
+    void onPrepareFromCreateForm() throws Exception {
+        // Instantiate a Course for the form data to overlay.
+        course = new Course();
+    }
+
+    // Component "createForm" bubbles up the VALIDATE event when it is submitted
+
+    void onValidateFromCreateForm() {
+
+        if (createForm.getHasErrors()) {
+            // We get here only if a server-side validator detected an error.
+            return;
+        }
+
+        if (demoModeStr != null && demoModeStr.equals("true")) {
+            createForm.recordError("Sorry, but Create is not allowed in Demo mode.");
+            return;
+        }
+
+        try {
+            course = courseManagerService.createCourse(course);
+        } catch (Exception e) {
+            // Display the cause. In a real system we would try harder to get a
+            // user-friendly message.
+            createForm.recordError(ExceptionUtil.getRootCauseMessage(e));
+        }
+    }
+
+    // Component "createForm" bubbles up SUCCESS or FAILURE when it is
+    // submitted, depending on whether VALIDATE
+    // records an error
+
+    boolean onSuccessFromCreateForm() {
+        // We want to tell our containing page explicitly what course we've
+        // created, so we trigger new event
+        // "successfulCreate" with a parameter. It will bubble up because we
+        // don't have a handler method for it.
+        componentResources.triggerEvent(SUCCESSFUL_CREATE, new Object[] { course.getId() }, null);
+        // We don't want "success" to bubble up, so we return true to say we've
+        // handled it.
+        return true;
+    }
+
+    boolean onFailureFromCreateForm() {
+        // Rather than letting "failure" bubble up which doesn't say what you
+        // were trying to do, we trigger new event
+        // "failedCreate". It will bubble up because we don't have a handler
+        // method for it.
+        componentResources.triggerEvent(FAILED_CREATE, null, null);
+        // We don't want "failure" to bubble up, so we return true to say we've
+        // handled it.
+        return true;
+    }
+
+    // /////////////////////////////////////////////////////////////////////
+    // REVIEW
+    // /////////////////////////////////////////////////////////////////////
+
+    // /////////////////////////////////////////////////////////////////////
+    // UPDATE
+    // /////////////////////////////////////////////////////////////////////
+
+    // Handle event "toUpdate"
+
+    boolean onToUpdate(String courseUuid) {
+        // Return false, which means we haven't handled the event so bubble it
+        // up.
+        // This method is here solely as documentation, because without this
+        // method the event would bubble up anyway.
+        return false;
+    }
+
+    // Handle event "cancelUpdate"
+
+    boolean onCancelUpdate(String courseUuid) {
+        // Return false, which means we haven't handled the event so bubble it
+        // up.
+        // This method is here solely as documentation, because without this
+        // method the event would bubble up anyway.
+        return false;
+    }
+
+    // Component "updateForm" bubbles up the PREPARE_FOR_RENDER event during
+    // form render
+
+    void onPrepareForRenderFromUpdateForm() {
+        course = courseFinderService.findCourse(courseUuid);
+        // Handle null course in the template.
+
+        // If the form has errors then we're redisplaying after a redirect.
+        // Form will restore your input values but it's up to us to restore
+        // Hidden values.
+
+        if (updateForm.getHasErrors()) {
+            if (course != null) {
+                course.setVersion(versionFlash);
+            }
+        }
+    }
+
+    // Component "updateForm" bubbles up the PREPARE_FOR_SUBMIT event during for
+    // submission
+
+    void onPrepareForSubmitFromUpdateForm() {
+        // Get objects for the form fields to overlay.
+        course = courseFinderService.findCourse(courseUuid);
+
+        if (course == null) {
+            course = new Course();
+            updateForm.recordError("Course has been deleted by another process.");
+        }
+    }
+
+    // Component "updateForm" bubbles up the VALIDATE event when it is submitted
+
+    void onValidateFromUpdateForm() {
+
+        if (updateForm.getHasErrors()) {
+            // We get here only if a server-side validator detected an error.
+            return;
+        }
+
+        try {
+            courseManagerService.updateCourse(course);
+        } catch (Exception e) {
+            // Display the cause. In a real system we would try harder to get a
+            // user-friendly message.
+            updateForm.recordError(ExceptionUtil.getRootCauseMessage(e));
+        }
+    }
+
+    // Component "updateForm" bubbles up SUCCESS or FAILURE when it is
+    // submitted, depending on whether VALIDATE
+    // records an error
+
+    boolean onSuccessFromUpdateForm() {
+        // We want to tell our containing page explicitly what course we've
+        // updated, so we trigger new event
+        // "successfulUpdate" with a parameter. It will bubble up because we
+        // don't have a handler method for it.
+        componentResources.triggerEvent(SUCCESSFUL_UPDATE, new Object[] { courseUuid }, null);
+        // We don't want "success" to bubble up, so we return true to say we've
+        // handled it.
+        return true;
+    }
+
+    boolean onFailureFromUpdateForm() {
+        versionFlash = course.getVersion();
+
+        // Rather than letting "failure" bubble up which doesn't say what you
+        // were trying to do, we trigger new event
+        // "failedUpdate". It will bubble up because we don't have a handler
+        // method for it.
+        componentResources.triggerEvent(FAILED_UPDATE, new Object[] { courseUuid }, null);
+        // We don't want "failure" to bubble up, so we return true to say we've
+        // handled it.
+        return true;
+    }
+
+    // /////////////////////////////////////////////////////////////////////
+    // DELETE
+    // /////////////////////////////////////////////////////////////////////
+
+    // Handle event "delete"
+
+    boolean onDelete(String courseUuid, Integer courseVersion) {
+        this.courseUuid = courseUuid;
+
+        if (demoModeStr != null && demoModeStr.equals("true")) {
+            deleteMessage = "Sorry, but Delete is not allowed in Demo mode.";
+
+            // Trigger new event "failedDelete" which will bubble up.
+            componentResources.triggerEvent(FAILED_DELETE, new Object[] { courseUuid }, null);
+            // We don't want "delete" to bubble up, so we return true to say
+            // we've handled it.
+            return true;
+        }
+
+        try {
+            courseManagerService.deleteCourse(courseUuid, courseVersion);
+        } catch (Exception e) {
+            // Display the cause. In a real system we would try harder to get a
+            // user-friendly message.
+            deleteMessage = ExceptionUtil.getRootCauseMessage(e);
+
+            // Trigger new event "failedDelete" which will bubble up.
+            componentResources.triggerEvent(FAILED_DELETE, new Object[] { courseUuid }, null);
+            // We don't want "delete" to bubble up, so we return true to say
+            // we've handled it.
+            return true;
+        }
+
+        // Trigger new event "successfulDelete" which will bubble up.
+        componentResources.triggerEvent(SUCCESFUL_DELETE, new Object[] { courseUuid }, null);
+        // We don't want "delete" to bubble up, so we return true to say we've
+        // handled it.
+        return true;
+    }
+
+    // /////////////////////////////////////////////////////////////////////
+    // OTHER
+    // /////////////////////////////////////////////////////////////////////
+
+    // Getters
+
+    public boolean isModeCreate() {
+        return mode == Mode.CREATE;
+    }
+
+    public boolean isModeReview() {
+        return mode == Mode.REVIEW;
+    }
+
+    public boolean isModeUpdate() {
+        return mode == Mode.UPDATE;
+    }
+
+    public String getDatePattern() {
+        return "dd/MM/yyyy";
+    }
+
+    public Format getDateFormat() {
+        return new SimpleDateFormat(getDatePattern());
+    }
+}
