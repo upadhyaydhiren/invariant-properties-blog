@@ -8,7 +8,7 @@
         <!-- The only significant configuration for Tapestry 5, this informs Tapestry
 of where to look for pages, components and mixins. -->
         <param-name>tapestry.app-package</param-name>
-        <param-value>com.invariantproperties.sandbox.student.maintenance</param-value>
+        <param-value>com.invariantproperties.sandbox.student.maintenance.web</param-value>
     </context-param>
     <!--
     Specify some additional Modules for two different execution

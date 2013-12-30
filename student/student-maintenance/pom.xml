@@ -4,7 +4,7 @@
   <parent>
     <groupId>com.invariantproperties.sandbox.student</groupId>
     <artifactId>student</artifactId>
-    <version>0.0.2-SNAPSHOT</version>
+    <version>0.0.3-SNAPSHOT</version>
   </parent>
   <artifactId>student-maintenance</artifactId>
   <packaging>pom</packaging>
@@ -12,4 +12,5 @@
   	<module>student-maintenance-selenium</module>
     <module>student-maintenance-webapp</module>
   </modules>
+  <name>Project Student: maintenance tools</name>
 </project>

@@ -3,7 +3,8 @@
   <parent>
     <groupId>com.invariantproperties.sandbox.student</groupId>
     <artifactId>student-maintenance</artifactId>
-    <version>0.0.2-SNAPSHOT</version>
+    <version>0.0.3-SNAPSHOT</version>
   </parent>
   <artifactId>student-maintenance-selenium</artifactId>
+  <name>Project Student: maintenance webapp testing</name>
 </project>

@@ -33,13 +33,13 @@
 
         <p>
             [
-            <t:pagelink page="Course">Courses</t:pagelink>
-            ]
-        </p>
-
-        <p>
+            <t:pagelink page="Index">Index</t:pagelink>
+            ]<br/>
             [
-            <t:pagelink page="Index">refresh page</t:pagelink>
+            <t:pagelink page="Classroom/List">Classrooms</t:pagelink>
+            ]<br/>
+            [
+            <t:pagelink page="Course/List">Courses</t:pagelink>
             ]
         </p>
     </p:sidebar>
