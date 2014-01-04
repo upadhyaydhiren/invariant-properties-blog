@@ -83,6 +83,15 @@ public class DummyCourseService implements CourseFinderService, CourseManagerSer
     }
 
     @Override
+    public Course findCourseByCode(String code) {
+        log.debug("CourseServer: findCourseByCode()");
+        if (!cache.containsKey(code)) {
+            throw new ObjectNotFoundException(code);
+        }
+        return cache.get(code);
+    }
+
+    @Override
     public List<Course> findCoursesByTestRun(TestRun testRun) {
         log.debug("CourseServer: findCoursesByTestRun()");
         final List<Course> results = new ArrayList<Course>();
@@ -95,25 +104,30 @@ public class DummyCourseService implements CourseFinderService, CourseManagerSer
     }
 
     @Override
-    public Course createCourse(String name) {
+    public Course createCourse(String code, String name, String summary, String description, Integer creditHours) {
         log.debug("CourseServer: createCourse()");
         final Course course = new Course();
         course.setUuid(UUID.randomUUID().toString());
+        course.setCode(code);
         course.setName(name);
+        course.setSummary(summary);
+        course.setDescription(description);
+        course.setCreditHours(creditHours);
         cache.put(course.getUuid(), course);
         return course;
     }
 
     @Override
-    public Course createCourseForTesting(String name, TestRun testRun) {
+    public Course createCourseForTesting(String code, String name, String summary, String description,
+            Integer creditHours, TestRun testRun) {
         log.debug("CourseServer: createCourseForTesting()");
-        final Course course = createCourse(name);
+        final Course course = createCourse(code, name, summary, description, creditHours);
         course.setTestRun(course.getTestRun());
         return course;
     }
 
     @Override
-    public Course updateCourse(Course oldCourse, String name) {
+    public Course updateCourse(Course oldCourse, String name, String summary, String description, Integer creditHours) {
         log.debug("CourseServer: updateCourse()");
         if (!cache.containsKey(oldCourse.getUuid())) {
             throw new ObjectNotFoundException(oldCourse.getUuid());
@@ -121,6 +135,9 @@ public class DummyCourseService implements CourseFinderService, CourseManagerSer
 
         Course course = cache.get(oldCourse.getUuid());
         course.setName(name);
+        course.setSummary(summary);
+        course.setDescription(description);
+        course.setCreditHours(creditHours);
         course.setUuid(oldCourse.getUuid());
         course.setTestRun(oldCourse.getTestRun());
         return course;

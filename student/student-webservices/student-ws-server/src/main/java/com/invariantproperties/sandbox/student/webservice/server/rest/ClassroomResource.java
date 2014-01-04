@@ -54,7 +54,7 @@ import com.invariantproperties.sandbox.student.domain.TestRun;
 @Service
 @Path("/classroom")
 public class ClassroomResource extends AbstractResource {
-    private static final Logger log = Logger.getLogger(ClassroomResource.class);
+    private static final Logger LOG = Logger.getLogger(ClassroomResource.class);
     private static final Classroom[] EMPTY_CLASSROOM_ARRAY = new Classroom[0];
 
     @Context
@@ -116,7 +116,7 @@ public class ClassroomResource extends AbstractResource {
     @GET
     @Produces({ MediaType.APPLICATION_JSON, MediaType.TEXT_XML })
     public Response findAllClassrooms() {
-        log.debug("ClassroomResource: findAllClassrooms()");
+        LOG.debug("ClassroomResource: findAllClassrooms()");
 
         Response response = null;
         try {
@@ -130,7 +130,7 @@ public class ClassroomResource extends AbstractResource {
             response = Response.ok(results.toArray(EMPTY_CLASSROOM_ARRAY)).build();
         } catch (Exception e) {
             if (!(e instanceof UnitTestException)) {
-                log.info("unhandled exception", e);
+                LOG.info("unhandled exception", e);
             }
             response = Response.status(Status.INTERNAL_SERVER_ERROR).build();
         }
@@ -148,7 +148,7 @@ public class ClassroomResource extends AbstractResource {
     @Consumes({ MediaType.APPLICATION_JSON, MediaType.TEXT_XML })
     @Produces({ MediaType.APPLICATION_JSON, MediaType.TEXT_XML })
     public Response createClassroom(Name req) {
-        log.debug("ClassroomResource: createClassroom()");
+        LOG.debug("ClassroomResource: createClassroom()");
 
         final String name = req.getName();
         if ((name == null) || name.isEmpty()) {
@@ -178,7 +178,7 @@ public class ClassroomResource extends AbstractResource {
             }
         } catch (Exception e) {
             if (!(e instanceof UnitTestException)) {
-                log.info("unhandled exception", e);
+                LOG.info("unhandled exception", e);
             }
             response = Response.status(Status.INTERNAL_SERVER_ERROR).build();
         }
@@ -196,7 +196,7 @@ public class ClassroomResource extends AbstractResource {
     @GET
     @Produces({ MediaType.APPLICATION_JSON, MediaType.TEXT_XML })
     public Response getClassroom(@PathParam("classroomId") String id) {
-        log.debug("ClassroomResource: getClassroom()");
+        LOG.debug("ClassroomResource: getClassroom()");
 
         Response response = null;
         try {
@@ -204,9 +204,10 @@ public class ClassroomResource extends AbstractResource {
             response = Response.ok(scrubClassroom(classroom)).build();
         } catch (ObjectNotFoundException e) {
             response = Response.status(Status.NOT_FOUND).build();
+            LOG.trace("classroom not found: " + id);
         } catch (Exception e) {
             if (!(e instanceof UnitTestException)) {
-                log.info("unhandled exception", e);
+                LOG.info("unhandled exception", e);
             }
             response = Response.status(Status.INTERNAL_SERVER_ERROR).build();
         }
@@ -228,7 +229,7 @@ public class ClassroomResource extends AbstractResource {
     @Consumes({ MediaType.APPLICATION_JSON, MediaType.TEXT_XML })
     @Produces({ MediaType.APPLICATION_JSON, MediaType.TEXT_XML })
     public Response updateClassroom(@PathParam("classroomId") String id, Name req) {
-        log.debug("ClassroomResource: updateClassroom()");
+        LOG.debug("ClassroomResource: updateClassroom()");
 
         final String name = req.getName();
         if ((name == null) || name.isEmpty()) {
@@ -242,9 +243,10 @@ public class ClassroomResource extends AbstractResource {
             response = Response.ok(scrubClassroom(updatedClassroom)).build();
         } catch (ObjectNotFoundException exception) {
             response = Response.status(Status.NOT_FOUND).build();
+            LOG.debug("classroom not found: " + id);
         } catch (Exception e) {
             if (!(e instanceof UnitTestException)) {
-                log.info("unhandled exception", e);
+                LOG.info("unhandled exception", e);
             }
             response = Response.status(Status.INTERNAL_SERVER_ERROR).build();
         }
@@ -261,7 +263,7 @@ public class ClassroomResource extends AbstractResource {
     @Path("/{classroomId}")
     @DELETE
     public Response deleteClassroom(@PathParam("classroomId") String id, @PathParam("version") int version) {
-        log.debug("ClassroomResource: deleteClassroom()");
+        LOG.debug("ClassroomResource: deleteClassroom()");
 
         Response response = null;
         try {
@@ -269,9 +271,10 @@ public class ClassroomResource extends AbstractResource {
             response = Response.noContent().build();
         } catch (ObjectNotFoundException exception) {
             response = Response.noContent().build();
+            LOG.debug("classroom not found: " + id);
         } catch (Exception e) {
             if (!(e instanceof UnitTestException)) {
-                log.info("unhandled exception", e);
+                LOG.info("unhandled exception", e);
             }
             response = Response.status(Status.INTERNAL_SERVER_ERROR).build();
         }

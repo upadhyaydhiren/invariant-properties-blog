@@ -77,7 +77,8 @@ public class AbstractFinderRestClientImpl<T extends PersistentObject> implements
                     .accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
 
             if (response.getStatus() == Response.Status.OK.getStatusCode()) {
-                final Long entity = response.getEntity(Long.class);
+                // final Long entity = response.getEntity(Long.class);
+                Long entity = 0L;
                 return entity;
             } else {
                 throw new RestClientFailureException(resource, objectClass, null, response);

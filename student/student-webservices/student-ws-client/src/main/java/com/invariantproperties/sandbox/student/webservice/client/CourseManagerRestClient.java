@@ -35,25 +35,37 @@ public interface CourseManagerRestClient extends ManagerRestClient<Course> {
     /**
      * Create specific course.
      * 
+     * @param code
      * @param name
+     * @param summary
+     * @param description
+     * @param creditHours
      */
-    Course createCourse(String name);
+    Course createCourse(String code, String name, String summary, String description, Integer creditHours);
 
     /**
      * Create specific course.
      * 
+     * @param code
      * @param name
+     * @param summary
+     * @param description
+     * @param creditHours
      * @param testRun
      */
-    Course createCourseForTesting(String name, TestRun testRun);
+    Course createCourseForTesting(String code, String name, String summary, String description, Integer creditHours,
+            TestRun testRun);
 
     /**
      * Update specific course.
      * 
      * @param uuid
      * @param name
+     * @param summary
+     * @param description
+     * @param creditHours
      */
-    Course updateCourse(String uuid, String name);
+    Course updateCourse(String uuid, String name, String summary, String description, Integer creditHours);
 
     /**
      * Delete course.

@@ -54,7 +54,7 @@ import com.invariantproperties.sandbox.student.domain.TestRun;
 @Service
 @Path("/section")
 public class SectionResource extends AbstractResource {
-    private static final Logger log = Logger.getLogger(SectionResource.class);
+    private static final Logger LOG = Logger.getLogger(SectionResource.class);
     private static final Section[] EMPTY_SECTION_ARRAY = new Section[0];
 
     @Context
@@ -116,7 +116,7 @@ public class SectionResource extends AbstractResource {
     @GET
     @Produces({ MediaType.APPLICATION_JSON, MediaType.TEXT_XML })
     public Response findAllSections() {
-        log.debug("SectionResource: findAllSections()");
+        LOG.debug("SectionResource: findAllSections()");
 
         Response response = null;
         try {
@@ -130,7 +130,7 @@ public class SectionResource extends AbstractResource {
             response = Response.ok(results.toArray(EMPTY_SECTION_ARRAY)).build();
         } catch (Exception e) {
             if (!(e instanceof UnitTestException)) {
-                log.info("unhandled exception", e);
+                LOG.info("unhandled exception", e);
             }
             response = Response.status(Status.INTERNAL_SERVER_ERROR).build();
         }
@@ -148,7 +148,7 @@ public class SectionResource extends AbstractResource {
     @Consumes({ MediaType.APPLICATION_JSON, MediaType.TEXT_XML })
     @Produces({ MediaType.APPLICATION_JSON, MediaType.TEXT_XML })
     public Response createSection(Name req) {
-        log.debug("SectionResource: createSection()");
+        LOG.debug("SectionResource: createSection()");
 
         final String name = req.getName();
         if ((name == null) || name.isEmpty()) {
@@ -177,7 +177,7 @@ public class SectionResource extends AbstractResource {
             }
         } catch (Exception e) {
             if (!(e instanceof UnitTestException)) {
-                log.info("unhandled exception", e);
+                LOG.info("unhandled exception", e);
             }
             response = Response.status(Status.INTERNAL_SERVER_ERROR).build();
         }
@@ -195,7 +195,7 @@ public class SectionResource extends AbstractResource {
     @GET
     @Produces({ MediaType.APPLICATION_JSON, MediaType.TEXT_XML })
     public Response getSection(@PathParam("sectionId") String id) {
-        log.debug("SectionResource: getSection()");
+        LOG.debug("SectionResource: getSection()");
 
         Response response = null;
         try {
@@ -203,9 +203,10 @@ public class SectionResource extends AbstractResource {
             response = Response.ok(scrubSection(section)).build();
         } catch (ObjectNotFoundException e) {
             response = Response.status(Status.NOT_FOUND).build();
+            LOG.debug("section not found: " + id);
         } catch (Exception e) {
             if (!(e instanceof UnitTestException)) {
-                log.info("unhandled exception", e);
+                LOG.info("unhandled exception", e);
             }
             response = Response.status(Status.INTERNAL_SERVER_ERROR).build();
         }
@@ -227,7 +228,7 @@ public class SectionResource extends AbstractResource {
     @Consumes({ MediaType.APPLICATION_JSON, MediaType.TEXT_XML })
     @Produces({ MediaType.APPLICATION_JSON, MediaType.TEXT_XML })
     public Response updateSection(@PathParam("sectionId") String id, Name req) {
-        log.debug("SectionResource: updateSection()");
+        LOG.debug("SectionResource: updateSection()");
 
         final String name = req.getName();
         if ((name == null) || name.isEmpty()) {
@@ -241,9 +242,10 @@ public class SectionResource extends AbstractResource {
             response = Response.ok(scrubSection(updatedSection)).build();
         } catch (ObjectNotFoundException exception) {
             response = Response.status(Status.NOT_FOUND).build();
+            LOG.debug("section not found: " + id);
         } catch (Exception e) {
             if (!(e instanceof UnitTestException)) {
-                log.info("unhandled exception", e);
+                LOG.info("unhandled exception", e);
             }
             response = Response.status(Status.INTERNAL_SERVER_ERROR).build();
         }
@@ -266,9 +268,10 @@ public class SectionResource extends AbstractResource {
             response = Response.noContent().build();
         } catch (ObjectNotFoundException exception) {
             response = Response.noContent().build();
+            LOG.debug("section not found: " + id);
         } catch (Exception e) {
             if (!(e instanceof UnitTestException)) {
-                log.info("unhandled exception", e);
+                LOG.info("unhandled exception", e);
             }
             response = Response.status(Status.INTERNAL_SERVER_ERROR).build();
         }

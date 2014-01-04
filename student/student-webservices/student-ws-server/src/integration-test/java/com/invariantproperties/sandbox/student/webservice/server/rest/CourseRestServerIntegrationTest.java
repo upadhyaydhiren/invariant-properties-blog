@@ -22,8 +22,9 @@
  */
 package com.invariantproperties.sandbox.student.webservice.server.rest;
 
-import static org.junit.Assert.assertEquals;
+import static com.invariantproperties.sandbox.student.matcher.CourseEquality.equalTo;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -85,19 +86,42 @@ public class CourseRestServerIntegrationTest {
     public void testLifecycle() throws IOException {
         final TestRun testRun = testClient.createTestRun();
 
-        final String physicsName = "Physics 201 : " + testRun.getUuid();
-        final Course expected = managerClient.createCourse(physicsName);
-        assertEquals(physicsName, expected.getName());
+        final String code = "PHYS101";
+        final String name = "Physics 201 : " + testRun.getUuid();
+        final String summary = "summary 1";
+        final String description = "description 1";
+        final Integer hours = 1;
+
+        final Course expected = new Course();
+        expected.setCode(code);
+        expected.setName(name);
+        expected.setSummary(summary);
+        expected.setDescription(description);
+        expected.setCreditHours(hours);
+
+        final Course actual = managerClient.createCourse(code, name, summary, description, hours);
+        expected.setId(actual.getId());
+        expected.setUuid(actual.getUuid());
+        expected.setCreationDate(actual.getCreationDate());
+        assertThat(expected, equalTo(actual));
 
         final Course actual1 = finderClient.getCourse(expected.getUuid());
-        assertEquals(physicsName, actual1.getName());
+        assertThat(expected, equalTo(actual1));
 
         final Course[] courses = finderClient.getAllCourses();
         assertTrue(courses.length > 0);
 
-        final String mechanicsName = "Newtonian Mechanics 201 : " + testRun.getUuid();
-        final Course actual2 = managerClient.updateCourse(actual1.getUuid(), mechanicsName);
-        assertEquals(mechanicsName, actual2.getName());
+        final String name2 = "Newtonian Mechanics 201 : " + testRun.getUuid();
+        final String summary2 = "summary 2";
+        final String description2 = "description 2";
+        final Integer hours2 = 2;
+        expected.setName(name2);
+        expected.setSummary(summary2);
+        expected.setDescription(description2);
+        expected.setCreditHours(hours2);
+
+        final Course actual2 = managerClient.updateCourse(actual1.getUuid(), name2, summary2, description2, hours2);
+        assertThat(expected, equalTo(actual2));
 
         managerClient.deleteCourse(actual1.getUuid());
         try {

@@ -78,7 +78,6 @@ public class TestRunRestServerIntegrationTest {
     @Test
     public void testLifecycle() throws IOException {
         final TestRun expected = managerClient.createTestRun();
-        System.out.println("***** test run: " + expected);
 
         final TestRun actual = finderClient.getTestRun(expected.getUuid());
         assertEquals(expected.getName(), actual.getName());

@@ -51,7 +51,7 @@ import com.invariantproperties.sandbox.student.domain.TestRun;
 @Service
 @Path("/testRun")
 public class TestRunResource extends AbstractResource {
-    private static final Logger log = Logger.getLogger(TestRunResource.class);
+    private static final Logger LOG = Logger.getLogger(TestRunResource.class);
     private static final TestRun[] EMPTY_TEST_RUN_ARRAY = new TestRun[0];
 
     @Context
@@ -87,7 +87,7 @@ public class TestRunResource extends AbstractResource {
     @GET
     @Produces({ MediaType.APPLICATION_JSON, MediaType.TEXT_XML })
     public Response findAllTestRuns() {
-        log.debug("TestRunResource: findAllTestRuns()");
+        LOG.debug("TestRunResource: findAllTestRuns()");
 
         Response response = null;
         try {
@@ -101,7 +101,7 @@ public class TestRunResource extends AbstractResource {
             response = Response.ok(results.toArray(EMPTY_TEST_RUN_ARRAY)).build();
         } catch (Exception e) {
             if (!(e instanceof UnitTestException)) {
-                log.info("unhandled exception", e);
+                LOG.info("unhandled exception", e);
             }
             response = Response.status(Status.INTERNAL_SERVER_ERROR).build();
         }
@@ -119,7 +119,7 @@ public class TestRunResource extends AbstractResource {
     @Consumes({ MediaType.APPLICATION_JSON, MediaType.TEXT_XML })
     @Produces({ MediaType.APPLICATION_JSON, MediaType.TEXT_XML })
     public Response createTestRun(Name req) {
-        log.debug("TestRunResource: createTestRun()");
+        LOG.debug("TestRunResource: createTestRun()");
 
         Response response = null;
 
@@ -137,7 +137,7 @@ public class TestRunResource extends AbstractResource {
             }
         } catch (Exception e) {
             if (!(e instanceof UnitTestException)) {
-                log.info("unhandled exception", e);
+                LOG.info("unhandled exception", e);
             }
             response = Response.status(Status.INTERNAL_SERVER_ERROR).build();
         }
@@ -155,7 +155,7 @@ public class TestRunResource extends AbstractResource {
     @GET
     @Produces({ MediaType.APPLICATION_JSON, MediaType.TEXT_XML })
     public Response getTestRun(@PathParam("testRunId") String id) {
-        log.debug("TestRunResource: getTestRun()");
+        LOG.debug("TestRunResource: getTestRun()");
 
         Response response = null;
         try {
@@ -163,9 +163,10 @@ public class TestRunResource extends AbstractResource {
             response = Response.ok(scrubTestRun(testRun)).build();
         } catch (ObjectNotFoundException e) {
             response = Response.status(Status.NOT_FOUND).build();
+            LOG.debug("testrun not found: " + id);
         } catch (Exception e) {
             if (!(e instanceof UnitTestException)) {
-                log.info("unhandled exception", e);
+                LOG.info("unhandled exception", e);
             }
             response = Response.status(Status.INTERNAL_SERVER_ERROR).build();
         }
@@ -182,7 +183,7 @@ public class TestRunResource extends AbstractResource {
     @Path("/{testRunId}")
     @DELETE
     public Response deleteTestRun(@PathParam("testRunId") String id) {
-        log.debug("TestRunResource: deleteTestRun()");
+        LOG.debug("TestRunResource: deleteTestRun()");
 
         Response response = null;
         try {
@@ -190,9 +191,10 @@ public class TestRunResource extends AbstractResource {
             response = Response.noContent().build();
         } catch (ObjectNotFoundException exception) {
             response = Response.noContent().build();
+            LOG.debug("testrun not found: " + id);
         } catch (Exception e) {
             if (!(e instanceof UnitTestException)) {
-                log.info("unhandled exception", e);
+                LOG.info("unhandled exception", e);
             }
             response = Response.status(Status.INTERNAL_SERVER_ERROR).build();
         }
