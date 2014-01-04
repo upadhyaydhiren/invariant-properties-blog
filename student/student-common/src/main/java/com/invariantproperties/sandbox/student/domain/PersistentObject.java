@@ -92,11 +92,13 @@ public abstract class PersistentObject implements Serializable {
     @Column(name = "creation_date", nullable = false, updatable = false)
     @Temporal(TemporalType.TIMESTAMP)
     public Date getCreationDate() {
-        return creationDate;
+        // security - don't return reference to mutable object
+        return creationDate == null ? null : new Date(creationDate.getTime());
     }
 
     public void setCreationDate(Date creationDate) {
-        this.creationDate = creationDate;
+        // security - don't keep reference to mutable object
+        this.creationDate = (creationDate == null ? null : new Date(creationDate.getTime()));
     }
 
     @Transient
@@ -126,7 +128,7 @@ public abstract class PersistentObject implements Serializable {
 
     @Override
     public boolean equals(Object o) {
-        if (o == null || !(o instanceof PersistentObject)) {
+        if (!(o instanceof PersistentObject)) {
             return false;
         }
 
@@ -142,7 +144,7 @@ public abstract class PersistentObject implements Serializable {
     public String toString() {
         // ToStringBuilder tsb = new ToStringBuilder(this,
         // ToStringStyle.SHORT_PREFIX_STYLE);
-        // tsb.append(id).append(uuid).append(name).append(veracodeAppId);
+        // tsb.append(id).append(uuid).append(name);
         // return tsb.toString();
 
         return String.format("[%s: %s, %s]", this.getClass().getSimpleName(), getId(), getUuid());

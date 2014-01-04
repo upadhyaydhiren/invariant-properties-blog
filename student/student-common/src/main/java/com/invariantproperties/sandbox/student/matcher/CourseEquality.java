@@ -51,14 +51,18 @@ public class CourseEquality extends TypeSafeMatcher<Course> {
         EqualsBuilder eq = new EqualsBuilder();
         eq.append(expected.getId(), actual.getId());
         eq.append(expected.getUuid(), actual.getUuid());
+        eq.append(expected.getCode(), actual.getCode());
         eq.append(expected.getName(), actual.getName());
+        eq.append(expected.getSummary(), actual.getSummary());
+        eq.append(expected.getDescription(), actual.getDescription());
+        eq.append(expected.getCreditHours(), actual.getCreditHours());
         eq.append(expected.getCreationDate(), actual.getCreationDate());
 
         return eq.isEquals();
     }
 
     public void describeTo(Description description) {
-        description.appendText("Course comparison");
+        description.appendText(expected.toString());
     }
 
     @Factory

@@ -40,18 +40,32 @@ import com.invariantproperties.sandbox.student.repository.CourseRepository;
  * @author Bear Giles <bgiles@coyotesong.com>
  */
 public class CourseManagerServiceImplTest {
+    private static final String CODE1 = "code 1";
+    private static final String NAME1 = "name 1";
+    private static final String NAME2 = "name 2";
+    private static final String SUMMARY1 = "summary 1";
+    private static final String SUMMARY2 = "summary 2";
+    private static final String DESCRIPTION1 = "description 1";
+    private static final String DESCRIPTION2 = "description 2";
+    private static final Integer HOURS1 = 1;
+    private static final Integer HOURS2 = 2;
+    private static final String UUID = "[uuid]";
 
     @Test
     public void testCreateCourse() {
         final Course expected = new Course();
-        expected.setName("name");
-        expected.setUuid("[uuid]");
+        expected.setCode(CODE1);
+        expected.setName(NAME1);
+        expected.setSummary(SUMMARY1);
+        expected.setDescription(DESCRIPTION1);
+        expected.setCreditHours(HOURS1);
+        expected.setUuid(UUID);
 
         final CourseRepository repository = Mockito.mock(CourseRepository.class);
         when(repository.saveAndFlush(any(Course.class))).thenReturn(expected);
 
         final CourseManagerService service = new CourseManagerServiceImpl(repository);
-        final Course actual = service.createCourse(expected.getName());
+        final Course actual = service.createCourse(CODE1, NAME1, SUMMARY1, DESCRIPTION1, HOURS1);
 
         assertEquals(expected, actual);
     }
@@ -62,23 +76,30 @@ public class CourseManagerServiceImplTest {
         when(repository.saveAndFlush(any(Course.class))).thenThrow(new UnitTestException());
 
         final CourseManagerService service = new CourseManagerServiceImpl(repository);
-        service.createCourse("name");
+        service.createCourse(CODE1, NAME1, SUMMARY1, DESCRIPTION1, HOURS1);
     }
 
     @Test
     public void testUpdateCourse() {
         final Course expected = new Course();
-        expected.setName("Alice");
-        expected.setUuid("[uuid]");
+        expected.setCode(CODE1);
+        expected.setName(NAME1);
+        expected.setSummary(SUMMARY1);
+        expected.setDescription(DESCRIPTION1);
+        expected.setCreditHours(HOURS1);
+        expected.setUuid(UUID);
 
         final CourseRepository repository = Mockito.mock(CourseRepository.class);
         when(repository.findCourseByUuid(any(String.class))).thenReturn(expected);
         when(repository.saveAndFlush(any(Course.class))).thenReturn(expected);
 
         final CourseManagerService service = new CourseManagerServiceImpl(repository);
-        final Course actual = service.updateCourse(expected, "Bob");
+        final Course actual = service.updateCourse(expected, NAME2, SUMMARY2, DESCRIPTION2, HOURS2);
 
-        assertEquals("Bob", actual.getName());
+        assertEquals(NAME2, actual.getName());
+        assertEquals(SUMMARY2, actual.getSummary());
+        assertEquals(DESCRIPTION2, actual.getDescription());
+        assertEquals(HOURS2, actual.getCreditHours());
     }
 
     @Test(expected = ObjectNotFoundException.class)
@@ -88,26 +109,26 @@ public class CourseManagerServiceImplTest {
         when(repository.findCourseByUuid(any(String.class))).thenReturn(null);
 
         final CourseManagerService service = new CourseManagerServiceImpl(repository);
-        service.updateCourse(expected, "Bob");
+        service.updateCourse(expected, NAME2, SUMMARY2, DESCRIPTION2, HOURS2);
     }
 
     @Test(expected = PersistenceException.class)
     public void testUpdateCourseError() {
         final Course expected = new Course();
-        expected.setUuid("[uuid]");
+        expected.setUuid(UUID);
 
         final CourseRepository repository = Mockito.mock(CourseRepository.class);
         when(repository.findCourseByUuid(any(String.class))).thenReturn(expected);
         doThrow(new UnitTestException()).when(repository).saveAndFlush(any(Course.class));
 
         final CourseManagerService service = new CourseManagerServiceImpl(repository);
-        service.updateCourse(expected, "Bob");
+        service.updateCourse(expected, NAME2, SUMMARY2, DESCRIPTION2, HOURS2);
     }
 
     @Test
     public void testDeleteCourse() {
         final Course expected = new Course();
-        expected.setUuid("[uuid]");
+        expected.setUuid(UUID);
 
         final CourseRepository repository = Mockito.mock(CourseRepository.class);
         when(repository.findCourseByUuid(any(String.class))).thenReturn(expected);
@@ -123,13 +144,13 @@ public class CourseManagerServiceImplTest {
         when(repository.findCourseByUuid(any(String.class))).thenReturn(null);
 
         final CourseManagerService service = new CourseManagerServiceImpl(repository);
-        service.deleteCourse("[uuid]", 0);
+        service.deleteCourse(UUID, 0);
     }
 
     @Test(expected = PersistenceException.class)
     public void testDeleteCourseError() {
         final Course expected = new Course();
-        expected.setUuid("[uuid]");
+        expected.setUuid(UUID);
 
         final CourseRepository repository = Mockito.mock(CourseRepository.class);
         when(repository.findCourseByUuid(any(String.class))).thenReturn(expected);

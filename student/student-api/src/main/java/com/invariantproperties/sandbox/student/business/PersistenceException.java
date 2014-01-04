@@ -42,10 +42,10 @@ public class PersistenceException extends RuntimeException {
      */
     public enum Type {
         UNABLE_TO_COUNT("unable to count %s by testrun "), UNABLE_TO_FIND_BY_ID("unable to find %s by id"), UNABLE_TO_FIND_BY_UUID(
-                "unable to find %s by uuid"), UNABLE_TO_FIND_BY_EMAIL_ADDRESS("unable to find %s by email address"), UNABLE_TO_LIST(
-                "unable to get list of %s by testrun"), UNABLE_TO_CREATE("unable to create %s"), UNABLE_TO_CREATE_FOR_TESTING(
-                "unable to create %s for testing"), UNABLE_TO_UPDATE("unable to update %s"), UNABLE_TO_DELETE(
-                "unable to delete %s");
+                "unable to find %s by uuid"), UNABLE_TO_FIND_BY_EMAIL_ADDRESS("unable to find %s by email address"), UNABLE_TO_FIND_BY_CODE(
+                "unable to find %s by code"), UNABLE_TO_LIST("unable to get list of %s by testrun"), UNABLE_TO_CREATE(
+                "unable to create %s"), UNABLE_TO_CREATE_FOR_TESTING("unable to create %s for testing"), UNABLE_TO_UPDATE(
+                "unable to update %s"), UNABLE_TO_DELETE("unable to delete %s");
 
         private final String msg;
 

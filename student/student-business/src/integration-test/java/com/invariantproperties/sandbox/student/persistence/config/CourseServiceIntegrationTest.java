@@ -73,15 +73,23 @@ public class CourseServiceIntegrationTest {
     public void testCourseLifecycle() throws Exception {
         final TestRun testRun = testService.createTestRun();
 
-        final String name = "Calculus 101 : " + testRun.getUuid();
+        final String code = "MATH101";
+        final String name = "Calculus 101 name : " + testRun.getUuid();
+        final String summary = "summary 1";
+        final String description = "description 1";
+        final Integer hours = 1;
 
         final Course expected = new Course();
+        expected.setCode(code);
         expected.setName(name);
+        expected.setSummary(summary);
+        expected.setDescription(description);
+        expected.setCreditHours(hours);
 
         assertNull(expected.getId());
 
         // create course
-        Course actual = mdao.createCourseForTesting(name, testRun);
+        Course actual = mdao.createCourseForTesting(code, name, summary, description, hours, testRun);
         expected.setId(actual.getId());
         expected.setUuid(actual.getUuid());
         expected.setCreationDate(actual.getCreationDate());
@@ -98,6 +106,10 @@ public class CourseServiceIntegrationTest {
         actual = fdao.findCourseByUuid(expected.getUuid());
         assertThat(expected, equalTo(actual));
 
+        // get course by code
+        actual = fdao.findCourseByCode(expected.getCode());
+        assertThat(expected, equalTo(actual));
+
         // get all courses
         final List<Course> courses = fdao.findCoursesByTestRun(testRun);
         assertTrue(courses.contains(actual));
@@ -108,7 +120,11 @@ public class CourseServiceIntegrationTest {
 
         // update course
         expected.setName("Calculus 102 : " + testRun.getUuid());
-        actual = mdao.updateCourse(actual, expected.getName());
+        expected.setSummary("summary 2");
+        expected.setDescription("description 2");
+        expected.setCreditHours(2);
+        actual = mdao.updateCourse(actual, expected.getName(), expected.getSummary(), expected.getDescription(),
+                expected.getCreditHours());
         assertThat(expected, equalTo(actual));
 
         // verify testRun.getObjects
@@ -154,7 +170,7 @@ public class CourseServiceIntegrationTest {
     public void testUpdateCourseWhenCourseIsNotFound() {
         final Course course = new Course();
         course.setUuid("missing");
-        mdao.updateCourse(course, "Calculus 102");
+        mdao.updateCourse(course, "Calculus 102", "summary", "description", 2);
     }
 
     /**

@@ -37,5 +37,7 @@ public interface CourseFinderService extends FinderService<Course> {
 
     Course findCourseByUuid(String uuid);
 
+    Course findCourseByCode(String code);
+
     List<Course> findCoursesByTestRun(TestRun testRun);
 }

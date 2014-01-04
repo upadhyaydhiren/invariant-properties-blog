@@ -23,6 +23,7 @@
 package com.invariantproperties.sandbox.student.business;
 
 import static com.invariantproperties.sandbox.student.business.PersistenceException.Type.UNABLE_TO_COUNT;
+import static com.invariantproperties.sandbox.student.business.PersistenceException.Type.UNABLE_TO_FIND_BY_CODE;
 import static com.invariantproperties.sandbox.student.business.PersistenceException.Type.UNABLE_TO_FIND_BY_ID;
 import static com.invariantproperties.sandbox.student.business.PersistenceException.Type.UNABLE_TO_FIND_BY_UUID;
 import static com.invariantproperties.sandbox.student.business.PersistenceException.Type.UNABLE_TO_LIST;
@@ -159,6 +160,32 @@ public class CourseFinderServiceImpl implements CourseFinderService {
 
         if (course == null) {
             throw new ObjectNotFoundException(uuid);
+        }
+
+        return course;
+    }
+
+    /**
+     * @see com.invariantproperties.sandbox.student.business.CourseFinderService#
+     *      findCourseByCode(java.lang.String)
+     */
+    @Transactional(readOnly = true)
+    @Override
+    public Course findCourseByCode(String code) {
+        Course course = null;
+        try {
+            course = courseRepository.findCourseByCode(code);
+        } catch (UnitTestException e) {
+            final String msg = UNABLE_TO_FIND_BY_CODE.format(COURSE);
+            throw new PersistenceException(UNABLE_TO_FIND_BY_CODE, msg, e, code);
+        } catch (DataAccessException e) {
+            final String msg = UNABLE_TO_FIND_BY_CODE.format(COURSE);
+            LOG.info(msg);
+            throw new PersistenceException(UNABLE_TO_FIND_BY_CODE, msg, e, code);
+        }
+
+        if (course == null) {
+            throw new ObjectNotFoundException(code);
         }
 
         return course;

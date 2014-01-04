@@ -25,11 +25,13 @@ package com.invariantproperties.sandbox.student.maintenance.web.pages.course;
 import java.text.Format;
 import java.text.SimpleDateFormat;
 
+import org.apache.log4j.Logger;
 import org.apache.tapestry5.ComponentResources;
 import org.apache.tapestry5.PersistenceConstants;
+import org.apache.tapestry5.annotations.ActivationRequestParameter;
 import org.apache.tapestry5.annotations.Component;
 import org.apache.tapestry5.annotations.Events;
-import org.apache.tapestry5.annotations.Parameter;
+import org.apache.tapestry5.annotations.InjectPage;
 import org.apache.tapestry5.annotations.Persist;
 import org.apache.tapestry5.annotations.Property;
 import org.apache.tapestry5.ioc.Messages;
@@ -40,24 +42,25 @@ import com.invariantproperties.sandbox.student.business.CourseManagerService;
 import com.invariantproperties.sandbox.student.domain.Course;
 import com.invariantproperties.sandbox.student.maintenance.util.ExceptionUtil;
 import com.invariantproperties.sandbox.student.maintenance.web.components.CustomForm;
+import com.invariantproperties.sandbox.student.webservice.client.ObjectNotFoundException;
+import com.invariantproperties.sandbox.student.webservice.client.RestClientFailureException;
 
 /**
  * This component will trigger the following events on its container (which in
  * this example is the page):
- * {@link jumpstart.web.components.examples.component.crud.Editor#CANCEL_CREATE}
- * ,
- * {@link jumpstart.web.components.examples.component.crud.Editor#SUCCESSFUL_CREATE}
+ * {@link Editor.web.components.examples.component.crud.Editor#CANCEL_CREATE} ,
+ * {@link Editor.web.components.examples.component.crud.Editor#SUCCESSFUL_CREATE}
  * (Long courseUuid),
- * {@link jumpstart.web.components.examples.component.crud.Editor#FAILED_CREATE}
- * , {@link jumpstart.web.components.examples.component.crud.Editor#TO_UPDATE}
+ * {@link Editor.web.components.examples.component.crud.Editor#FAILED_CREATE} ,
+ * {@link Editor.web.components.examples.component.crud.Editor#TO_UPDATE} (Long
+ * courseUuid),
+ * {@link Editor.web.components.examples.component.crud.Editor#SUCCESSFUL_UPDATE}
  * (Long courseUuid),
- * {@link jumpstart.web.components.examples.component.crud.Editor#SUCCESSFUL_UPDATE}
+ * {@link Editor.web.components.examples.component.crud.Editor#FAILED_UPDATE}
  * (Long courseUuid),
- * {@link jumpstart.web.components.examples.component.crud.Editor#FAILED_UPDATE}
+ * {@link Editor.web.components.examples.component.crud.Editor#SUCCESSFUL_DELETE}
  * (Long courseUuid),
- * {@link jumpstart.web.components.examples.component.crud.Editor#SUCCESSFUL_DELETE}
- * (Long courseUuid),
- * {@link jumpstart.web.components.examples.component.crud.Editor#FAILED_DELETE}
+ * {@link Editor.web.components.examples.component.crud.Editor#FAILED_DELETE}
  * (Long courseUuid).
  */
 // @Events is applied to a component solely to document what events it may
@@ -75,21 +78,19 @@ public class Editor {
     public static final String SUCCESFUL_DELETE = "successfulDelete";
     public static final String FAILED_DELETE = "failedDelete";
 
-    private final String demoModeStr = System.getProperty("jumpstart.demo-mode");
-
     public enum Mode {
         CREATE, REVIEW, UPDATE;
     }
 
+    private static final Logger LOG = Logger.getLogger(Editor.class);
+
     // Parameters
 
-    @Parameter
-    // @Parameter(required = true)
+    @ActivationRequestParameter
     @Property
-    private Mode mode = Mode.CREATE;
+    private Mode mode;
 
-    @Parameter
-    // @Parameter(required = true)
+    @ActivationRequestParameter
     @Property
     private String courseUuid;
 
@@ -121,6 +122,9 @@ public class Editor {
     private CustomForm createForm;
 
     @Component
+    private CustomForm reviewForm;
+
+    @Component
     private CustomForm updateForm;
 
     @Inject
@@ -129,7 +133,15 @@ public class Editor {
     @Inject
     private Messages messages;
 
+    @InjectPage
+    private com.invariantproperties.sandbox.student.maintenance.web.pages.course.Index indexPage;
+
     // The code
+
+    public void setup(Mode mode, String courseUuid) {
+        this.mode = mode;
+        this.courseUuid = courseUuid;
+    }
 
     // setupRender() is called by Tapestry right before it starts rendering the
     // component.
@@ -142,12 +154,15 @@ public class Editor {
                 // Handle null course in the template.
             } else {
                 if (course == null) {
-                    course = courseFinderService.findCourse(courseUuid);
-                    // Handle null course in the template.
+                    try {
+                        course = courseFinderService.findCourseByUuid(courseUuid);
+                    } catch (ObjectNotFoundException e) {
+                        // Handle null course in the template.
+                        LOG.trace("course not found: " + courseUuid);
+                    }
                 }
             }
         }
-
     }
 
     // /////////////////////////////////////////////////////////////////////
@@ -156,18 +171,19 @@ public class Editor {
 
     // Handle event "cancelCreate"
 
-    boolean onCancelCreate() {
+    Object onCancelCreate() {
+        return indexPage;
         // Return false, which means we haven't handled the event so bubble it
         // up.
         // This method is here solely as documentation, because without this
         // method the event would bubble up anyway.
-        return false;
+        // return false;
     }
 
     // Component "createForm" bubbles up the PREPARE event when it is rendered
     // or submitted
 
-    void onPrepareFromCreateForm() throws Exception {
+    void onPrepareFromCreateForm() {
         // Instantiate a Course for the form data to overlay.
         course = new Course();
     }
@@ -181,17 +197,18 @@ public class Editor {
             return;
         }
 
-        if (demoModeStr != null && demoModeStr.equals("true")) {
-            createForm.recordError("Sorry, but Create is not allowed in Demo mode.");
-            return;
-        }
-
         try {
-            course = courseManagerService.createCourse(course);
+            course = courseManagerService.createCourse(course.getCode(), course.getName(), course.getSummary(),
+                    course.getDescription(), 1);
+        } catch (RestClientFailureException e) {
+            createForm.recordError("Internal error on server.");
+            createForm.recordError(e.getMessage());
+            // TODO: replace with exception service
+            LOG.debug("internal error on server during validation", e);
         } catch (Exception e) {
-            // Display the cause. In a real system we would try harder to get a
-            // user-friendly message.
             createForm.recordError(ExceptionUtil.getRootCauseMessage(e));
+            // TODO: replace with exception service
+            LOG.info("unhandled exception during validation", e);
         }
     }
 
@@ -204,9 +221,11 @@ public class Editor {
         // created, so we trigger new event
         // "successfulCreate" with a parameter. It will bubble up because we
         // don't have a handler method for it.
-        componentResources.triggerEvent(SUCCESSFUL_CREATE, new Object[] { course.getId() }, null);
+        componentResources.triggerEvent(SUCCESSFUL_CREATE, new Object[] { course.getUuid() }, null);
         // We don't want "success" to bubble up, so we return true to say we've
         // handled it.
+        mode = Mode.REVIEW;
+        courseUuid = course.getUuid();
         return true;
     }
 
@@ -225,36 +244,35 @@ public class Editor {
     // REVIEW
     // /////////////////////////////////////////////////////////////////////
 
+    void onPrepareFromReviewForm() {
+        try {
+            course = courseFinderService.findCourseByUuid(courseUuid);
+        } catch (ObjectNotFoundException e) {
+            // Handle null course in the template.
+            LOG.trace("course not found: " + courseUuid);
+        }
+    }
+
     // /////////////////////////////////////////////////////////////////////
     // UPDATE
     // /////////////////////////////////////////////////////////////////////
 
-    // Handle event "toUpdate"
-
-    boolean onToUpdate(String courseUuid) {
-        // Return false, which means we haven't handled the event so bubble it
-        // up.
-        // This method is here solely as documentation, because without this
-        // method the event would bubble up anyway.
-        return false;
-    }
-
     // Handle event "cancelUpdate"
 
-    boolean onCancelUpdate(String courseUuid) {
-        // Return false, which means we haven't handled the event so bubble it
-        // up.
-        // This method is here solely as documentation, because without this
-        // method the event would bubble up anyway.
-        return false;
+    Object onCancelUpdate(String courseUuid) {
+        return indexPage;
     }
 
     // Component "updateForm" bubbles up the PREPARE_FOR_RENDER event during
     // form render
 
     void onPrepareForRenderFromUpdateForm() {
-        course = courseFinderService.findCourse(courseUuid);
-        // Handle null course in the template.
+        try {
+            course = courseFinderService.findCourseByUuid(courseUuid);
+        } catch (ObjectNotFoundException e) {
+            // Handle null course in the template.
+            LOG.trace("course not found: " + courseUuid);
+        }
 
         // If the form has errors then we're redisplaying after a redirect.
         // Form will restore your input values but it's up to us to restore
@@ -272,11 +290,12 @@ public class Editor {
 
     void onPrepareForSubmitFromUpdateForm() {
         // Get objects for the form fields to overlay.
-        course = courseFinderService.findCourse(courseUuid);
-
-        if (course == null) {
+        try {
+            course = courseFinderService.findCourseByUuid(courseUuid);
+        } catch (ObjectNotFoundException e) {
             course = new Course();
             updateForm.recordError("Course has been deleted by another process.");
+            LOG.trace("course not found: " + courseUuid);
         }
     }
 
@@ -290,11 +309,19 @@ public class Editor {
         }
 
         try {
-            courseManagerService.updateCourse(course);
+            courseManagerService
+                    .updateCourse(course, course.getName(), course.getSummary(), course.getDescription(), 1);
+        } catch (RestClientFailureException e) {
+            updateForm.recordError("Internal error on server.");
+            updateForm.recordError(e.getMessage());
+            // TODO: replace with exception service
+            LOG.debug("internal error on server during validation", e);
         } catch (Exception e) {
             // Display the cause. In a real system we would try harder to get a
             // user-friendly message.
             updateForm.recordError(ExceptionUtil.getRootCauseMessage(e));
+            // TODO: replace with exception service
+            LOG.info("unhandled exception during validation", e);
         }
     }
 
@@ -308,8 +335,10 @@ public class Editor {
         // "successfulUpdate" with a parameter. It will bubble up because we
         // don't have a handler method for it.
         componentResources.triggerEvent(SUCCESSFUL_UPDATE, new Object[] { courseUuid }, null);
+
         // We don't want "success" to bubble up, so we return true to say we've
         // handled it.
+        mode = Mode.REVIEW;
         return true;
     }
 
@@ -332,21 +361,30 @@ public class Editor {
 
     // Handle event "delete"
 
-    boolean onDelete(String courseUuid, Integer courseVersion) {
+    Object onDelete(String courseUuid) {
         this.courseUuid = courseUuid;
+        int courseVersion = 0;
 
-        if (demoModeStr != null && demoModeStr.equals("true")) {
-            deleteMessage = "Sorry, but Delete is not allowed in Demo mode.";
+        try {
+            courseManagerService.deleteCourse(courseUuid, courseVersion);
+        } catch (ObjectNotFoundException e) {
+            // object has already been deleted.
+            LOG.trace("course not found: " + courseUuid);
+        } catch (RestClientFailureException e) {
+            createForm.recordError("Internal error on server.");
+            createForm.recordError(e.getMessage());
+
+            // Display the cause. In a real system we would try harder to get a
+            // user-friendly message.
+            deleteMessage = ExceptionUtil.getRootCauseMessage(e);
 
             // Trigger new event "failedDelete" which will bubble up.
             componentResources.triggerEvent(FAILED_DELETE, new Object[] { courseUuid }, null);
             // We don't want "delete" to bubble up, so we return true to say
             // we've handled it.
+            // TODO: replace with exception service
+            LOG.debug("internal error on server during validation", e);
             return true;
-        }
-
-        try {
-            courseManagerService.deleteCourse(courseUuid, courseVersion);
         } catch (Exception e) {
             // Display the cause. In a real system we would try harder to get a
             // user-friendly message.
@@ -356,6 +394,8 @@ public class Editor {
             componentResources.triggerEvent(FAILED_DELETE, new Object[] { courseUuid }, null);
             // We don't want "delete" to bubble up, so we return true to say
             // we've handled it.
+            // TODO: replace with exception service
+            LOG.info("unhandled exception during deletion", e);
             return true;
         }
 
@@ -363,7 +403,24 @@ public class Editor {
         componentResources.triggerEvent(SUCCESFUL_DELETE, new Object[] { courseUuid }, null);
         // We don't want "delete" to bubble up, so we return true to say we've
         // handled it.
-        return true;
+        return indexPage;
+    }
+
+    // /////////////////////////////////////////////////////////////////////
+    // PAGE NAVIGATION
+    // /////////////////////////////////////////////////////////////////////
+
+    // Handle event "toUpdate"
+
+    boolean onToUpdate(String courseUuid) {
+        mode = Mode.UPDATE;
+        return false;
+    }
+
+    // Handle event "toIndex"
+
+    Object onToIndex() {
+        return indexPage;
     }
 
     // /////////////////////////////////////////////////////////////////////

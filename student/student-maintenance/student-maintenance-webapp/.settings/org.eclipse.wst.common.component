@@ -4,13 +4,13 @@
         <wb-resource deploy-path="/" source-path="/src/main/webapp" tag="defaultRootSource"/>
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/src/main/java"/>
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/src/main/resources"/>
-        <dependent-module archiveName="student-common-0.0.3-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/student-common/student-common">
+        <dependent-module archiveName="student-common-0.0.4-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/student-common/student-common">
             <dependency-type>uses</dependency-type>
         </dependent-module>
-        <dependent-module archiveName="student-ws-client-0.0.3-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/student-ws-client/student-ws-client">
+        <dependent-module archiveName="student-ws-client-0.0.4-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/student-ws-client/student-ws-client">
             <dependency-type>uses</dependency-type>
         </dependent-module>
-        <dependent-module archiveName="student-api-0.0.3-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/student-api/student-api">
+        <dependent-module archiveName="student-api-0.0.4-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/student-api/student-api">
             <dependency-type>uses</dependency-type>
         </dependent-module>
         <property name="context-root" value="student-maintenance-webapp"/>
