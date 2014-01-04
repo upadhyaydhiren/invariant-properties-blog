@@ -22,7 +22,7 @@
  */
 package com.invariantproperties.sandbox.student.maintenance.web.components;
 
-import org.apache.tapestry5.corelib.components.Form;
+import org.apache.tapestry5.corelib.components.Error;
 
-public class CustomForm extends Form {
+public class CustomError extends Error {
 }

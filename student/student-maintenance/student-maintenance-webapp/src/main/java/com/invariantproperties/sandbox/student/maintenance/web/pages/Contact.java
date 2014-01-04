@@ -1,6 +1,5 @@
 package com.invariantproperties.sandbox.student.maintenance.web.pages;
 
-public class Contact
-{
+public class Contact {
 
 }

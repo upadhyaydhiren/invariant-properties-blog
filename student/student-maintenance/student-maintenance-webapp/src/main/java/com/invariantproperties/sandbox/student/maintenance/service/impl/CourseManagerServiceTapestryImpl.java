@@ -69,8 +69,8 @@ public class CourseManagerServiceTapestryImpl implements CourseManagerService {
      * @see com.invariantproperties.sandbox.student.maintenance.service.CourseManagerService#createCourse(java.lang.String)
      */
     @Override
-    public Course createCourse(String name) {
-        final Course actual = manager.createCourse(name);
+    public Course createCourse(String code, String name, String summary, String description, Integer creditHours) {
+        final Course actual = manager.createCourse(code, name, summary, description, creditHours);
         return actual;
     }
 
@@ -79,8 +79,8 @@ public class CourseManagerServiceTapestryImpl implements CourseManagerService {
      *      java.lang.String)
      */
     @Override
-    public Course updateCourse(Course course, String name) {
-        final Course actual = manager.updateCourse(course.getUuid(), name);
+    public Course updateCourse(Course course, String name, String summary, String description, Integer creditHours) {
+        final Course actual = manager.updateCourse(course.getUuid(), name, summary, description, creditHours);
         return actual;
     }
 
@@ -98,8 +98,9 @@ public class CourseManagerServiceTapestryImpl implements CourseManagerService {
      *      com.invariantproperties.sandbox.student.domain.TestRun)
      */
     @Override
-    public Course createCourseForTesting(String name, TestRun testRun) {
-        final Course actual = manager.createCourse(name);
+    public Course createCourseForTesting(String code, String name, String summary, String description,
+            Integer creditHours, TestRun testRun) {
+        final Course actual = manager.createCourseForTesting(code, name, summary, description, creditHours, testRun);
         return actual;
     }
 }

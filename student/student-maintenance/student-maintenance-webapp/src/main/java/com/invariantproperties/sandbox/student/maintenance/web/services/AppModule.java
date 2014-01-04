@@ -43,17 +43,17 @@ public class AppModule {
     }
 
     public static void contributeFactoryDefaults(MappedConfiguration<String, Object> configuration) {
-        // The application version number is incorprated into URLs for some
+        // The application version number is incorporated into URLs for some
         // assets. Web browsers will cache assets because of the far future
         // expires
         // header. If existing assets are changed, the version number should
         // also
         // change, to force the browser to download new versions. This overrides
         // Tapesty's default
-        // (a random hexadecimal number), but may be further overriden by
+        // (a random hexadecimal number), but may be further overridden by
         // DevelopmentModule or
         // QaModule.
-        configuration.override(SymbolConstants.APPLICATION_VERSION, "0.0.2-SNAPSHOT");
+        configuration.override(SymbolConstants.APPLICATION_VERSION, "0.0.3-SNAPSHOT");
     }
 
     public static void contributeApplicationDefaults(MappedConfiguration<String, Object> configuration) {
@@ -68,6 +68,7 @@ public class AppModule {
         // the first locale name is the default when there's no reasonable
         // match).
         configuration.add(SymbolConstants.SUPPORTED_LOCALES, "en");
+        configuration.add(SymbolConstants.HMAC_PASSPHRASE, "9c7657b2a9e148a0bdc02727f44b3ab2");
     }
 
     /**

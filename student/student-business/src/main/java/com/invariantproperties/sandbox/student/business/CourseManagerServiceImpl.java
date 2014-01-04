@@ -42,6 +42,8 @@ import com.invariantproperties.sandbox.student.repository.CourseRepository;
 /**
  * Implementation of CourseService.
  * 
+ * FIXME - add validation that credit hours >= 0
+ * 
  * @author Bear Giles <bgiles@coyotesong.com>
  */
 @Service
@@ -68,14 +70,19 @@ public class CourseManagerServiceImpl implements CourseManagerService {
     }
 
     /**
-     * @see com.invariantproperties.sandbox.student.business.CourseFinderService#
-     *      createCourse(java.lang.String)
+     * @see 
+     *      com.invariantproperties.sandbox.student.business.CourseFinderService#
+     *      createCourse(...)
      */
     @Transactional
     @Override
-    public Course createCourse(String name) {
+    public Course createCourse(String code, String name, String summary, String description, Integer creditHours) {
         final Course course = new Course();
+        course.setCode(code);
         course.setName(name);
+        course.setSummary(summary);
+        course.setDescription(description);
+        course.setCreditHours(creditHours);
 
         Course actual = null;
         try {
@@ -93,15 +100,20 @@ public class CourseManagerServiceImpl implements CourseManagerService {
     }
 
     /**
-     * @see com.invariantproperties.sandbox.student.business.CourseFinderService#
-     *      createCourseForTesting(java.lang.String,
-     *      com.invariantproperties.sandbox.student.common.TestRun)
+     * @see 
+     *      com.invariantproperties.sandbox.student.business.CourseFinderService#
+     *      createCourseForTesting(...)
      */
     @Transactional
     @Override
-    public Course createCourseForTesting(String name, TestRun testRun) {
+    public Course createCourseForTesting(String code, String name, String summary, String description,
+            Integer creditHours, TestRun testRun) {
         final Course course = new Course();
+        course.setCode(code);
         course.setName(name);
+        course.setSummary(summary);
+        course.setDescription(description);
+        course.setCreditHours(creditHours);
         course.setTestRun(testRun);
 
         Course actual = null;
@@ -120,13 +132,12 @@ public class CourseManagerServiceImpl implements CourseManagerService {
     }
 
     /**
-     * @see com.invariantproperties.sandbox.CourseFinderService.persistence.CourseService#
-     *      updateCourse(com.invariantproperties.sandbox.course.domain.Course,
-     *      java.lang.String)
+     * @see com.invariantproperties.sandbox.CourseFinderService.persistence.
+     *      CourseService# updateCourse(...)
      */
     @Transactional
     @Override
-    public Course updateCourse(Course course, String name) {
+    public Course updateCourse(Course course, String name, String summary, String description, Integer creditHours) {
         Course updated = null;
         try {
             final Course actual = courseRepository.findCourseByUuid(course.getUuid());
@@ -137,8 +148,14 @@ public class CourseManagerServiceImpl implements CourseManagerService {
             }
 
             actual.setName(name);
+            actual.setSummary(summary);
+            actual.setDescription(description);
+            actual.setCreditHours(creditHours);
             updated = courseRepository.saveAndFlush(actual);
             course.setName(name);
+            course.setSummary(summary);
+            course.setDescription(description);
+            course.setCreditHours(creditHours);
 
         } catch (UnitTestException e) {
             final String msg = UNABLE_TO_UPDATE.format(COURSE);

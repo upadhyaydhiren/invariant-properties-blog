@@ -5,7 +5,7 @@
 	<parent>
 		<artifactId>student-maintenance</artifactId>
 		<groupId>com.invariantproperties.sandbox.student</groupId>
-		<version>0.0.3-SNAPSHOT</version>
+		<version>0.0.4-SNAPSHOT</version>
 	</parent>
 	<artifactId>student-maintenance-webapp</artifactId>
 	<packaging>war</packaging>
@@ -127,6 +127,15 @@
 					</systemProperties>
 				</configuration>
 			</plugin>
+			
+            <plugin>
+                <groupId>org.apache.tomcat.maven</groupId>
+                <artifactId>tomcat7-maven-plugin</artifactId>
+                <version>2.2</version>
+                <configuration>
+                    <server>tomcat</server>
+                </configuration>
+            </plugin>
 		</plugins>
 	</build>
 

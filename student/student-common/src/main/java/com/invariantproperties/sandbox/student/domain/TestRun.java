@@ -68,11 +68,13 @@ public class TestRun extends PersistentObject {
     @Column(name = "test_date", nullable = false, updatable = false)
     @Temporal(TemporalType.TIMESTAMP)
     public Date getTestDate() {
-        return testDate;
+        // security - don't return reference to mutable object
+        return testDate == null ? null : new Date(testDate.getTime());
     }
 
     public void setTestDate(Date testDate) {
-        this.testDate = testDate;
+        // security - don't keep reference to mutable object
+        this.testDate = (testDate == null ? null : new Date(testDate.getTime()));
     }
 
     @Column(name = "username", length = 40, unique = false, updatable = false)

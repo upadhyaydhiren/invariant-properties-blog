@@ -26,14 +26,21 @@ import com.invariantproperties.sandbox.student.domain.Course;
 import com.invariantproperties.sandbox.student.domain.TestRun;
 
 /**
+ * Course manager service.
+ * 
+ * FIXME - could we use a builder pattern instead of long list of parameters? We
+ * don't want to pass in a 'course' since some values have to be generated and
+ * others can't be updated.
+ * 
  * @author Bear Giles <bgiles@coyotesong.com>
  */
 public interface CourseManagerService extends ManagerService<Course> {
-    Course createCourse(String name);
+    Course createCourse(String code, String name, String summary, String description, Integer creditHours);
 
-    Course updateCourse(Course course, String name);
+    Course updateCourse(Course course, String name, String summary, String description, Integer creditHours);
 
     void deleteCourse(String uuid, Integer version);
 
-    Course createCourseForTesting(String name, TestRun testRun);
+    Course createCourseForTesting(String code, String name, String summary, String description, Integer creditHours,
+            TestRun testRun);
 }

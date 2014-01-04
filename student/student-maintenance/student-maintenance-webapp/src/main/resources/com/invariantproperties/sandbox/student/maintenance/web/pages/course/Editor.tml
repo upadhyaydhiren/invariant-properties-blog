@@ -3,10 +3,12 @@
      We use a "strict" DTD to make IE follow the alignment rules. -->
 <!-- see: http://jumpstart.doublenegative.com.au/jumpstart/together/componentscrud/courses -->
 
-<html xmlns:t="http://tapestry.apache.org/schema/tapestry_5_3.xsd" xmlns:p="tapestry:parameter">
+<html t:type="layout" title="Course Editor"
+      t:sidebarTitle="Framework Version"
+      xmlns:t="http://tapestry.apache.org/schema/tapestry_5_3.xsd" xmlns:p="tapestry:parameter">
 <!--  At runtime the page will supply the stylesheet. The link here is to enable preview. -->
 
-<t:content>
+    <t:zone t:id="zone">   
 
     <t:if test="modeCreate">
         <h1>Create</h1>
@@ -16,22 +18,43 @@
     
             <table>
                 <tr>
-                    <th><t:label for="name"/>:</th>
-                    <td><input t:type="TextField" t:id="name" value="course.name" t:validate="required, maxlength=10" size="10"/></td>
+                    <th><t:label for="code"/>:</th>
+                    <td><input t:type="TextField" t:id="code" value="course.code" t:validate="required, maxlength=12" size="12"/></td>
                     <td>(required)</td>
                 </tr>
-                <!--
+                <tr class="err">
+                    <th></th>
+                    <td colspan="2"><t:CustomError for="code"/></td>
+                </tr>
+                <tr>
+                    <th><t:label for="name"/>:</th>
+                    <td><input t:type="TextField" t:id="name" value="course.name" t:validate="required, maxlength=80" size="45"/></td>
+                    <td>(required)</td>
+                </tr>
                 <tr class="err">
                     <th></th>
                     <td colspan="2"><t:CustomError for="name"/></td>
                 </tr>
-                -->
+                <tr>
+                    <th><t:label for="summary"/>:</th>
+                    <td><input cols="50" rows="4" t:type="TextArea" t:id="summary" value="course.summary" t:validate="maxlength=400"/></td>
+                </tr>
+                <tr class="err">
+                    <th></th>
+                    <td colspan="2"><t:CustomError for="summary"/></td>
+                </tr>
+                <tr>
+                    <th><t:label for="description"/>:</th>
+                    <td><input cols="50" rows="12" t:type="TextArea" t:id="description" value="course.description" t:validate="maxlength=2000"/></td>
+                </tr>
+                <tr class="err">
+                    <th></th>
+                    <td colspan="2"><t:CustomError for="description"/></td>
+                </tr>
             </table>
 
             <div class="buttons">
-             <!--
-                <a t:type="eventLink" t:event="cancelCreate" href="#">Cancel</a>
-              -->
+                <t:submit t:event="cancelCreate" t:context="course.uuid" value="Cancel"/>
                 <input type="submit" value="Save"/>
             </div>
         </form>
@@ -40,6 +63,11 @@
 
     <t:if test="modeReview">
         <h1>Review</h1>
+        
+        <strong>Warning: no attempt is made to block XSS</strong>
+
+        <form t:type="form" t:id="reviewForm">
+            <t:errors/>
         
         <t:if test="course">
             <div t:type="if" t:test="deleteMessage" class="error">
@@ -52,28 +80,40 @@
                     <td>${course.uuid}</td>
                 </tr>
                 <tr>
+                    <th>Code:</th>
+                    <td>${course.code}</td>
+                </tr>
+                <tr>
                     <th>Name:</th>
                     <td>${course.name}</td>
+                </tr>
+                <tr>
+                    <th>Summary:</th>
+                    <td>${course.summary}</td>
+                </tr>
+                <tr>
+                    <th>Description:</th>
+                    <td>${course.description}</td>
                 </tr>
             </table>
 
             <div class="buttons">
-            <!--
-                <a t:type="eventLink" t:event="toUpdate" t:context="course.uuid" href="#">Update...</a>
-                <a t:type="eventLink" t:event="delete" t:context="[course.uuid]" href="#" 
-                    t:mixins="Confirm" t:message="Delete ${course.name}?">Delete...</a>
-            -->
+                <t:submit t:event="toIndex" t:context="course.uuid" value="List"/>
+                <t:submit t:event="toUpdate" t:context="course.uuid" value="Update"/>
+                <t:submit t:event="delete" t:context="course.uuid" t:mixins="Confirm" t:message="Delete ${course.name}?" value="Delete"/>
             </div>
 
         </t:if>
         <t:if negate="true" test="course">
             Course ${courseUuid} does not exist.<br/><br/>
         </t:if>
-        
+        </form>
     </t:if>
 
     <t:if test="modeUpdate">
         <h1>Update</h1>
+
+        <strong>Warning: no attempt is made to block XSS</strong>
         
         <form t:type="form" t:id="updateForm">
             <t:errors/>
@@ -84,22 +124,44 @@
         
                 <table>
                     <tr>
-                        <th><t:label for="updName"/>:</th>
-                        <td><input t:type="TextField" t:id="updName" value="course.name" t:validate="required, maxlength=10" size="10"/></td>
-                        <td>(required)</td>
+                        <th><t:label for="updCode"/>:</th>
+                        <td><input t:type="TextField" t:id="updCode" value="course.code" t:disabled="true" size="12"/></td>
+                        <td>(read-only)</td>
                     </tr>
-                    <!--
                     <tr class="err">
                         <th></th>
                         <td colspan="2"><t:CustomError for="updName"/></td>
                     </tr>
-                    -->
+                    <tr>
+                        <th><t:label for="updName"/>:</th>
+                        <td><input t:type="TextField" t:id="updName" value="course.name" t:validate="required, maxlength=80" size="45"/></td>
+                        <td>(required)</td>
+                    </tr>
+                    <tr class="err">
+                        <th></th>
+                        <td colspan="2"><t:CustomError for="updSummary"/></td>
+                    </tr>
+                    <tr>
+                        <th><t:label for="updSummary"/>:</th>
+                        <td><input cols="50" rows="4" t:type="TextArea" t:id="updSummary" value="course.summary" t:validate="maxlength=400"/></td>
+                    </tr>
+                    <tr class="err">
+                        <th></th>
+                        <td colspan="2"><t:CustomError for="updSummary"/></td>
+                    </tr>
+                    <tr>
+                        <th><t:label for="updDescription"/>:</th>
+                        <td><input cols="50" rows="12" t:type="TextArea" t:id="updDescription" value="course.description" t:validate="maxlength=50"/></td>
+                    </tr>
+                    <tr class="err">
+                        <th></th>
+                        <td colspan="2"><t:CustomError for="updDescription"/></td>
+                    </tr>
                 </table>
 
                 <div class="buttons">
-                <!--
-                    <a t:type="eventLink" t:event="cancelUpdate" t:context="course.uuid" href="#">Cancel</a>
-                -->
+                    <t:submit t:event="toIndex" t:context="course.uuid" value="List"/>
+                    <t:submit t:event="cancelUpdate" t:context="course.uuid" value="Cancel"/>
                     <input t:type="submit" value="Save"/>
                 </div>
             </t:if>
@@ -111,5 +173,17 @@
         
     </t:if>
 
-</t:content>
+    </t:zone> 
+    
+    <p:sidebar>
+        <p>
+            [
+            <t:pagelink page="Index">Index</t:pagelink>
+            ]<br/>
+            [
+            <t:pagelink page="Course/Index">Courses</t:pagelink>
+            ]
+        </p>
+    </p:sidebar>  
+
 </html>

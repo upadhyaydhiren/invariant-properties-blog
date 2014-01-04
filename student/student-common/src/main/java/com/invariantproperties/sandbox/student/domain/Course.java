@@ -27,12 +27,16 @@ import java.util.List;
 import javax.persistence.AttributeOverride;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.Lob;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * Course bean
+ * 
+ * FIXME - add validation that code follows expected pattern FIXME - add
+ * validation that credit hours >= 0
  * 
  * @author Bear Giles <bgiles@coyotesong.com>
  */
@@ -43,8 +47,21 @@ import javax.xml.bind.annotation.XmlRootElement;
 public class Course extends TestablePersistentObject {
     private static final long serialVersionUID = 1L;
 
+    private String code;
     private String name;
+    private String summary;
+    private String description;
+    private Integer creditHours;
     private List<Section> sections;
+
+    @Column(length = 12, unique = true, updatable = false)
+    public String getCode() {
+        return code;
+    }
+
+    public void setCode(String code) {
+        this.code = code;
+    }
 
     @Column(length = 80, unique = false, updatable = true)
     public String getName() {
@@ -55,6 +72,34 @@ public class Course extends TestablePersistentObject {
         this.name = name;
     }
 
+    @Column(length = 400, unique = false, updatable = true)
+    public String getSummary() {
+        return summary;
+    }
+
+    public void setSummary(String summary) {
+        this.summary = summary;
+    }
+
+    @Column
+    @Lob
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    @Column(name = "credit_hours")
+    public Integer getCreditHours() {
+        return creditHours;
+    }
+
+    public void setCreditHours(Integer creditHours) {
+        this.creditHours = creditHours;
+    }
+
     @Transient
     public List<Section> getSections() {
         return sections;
@@ -62,5 +107,10 @@ public class Course extends TestablePersistentObject {
 
     public void setSections(List<Section> sections) {
         this.sections = sections;
+    }
+
+    public String toString() {
+        return String.format("[%s: %s, %s, '%s', '%s', %d]", this.getClass().getSimpleName(), getId(), getUuid(),
+                getCode(), getName(), getCreditHours());
     }
 }

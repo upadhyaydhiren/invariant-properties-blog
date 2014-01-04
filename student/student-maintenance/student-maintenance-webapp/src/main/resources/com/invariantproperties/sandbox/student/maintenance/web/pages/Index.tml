@@ -36,10 +36,7 @@
             <t:pagelink page="Index">Index</t:pagelink>
             ]<br/>
             [
-            <t:pagelink page="Classroom/List">Classrooms</t:pagelink>
-            ]<br/>
-            [
-            <t:pagelink page="Course/List">Courses</t:pagelink>
+            <t:pagelink page="Course/Index">Courses</t:pagelink>
             ]
         </p>
     </p:sidebar>

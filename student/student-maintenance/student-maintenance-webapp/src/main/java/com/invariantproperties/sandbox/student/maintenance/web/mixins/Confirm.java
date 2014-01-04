@@ -41,9 +41,7 @@ import org.apache.tapestry5.services.javascript.JavaScriptSupport;
  * 
  * @author <a href="mailto:chris@thegodcode.net">Chris Lewis</a> Apr 18, 2008
  */
-// The @Import tells Tapestry to put a link to the file in the head of the page
-// so that the browser will pull it in.
-@Import(library = "Confirm.js")
+@Import(library = "confirm.js")
 public class Confirm {
 
     @Parameter(name = "message", value = "Are you sure?", defaultPrefix = BindingConstants.LITERAL)
@@ -67,5 +65,4 @@ public class Confirm {
         spec.put("message", message);
         javaScriptSupport.addInitializerCall("confirm", spec);
     }
-
 }

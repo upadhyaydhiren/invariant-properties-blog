@@ -70,6 +70,12 @@ public class CourseFinderServiceTapestryImpl implements CourseFinderService {
     }
 
     @Override
+    public Course findCourseByCode(String code) {
+        // unsupported operation!
+        throw new ObjectNotFoundException(code);
+    }
+
+    @Override
     public List<Course> findAllCourses() {
         // return new ArrayList<Course>(cache.values());
         return Arrays.asList(finder.getAllCourses());
@@ -82,8 +88,9 @@ public class CourseFinderServiceTapestryImpl implements CourseFinderService {
     }
 
     private void initCache(CourseManagerRestClient manager) {
-        manager.createCourse("physics 101");
-        manager.createCourse("physics 201");
-        manager.createCourse("physics 202");
+        for (int i = 0; i < 5; i++) {
+            long x = System.currentTimeMillis() % 10000;
+            manager.createCourse("TST-" + x, "Physics " + x, "summary", "description", 3);
+        }
     }
 }
