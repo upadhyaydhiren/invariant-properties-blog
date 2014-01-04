@@ -54,7 +54,7 @@ import com.invariantproperties.sandbox.student.domain.TestRun;
 @Service
 @Path("/course")
 public class CourseResource extends AbstractResource {
-    private static final Logger log = Logger.getLogger(CourseResource.class);
+    private static final Logger LOG = Logger.getLogger(CourseResource.class);
     private static final Course[] EMPTY_COURSE_ARRAY = new Course[0];
 
     @Context
@@ -116,7 +116,7 @@ public class CourseResource extends AbstractResource {
     @GET
     @Produces({ MediaType.APPLICATION_JSON, MediaType.TEXT_XML })
     public Response findAllCourses() {
-        log.debug("CourseResource: findAllCourses()");
+        LOG.debug("CourseResource: findAllCourses()");
 
         Response response = null;
         try {
@@ -130,7 +130,7 @@ public class CourseResource extends AbstractResource {
             response = Response.ok(results.toArray(EMPTY_COURSE_ARRAY)).build();
         } catch (Exception e) {
             if (!(e instanceof UnitTestException)) {
-                log.info("unhandled exception", e);
+                LOG.info("unhandled exception", e);
             }
             response = Response.status(Status.INTERNAL_SERVER_ERROR).build();
         }
@@ -147,8 +147,13 @@ public class CourseResource extends AbstractResource {
     @POST
     @Consumes({ MediaType.APPLICATION_JSON, MediaType.TEXT_XML })
     @Produces({ MediaType.APPLICATION_JSON, MediaType.TEXT_XML })
-    public Response createCourse(Name req) {
-        log.debug("CourseResource: createCourse()");
+    public Response createCourse(CourseInfo req) {
+        LOG.debug("CourseResource: createCourse()");
+
+        final String code = req.getCode();
+        if ((code == null) || code.isEmpty()) {
+            return Response.status(Status.BAD_REQUEST).entity("'code' is required'").build();
+        }
 
         final String name = req.getName();
         if ((name == null) || name.isEmpty()) {
@@ -163,12 +168,13 @@ public class CourseResource extends AbstractResource {
             if (req.getTestUuid() != null) {
                 TestRun testRun = testRunService.findTestRunByUuid(req.getTestUuid());
                 if (testRun != null) {
-                    course = manager.createCourseForTesting(name, testRun);
+                    course = manager.createCourseForTesting(code, name, req.getSummary(), req.getDescription(),
+                            req.getCreditHours(), testRun);
                 } else {
                     response = Response.status(Status.BAD_REQUEST).entity("unknown test UUID").build();
                 }
             } else {
-                course = manager.createCourse(name);
+                course = manager.createCourse(code, name, req.getSummary(), req.getDescription(), req.getCreditHours());
             }
             if (course == null) {
                 response = Response.status(Status.INTERNAL_SERVER_ERROR).build();
@@ -177,7 +183,7 @@ public class CourseResource extends AbstractResource {
             }
         } catch (Exception e) {
             if (!(e instanceof UnitTestException)) {
-                log.info("unhandled exception", e);
+                LOG.info("unhandled exception", e);
             }
             response = Response.status(Status.INTERNAL_SERVER_ERROR).build();
         }
@@ -195,7 +201,7 @@ public class CourseResource extends AbstractResource {
     @GET
     @Produces({ MediaType.APPLICATION_JSON, MediaType.TEXT_XML })
     public Response getCourse(@PathParam("courseId") String id) {
-        log.debug("CourseResource: getCourse()");
+        LOG.debug("CourseResource: getCourse()");
 
         Response response = null;
         try {
@@ -203,9 +209,10 @@ public class CourseResource extends AbstractResource {
             response = Response.ok(scrubCourse(course)).build();
         } catch (ObjectNotFoundException e) {
             response = Response.status(Status.NOT_FOUND).build();
+            LOG.debug("course not found: " + id);
         } catch (Exception e) {
             if (!(e instanceof UnitTestException)) {
-                log.info("unhandled exception", e);
+                LOG.info("unhandled exception", e);
             }
             response = Response.status(Status.INTERNAL_SERVER_ERROR).build();
         }
@@ -226,8 +233,8 @@ public class CourseResource extends AbstractResource {
     @POST
     @Consumes({ MediaType.APPLICATION_JSON, MediaType.TEXT_XML })
     @Produces({ MediaType.APPLICATION_JSON, MediaType.TEXT_XML })
-    public Response updateCourse(@PathParam("courseId") String id, Name req) {
-        log.debug("CourseResource: updateCourse()");
+    public Response updateCourse(@PathParam("courseId") String id, CourseInfo req) {
+        LOG.debug("CourseResource: updateCourse()");
 
         final String name = req.getName();
         if ((name == null) || name.isEmpty()) {
@@ -237,13 +244,15 @@ public class CourseResource extends AbstractResource {
         Response response = null;
         try {
             final Course course = finder.findCourseByUuid(id);
-            final Course updatedCourse = manager.updateCourse(course, name);
+            final Course updatedCourse = manager.updateCourse(course, name, req.getSummary(), req.getDescription(),
+                    req.getCreditHours());
             response = Response.ok(scrubCourse(updatedCourse)).build();
         } catch (ObjectNotFoundException exception) {
             response = Response.status(Status.NOT_FOUND).build();
+            LOG.debug("course not found: " + id);
         } catch (Exception e) {
             if (!(e instanceof UnitTestException)) {
-                log.info("unhandled exception", e);
+                LOG.info("unhandled exception", e);
             }
             response = Response.status(Status.INTERNAL_SERVER_ERROR).build();
         }
@@ -260,7 +269,7 @@ public class CourseResource extends AbstractResource {
     @Path("/{courseId}")
     @DELETE
     public Response deleteCourse(@PathParam("courseId") String id, @PathParam("version") int version) {
-        log.debug("CourseResource: deleteCourse()");
+        LOG.debug("CourseResource: deleteCourse()");
 
         Response response = null;
         try {
@@ -268,9 +277,10 @@ public class CourseResource extends AbstractResource {
             response = Response.noContent().build();
         } catch (ObjectNotFoundException exception) {
             response = Response.noContent().build();
+            LOG.info("course not found: " + id);
         } catch (Exception e) {
             if (!(e instanceof UnitTestException)) {
-                log.info("unhandled exception", e);
+                LOG.info("unhandled exception", e);
             }
             response = Response.status(Status.INTERNAL_SERVER_ERROR).build();
         }

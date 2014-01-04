@@ -54,7 +54,7 @@ import com.invariantproperties.sandbox.student.domain.TestRun;
 @Service
 @Path("/term")
 public class TermResource extends AbstractResource {
-    private static final Logger log = Logger.getLogger(TermResource.class);
+    private static final Logger LOG = Logger.getLogger(TermResource.class);
     private static final Term[] EMPTY_TERM_ARRAY = new Term[0];
 
     @Context
@@ -116,7 +116,7 @@ public class TermResource extends AbstractResource {
     @GET
     @Produces({ MediaType.APPLICATION_JSON, MediaType.TEXT_XML })
     public Response findAllTerms() {
-        log.debug("TermResource: findAllTerms()");
+        LOG.debug("TermResource: findAllTerms()");
 
         Response response = null;
         try {
@@ -130,7 +130,7 @@ public class TermResource extends AbstractResource {
             response = Response.ok(results.toArray(EMPTY_TERM_ARRAY)).build();
         } catch (Exception e) {
             if (!(e instanceof UnitTestException)) {
-                log.info("unhandled exception", e);
+                LOG.info("unhandled exception", e);
             }
             response = Response.status(Status.INTERNAL_SERVER_ERROR).build();
         }
@@ -148,7 +148,7 @@ public class TermResource extends AbstractResource {
     @Consumes({ MediaType.APPLICATION_JSON, MediaType.TEXT_XML })
     @Produces({ MediaType.APPLICATION_JSON, MediaType.TEXT_XML })
     public Response createTerm(Name req) {
-        log.debug("TermResource: createTerm()");
+        LOG.debug("TermResource: createTerm()");
 
         final String name = req.getName();
         if ((name == null) || name.isEmpty()) {
@@ -178,7 +178,7 @@ public class TermResource extends AbstractResource {
             }
         } catch (Exception e) {
             if (!(e instanceof UnitTestException)) {
-                log.info("unhandled exception", e);
+                LOG.info("unhandled exception", e);
             }
             response = Response.status(Status.INTERNAL_SERVER_ERROR).build();
         }
@@ -196,7 +196,7 @@ public class TermResource extends AbstractResource {
     @GET
     @Produces({ MediaType.APPLICATION_JSON, MediaType.TEXT_XML })
     public Response getTerm(@PathParam("termId") String id) {
-        log.debug("TermResource: getTerm()");
+        LOG.debug("TermResource: getTerm()");
 
         Response response = null;
         try {
@@ -204,9 +204,10 @@ public class TermResource extends AbstractResource {
             response = Response.ok(scrubTerm(term)).build();
         } catch (ObjectNotFoundException e) {
             response = Response.status(Status.NOT_FOUND).build();
+            LOG.debug("term not found: " + id);
         } catch (Exception e) {
             if (!(e instanceof UnitTestException)) {
-                log.info("unhandled exception", e);
+                LOG.info("unhandled exception", e);
             }
             response = Response.status(Status.INTERNAL_SERVER_ERROR).build();
         }
@@ -228,7 +229,7 @@ public class TermResource extends AbstractResource {
     @Consumes({ MediaType.APPLICATION_JSON, MediaType.TEXT_XML })
     @Produces({ MediaType.APPLICATION_JSON, MediaType.TEXT_XML })
     public Response updateTerm(@PathParam("termId") String id, Name req) {
-        log.debug("TermResource: updateTerm()");
+        LOG.debug("TermResource: updateTerm()");
 
         final String name = req.getName();
         if ((name == null) || name.isEmpty()) {
@@ -242,9 +243,10 @@ public class TermResource extends AbstractResource {
             response = Response.ok(scrubTerm(updatedTerm)).build();
         } catch (ObjectNotFoundException exception) {
             response = Response.status(Status.NOT_FOUND).build();
+            LOG.debug("term not found: " + id);
         } catch (Exception e) {
             if (!(e instanceof UnitTestException)) {
-                log.info("unhandled exception", e);
+                LOG.info("unhandled exception", e);
             }
             response = Response.status(Status.INTERNAL_SERVER_ERROR).build();
         }
@@ -261,7 +263,7 @@ public class TermResource extends AbstractResource {
     @Path("/{termId}")
     @DELETE
     public Response deleteTerm(@PathParam("termId") String id, @PathParam("version") int version) {
-        log.debug("TermResource: deleteTerm()");
+        LOG.debug("TermResource: deleteTerm()");
 
         Response response = null;
         try {
@@ -269,9 +271,10 @@ public class TermResource extends AbstractResource {
             response = Response.noContent().build();
         } catch (ObjectNotFoundException exception) {
             response = Response.noContent().build();
+            LOG.debug("term not found: " + id);
         } catch (Exception e) {
             if (!(e instanceof UnitTestException)) {
-                log.info("unhandled exception", e);
+                LOG.info("unhandled exception", e);
             }
             response = Response.status(Status.INTERNAL_SERVER_ERROR).build();
         }

@@ -52,7 +52,11 @@ public abstract class AbstractResource {
     public Course scrubCourse(final Course dirty) {
         final Course clean = new Course();
         clean.setUuid(dirty.getUuid());
+        clean.setCode(dirty.getCode());
         clean.setName(dirty.getName());
+        clean.setSummary(dirty.getSummary());
+        clean.setDescription(dirty.getDescription());
+        clean.setCreditHours(dirty.getCreditHours());
         clean.setVersion(dirty.getVersion());
         clean.setCreationDate(dirty.getCreationDate());
         // clean.setSelf("resource/" + dirty.getUuid());

@@ -22,8 +22,9 @@
  */
 package com.invariantproperties.sandbox.student.webservice.server.rest;
 
+import static com.invariantproperties.sandbox.student.matcher.CourseEquality.equalTo;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
@@ -57,11 +58,19 @@ public class CourseResourceTest {
     @Before
     public void init() {
         physics.setId(1);
+        physics.setCode("PHYS101");
         physics.setName("physics");
+        physics.setSummary("summary 1");
+        physics.setDescription("description 1");
+        physics.setCreditHours(1);
         physics.setUuid(UUID.randomUUID().toString());
 
         mechanics.setId(2);
+        mechanics.setCode("PHYS201");
         mechanics.setName("mechanics");
+        mechanics.setSummary("summary 2");
+        mechanics.setDescription("description 2");
+        mechanics.setCreditHours(2);
         mechanics.setUuid(UUID.randomUUID().toString());
     }
 
@@ -80,9 +89,10 @@ public class CourseResourceTest {
         assertEquals(200, response.getStatus());
         final Course[] actual = (Course[]) response.getEntity();
         assertEquals(expected.size(), actual.length);
-        assertNull(actual[0].getId());
-        assertEquals(expected.get(0).getName(), actual[0].getName());
-        assertEquals(expected.get(0).getUuid(), actual[0].getUuid());
+        actual[0].setId(expected.get(0).getId());
+        actual[0].setUuid(expected.get(0).getUuid());
+        actual[0].setCreationDate(expected.get(0).getCreationDate());
+        assertThat(expected.get(0), equalTo(actual[0]));
     }
 
     @Test
@@ -129,9 +139,10 @@ public class CourseResourceTest {
 
         assertEquals(200, response.getStatus());
         final Course actual = (Course) response.getEntity();
-        assertNull(actual.getId());
-        assertEquals(expected.getName(), actual.getName());
-        assertEquals(expected.getUuid(), actual.getUuid());
+        actual.setId(expected.getId());
+        actual.setUuid(expected.getUuid());
+        actual.setCreationDate(expected.getCreationDate());
+        assertThat(expected, equalTo(actual));
     }
 
     @Test
@@ -163,34 +174,41 @@ public class CourseResourceTest {
     @Test
     public void testCreateCourse() {
         final Course expected = physics;
-        final Name name = new Name();
-        name.setName(expected.getName());
+        final CourseInfo info = new CourseInfo(expected);
 
         final CourseManagerService manager = Mockito.mock(CourseManagerService.class);
-        when(manager.createCourse(name.getName())).thenReturn(expected);
+        when(
+                manager.createCourse(expected.getCode(), expected.getName(), expected.getSummary(),
+                        expected.getDescription(), expected.getCreditHours())).thenReturn(expected);
 
         final TestRunService testService = Mockito.mock(TestRunService.class);
 
         final CourseResource resource = new CourseResource(manager, testService);
-        final Response response = resource.createCourse(name);
+        final Response response = resource.createCourse(info);
 
         assertEquals(201, response.getStatus());
         final Course actual = (Course) response.getEntity();
-        assertNull(actual.getId());
-        assertEquals(expected.getName(), actual.getName());
+        actual.setId(expected.getId());
+        actual.setUuid(expected.getUuid());
+        actual.setCreationDate(expected.getCreationDate());
+        assertThat(expected, equalTo(actual));
     }
 
     @Test
     public void testCreateCourseBlankName() {
-        final Name name = new Name();
+        final Course expected = physics;
+        final CourseInfo info = new CourseInfo(expected);
+        info.setName("");
 
         final CourseManagerService manager = Mockito.mock(CourseManagerService.class);
-        when(manager.createCourse(name.getName())).thenReturn(null);
+        when(
+                manager.createCourse(expected.getCode(), expected.getName(), expected.getSummary(),
+                        expected.getDescription(), expected.getCreditHours())).thenReturn(null);
 
         final TestRunService testService = Mockito.mock(TestRunService.class);
 
         final CourseResource resource = new CourseResource(manager, testService);
-        final Response response = resource.createCourse(name);
+        final Response response = resource.createCourse(info);
 
         assertEquals(400, response.getStatus());
     }
@@ -203,16 +221,16 @@ public class CourseResourceTest {
     @Test
     public void testCreateCourseProblem() {
         final Course expected = physics;
-        final Name name = new Name();
-        name.setName(expected.getName());
+        final CourseInfo info = new CourseInfo(expected);
 
         final CourseManagerService manager = Mockito.mock(CourseManagerService.class);
-        when(manager.createCourse(name.getName())).thenReturn(null);
-
+        when(
+                manager.createCourse(expected.getCode(), expected.getName(), expected.getSummary(),
+                        expected.getDescription(), expected.getCreditHours())).thenReturn(null);
         final TestRunService testService = Mockito.mock(TestRunService.class);
 
         final CourseResource resource = new CourseResource(manager, testService);
-        final Response response = resource.createCourse(name);
+        final Response response = resource.createCourse(info);
 
         assertEquals(500, response.getStatus());
     }
@@ -220,16 +238,17 @@ public class CourseResourceTest {
     @Test
     public void testCreateCourseFailure() {
         final Course expected = physics;
-        final Name name = new Name();
-        name.setName(expected.getName());
+        final CourseInfo info = new CourseInfo(expected);
 
         final CourseManagerService manager = Mockito.mock(CourseManagerService.class);
-        when(manager.createCourse(name.getName())).thenThrow(new UnitTestException());
+        when(
+                manager.createCourse(expected.getCode(), expected.getName(), expected.getSummary(),
+                        expected.getDescription(), expected.getCreditHours())).thenThrow(new UnitTestException());
 
         final TestRunService testService = Mockito.mock(TestRunService.class);
 
         final CourseResource resource = new CourseResource(manager, testService);
-        final Response response = resource.createCourse(name);
+        final Response response = resource.createCourse(info);
 
         assertEquals(500, response.getStatus());
     }
@@ -237,42 +256,50 @@ public class CourseResourceTest {
     @Test
     public void testUpdateCourse() {
         final Course expected = physics;
-        final Name name = new Name();
-        name.setName(mechanics.getName());
+        final CourseInfo info = new CourseInfo(mechanics);
         final Course updated = new Course();
         updated.setId(expected.getId());
+        updated.setCode(mechanics.getCode());
         updated.setName(mechanics.getName());
+        updated.setSummary(mechanics.getSummary());
+        updated.setDescription(mechanics.getDescription());
+        updated.setCreditHours(mechanics.getCreditHours());
         updated.setUuid(expected.getUuid());
 
         final CourseFinderService finder = Mockito.mock(CourseFinderService.class);
         final CourseManagerService manager = Mockito.mock(CourseManagerService.class);
         when(finder.findCourseByUuid(expected.getUuid())).thenReturn(expected);
-        when(manager.updateCourse(expected, name.getName())).thenReturn(updated);
+        when(
+                manager.updateCourse(expected, updated.getName(), updated.getSummary(), updated.getDescription(),
+                        updated.getCreditHours())).thenReturn(updated);
 
         final TestRunService testService = Mockito.mock(TestRunService.class);
 
         final CourseResource resource = new CourseResource(finder, manager, testService);
-        final Response response = resource.updateCourse(expected.getUuid(), name);
+        final Response response = resource.updateCourse(expected.getUuid(), info);
 
         assertEquals(200, response.getStatus());
         final Course actual = (Course) response.getEntity();
-        assertNull(actual.getId());
-        assertEquals(mechanics.getName(), actual.getName());
-        assertEquals(expected.getUuid(), actual.getUuid());
+        actual.setId(updated.getId());
+        actual.setUuid(updated.getUuid());
+        actual.setCreationDate(updated.getCreationDate());
+        assertThat(updated, equalTo(actual));
     }
 
     @Test
     public void testUpdateCourseBlankName() {
         final Course expected = physics;
-        final Name name = new Name();
+        final CourseInfo info = new CourseInfo();
 
         final CourseManagerService manager = Mockito.mock(CourseManagerService.class);
-        when(manager.createCourse(name.getName())).thenReturn(null);
+        when(
+                manager.createCourse(expected.getCode(), expected.getName(), expected.getSummary(),
+                        expected.getDescription(), 1)).thenReturn(null);
 
         final TestRunService testService = Mockito.mock(TestRunService.class);
 
         final CourseResource resource = new CourseResource(manager, testService);
-        final Response response = resource.updateCourse(expected.getUuid(), name);
+        final Response response = resource.updateCourse(expected.getUuid(), info);
 
         assertEquals(400, response.getStatus());
     }
@@ -285,16 +312,16 @@ public class CourseResourceTest {
     @Test
     public void testUpdateCourseProblem() {
         final Course expected = physics;
-        final Name name = new Name();
-        name.setName(expected.getName());
+        final CourseInfo info = new CourseInfo(expected);
 
         final CourseManagerService manager = Mockito.mock(CourseManagerService.class);
-        when(manager.updateCourse(expected, name.getName())).thenReturn(null);
+        when(manager.updateCourse(expected, expected.getName(), expected.getSummary(), expected.getDescription(), 1))
+                .thenReturn(null);
 
         final TestRunService testService = Mockito.mock(TestRunService.class);
 
         final CourseResource resource = new CourseResource(manager, testService);
-        final Response response = resource.createCourse(name);
+        final Response response = resource.createCourse(info);
 
         assertEquals(500, response.getStatus());
     }
@@ -302,16 +329,16 @@ public class CourseResourceTest {
     @Test
     public void testUpdateCourseFailure() {
         final Course expected = physics;
-        final Name name = new Name();
-        name.setName(expected.getName());
+        final CourseInfo info = new CourseInfo(expected);
 
         final CourseManagerService manager = Mockito.mock(CourseManagerService.class);
-        when(manager.updateCourse(expected, name.getName())).thenThrow(new UnitTestException());
+        when(manager.updateCourse(expected, expected.getName(), expected.getSummary(), expected.getDescription(), 1))
+                .thenThrow(new UnitTestException());
 
         final TestRunService testService = Mockito.mock(TestRunService.class);
 
         final CourseResource resource = new CourseResource(manager, testService);
-        final Response response = resource.createCourse(name);
+        final Response response = resource.createCourse(info);
 
         assertEquals(500, response.getStatus());
     }
@@ -334,8 +361,6 @@ public class CourseResourceTest {
     @Test
     public void testDeleteCourseMissing() {
         final Course expected = physics;
-        final Name name = new Name();
-        name.setName(expected.getName());
 
         final CourseManagerService manager = Mockito.mock(CourseManagerService.class);
         doThrow(new ObjectNotFoundException(expected.getUuid())).when(manager).deleteCourse(expected.getUuid(), 0);

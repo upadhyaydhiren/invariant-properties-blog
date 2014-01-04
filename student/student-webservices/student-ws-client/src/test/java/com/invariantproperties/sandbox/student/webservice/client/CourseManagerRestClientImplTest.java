@@ -22,7 +22,8 @@
  */
 package com.invariantproperties.sandbox.student.webservice.client;
 
-import static org.junit.Assert.assertEquals;
+import static com.invariantproperties.sandbox.student.matcher.CourseEquality.equalTo;
+import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.when;
@@ -46,48 +47,55 @@ import com.sun.jersey.api.client.WebResource;
  */
 public class CourseManagerRestClientImplTest {
     private static final String UUID = "uuid";
+    private static final String CODE = "code";
     private static final String NAME = "name";
+    private static final String SUMMARY = "summary";
+    private static final String DESCRIPTION = "description";
+    private static final Integer HOURS = 1;
 
     @Test
     public void testCreateCourse() {
         Course expected = new Course();
+        expected.setCode(CODE);
         expected.setName(NAME);
+        expected.setSummary(SUMMARY);
+        expected.setDescription(DESCRIPTION);
+        expected.setCreditHours(HOURS);
         CourseManagerRestClient client = new ManagerCourseMock(Response.Status.CREATED.getStatusCode(), expected);
-        Course actual = client.createCourse(expected.getName());
-        assertEquals(expected.getName(), actual.getName());
-        // assertEquals(CourseRestClientMock.RESOURCE + results.getUuid(),
-        // actual.getSelf());
+        Course actual = client.createCourse(CODE, NAME, SUMMARY, DESCRIPTION, HOURS);
+        assertThat(expected, equalTo(actual));
     }
 
     @Test(expected = RestClientFailureException.class)
     public void testCreateCourseError() {
         CourseManagerRestClient client = new ManagerCourseMock(500, null);
-        client.createCourse(UUID);
+        client.createCourse(CODE, NAME, SUMMARY, DESCRIPTION, HOURS);
     }
 
     @Test
     public void testUpdateCourse() {
         Course expected = new Course();
         expected.setUuid(UUID);
+        expected.setCode(CODE);
         expected.setName(NAME);
+        expected.setSummary(SUMMARY);
+        expected.setDescription(DESCRIPTION);
+        expected.setCreditHours(HOURS);
         CourseManagerRestClient client = new ManagerCourseMock(200, expected);
-        Course actual = client.updateCourse(expected.getUuid(), expected.getName());
-        assertEquals(expected.getUuid(), actual.getUuid());
-        assertEquals(expected.getName(), actual.getName());
-        // assertEquals(CourseRestClientMock.RESOURCE + course.getUuid(),
-        // actual.getSelf());
+        Course actual = client.updateCourse(expected.getUuid(), NAME, SUMMARY, DESCRIPTION, HOURS);
+        assertThat(expected, equalTo(actual));
     }
 
     @Test(expected = ObjectNotFoundException.class)
     public void testUpdateCourseMissing() {
         CourseManagerRestClient client = new ManagerCourseMock(404, null);
-        client.updateCourse(UUID, NAME);
+        client.updateCourse(UUID, NAME, SUMMARY, DESCRIPTION, HOURS);
     }
 
     @Test(expected = RestClientFailureException.class)
     public void testUpdateCourseError() {
         CourseManagerRestClient client = new ManagerCourseMock(500, null);
-        client.updateCourse(UUID, NAME);
+        client.updateCourse(UUID, NAME, SUMMARY, DESCRIPTION, HOURS);
     }
 
     @Test

@@ -47,41 +47,102 @@ public class CourseManagerRestClientImpl extends AbstractManagerRestClientImpl<C
     /**
      * Create JSON string.
      * 
+     * @param code
      * @param name
+     * @param summary
+     * @param description
+     * @param creditHours
+     * @param testRun
      * @return
      */
-    String createJson(final String name) {
-        return String.format("{ \"name\": \"%s\" }", name);
+    String createJson(final String code, final String name, final String summary, final String description,
+            final Integer creditHours, final TestRun testRun) {
+        StringBuilder json = new StringBuilder("{ ");
+        boolean first = true;
+        if (code != null) {
+            if (!first) {
+                json.append(", ");
+            } else {
+                first = false;
+            }
+            json.append(String.format("\"code\": \"%s\"", code));
+        }
+
+        if (name != null) {
+            if (!first) {
+                json.append(", ");
+            } else {
+                first = false;
+            }
+            json.append(String.format("\"name\": \"%s\"", name));
+        }
+
+        if (summary != null) {
+            if (!first) {
+                json.append(", ");
+            } else {
+                first = false;
+            }
+            json.append(String.format("\"summary\": \"%s\"", summary));
+        }
+
+        if (description != null) {
+            if (!first) {
+                json.append(", ");
+            } else {
+                first = false;
+            }
+            json.append(String.format("\"description\": \"%s\"", description));
+        }
+
+        if (creditHours != null) {
+            if (!first) {
+                json.append(", ");
+            } else {
+                first = false;
+            }
+            json.append(String.format("\"creditHours\": \"%s\"", creditHours));
+        }
+
+        if (testRun != null && testRun.getUuid() != null) {
+            if (!first) {
+                json.append(", ");
+            } else {
+                first = false;
+            }
+            json.append(String.format("\"testUuid\": \"%s\"", testRun.getUuid()));
+        }
+
+        json.append(" }");
+
+        return json.toString();
     }
 
     /**
-     * Create JSON string.
-     * 
-     * @param name
-     * @return
-     */
-    String createJson(final String name, final TestRun testRun) {
-        return String.format("{ \"name\": \"%s\", \"testUuid\": \"%s\" }", name, testRun.getUuid());
-    }
-
-    /**
-     * @see com.invariantproperties.sandbox.student.webservice.client.CourseManagerRestClient#createCourse(java.lang.String)
+     * @see com.invariantproperties.sandbox.student.webservice.client.
+     *      CourseManagerRestClient#createCourse(...)
      */
     @Override
-    public Course createCourse(final String name) {
+    public Course createCourse(final String code, final String name, final String summary, final String description,
+            final Integer creditHours) {
+        if (code == null || code.isEmpty()) {
+            throw new IllegalArgumentException("'code' is required");
+        }
+
         if (name == null || name.isEmpty()) {
             throw new IllegalArgumentException("'name' is required");
         }
 
-        return createObject(createJson(name));
+        return createObject(createJson(code, name, summary, description, creditHours, null));
     }
 
     /**
-     * @see com.invariantproperties.sandbox.student.webservice.client.CourseManagerRestClient#createCourseForTesting(java.lang.String,
-     *      com.invariantproperties.sandbox.student.common.TestRun)
+     * @see com.invariantproperties.sandbox.student.webservice.client.
+     *      CourseManagerRestClient#createCourseForTesting(...)
      */
     @Override
-    public Course createCourseForTesting(final String name, final TestRun testRun) {
+    public Course createCourseForTesting(final String code, final String name, final String summary,
+            final String description, final Integer creditHours, final TestRun testRun) {
         if (name == null || name.isEmpty()) {
             throw new IllegalArgumentException("'name' is required");
         }
@@ -90,20 +151,21 @@ public class CourseManagerRestClientImpl extends AbstractManagerRestClientImpl<C
             throw new IllegalArgumentException("'testRun' is required");
         }
 
-        return createObject(createJson(name, testRun));
+        return createObject(createJson(code, name, summary, description, creditHours, null));
     }
 
     /**
-     * @see com.invariantproperties.sandbox.student.webservice.client.CourseManagerRestClient#updateCourse(java.lang.String,
-     *      java.lang.String)
+     * @see com.invariantproperties.sandbox.student.webservice.client.
+     *      CourseManagerRestClient#updateCourse(...)
      */
     @Override
-    public Course updateCourse(final String uuid, final String name) {
+    public Course updateCourse(final String uuid, final String name, final String summary, final String description,
+            final Integer creditHours) {
         if (name == null || name.isEmpty()) {
             throw new IllegalArgumentException("'name' is required");
         }
 
-        return super.updateObject(createJson(name), uuid);
+        return super.updateObject(createJson(null, name, summary, description, creditHours, null), uuid);
     }
 
     /**
