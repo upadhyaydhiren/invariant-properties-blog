@@ -50,6 +50,7 @@ import com.invariantproperties.sandbox.student.business.TermManagerService;
 import com.invariantproperties.sandbox.student.business.TestRunService;
 import com.invariantproperties.sandbox.student.domain.Term;
 import com.invariantproperties.sandbox.student.domain.TestRun;
+import com.invariantproperties.sandbox.student.util.StudentUtil;
 
 @Service
 @Path("/term")
@@ -196,20 +197,25 @@ public class TermResource extends AbstractResource {
     @GET
     @Produces({ MediaType.APPLICATION_JSON, MediaType.TEXT_XML })
     public Response getTerm(@PathParam("termId") String id) {
-        LOG.debug("TermResource: getTerm()");
 
         Response response = null;
-        try {
-            Term term = finder.findTermByUuid(id);
-            response = Response.ok(scrubTerm(term)).build();
-        } catch (ObjectNotFoundException e) {
-            response = Response.status(Status.NOT_FOUND).build();
-            LOG.debug("term not found: " + id);
-        } catch (Exception e) {
-            if (!(e instanceof UnitTestException)) {
-                LOG.info("unhandled exception", e);
+        if (!StudentUtil.isPossibleUuid(id)) {
+            response = Response.status(Status.BAD_REQUEST).build();
+            LOG.info("attempt to use malformed UUID");
+        } else {
+            LOG.debug("TermResource: getTerm(" + id + ")");
+            try {
+                Term term = finder.findTermByUuid(id);
+                response = Response.ok(scrubTerm(term)).build();
+            } catch (ObjectNotFoundException e) {
+                response = Response.status(Status.NOT_FOUND).build();
+                LOG.debug("term not found: " + id);
+            } catch (Exception e) {
+                if (!(e instanceof UnitTestException)) {
+                    LOG.info("unhandled exception", e);
+                }
+                response = Response.status(Status.INTERNAL_SERVER_ERROR).build();
             }
-            response = Response.status(Status.INTERNAL_SERVER_ERROR).build();
         }
 
         return response;
@@ -229,7 +235,6 @@ public class TermResource extends AbstractResource {
     @Consumes({ MediaType.APPLICATION_JSON, MediaType.TEXT_XML })
     @Produces({ MediaType.APPLICATION_JSON, MediaType.TEXT_XML })
     public Response updateTerm(@PathParam("termId") String id, Name req) {
-        LOG.debug("TermResource: updateTerm()");
 
         final String name = req.getName();
         if ((name == null) || name.isEmpty()) {
@@ -237,18 +242,24 @@ public class TermResource extends AbstractResource {
         }
 
         Response response = null;
-        try {
-            final Term term = finder.findTermByUuid(id);
-            final Term updatedTerm = manager.updateTerm(term, name);
-            response = Response.ok(scrubTerm(updatedTerm)).build();
-        } catch (ObjectNotFoundException exception) {
-            response = Response.status(Status.NOT_FOUND).build();
-            LOG.debug("term not found: " + id);
-        } catch (Exception e) {
-            if (!(e instanceof UnitTestException)) {
-                LOG.info("unhandled exception", e);
+        if (!StudentUtil.isPossibleUuid(id)) {
+            response = Response.status(Status.BAD_REQUEST).build();
+            LOG.info("attempt to use malformed UUID");
+        } else {
+            LOG.debug("TermResource: updateTerm(" + id + ")");
+            try {
+                final Term term = finder.findTermByUuid(id);
+                final Term updatedTerm = manager.updateTerm(term, name);
+                response = Response.ok(scrubTerm(updatedTerm)).build();
+            } catch (ObjectNotFoundException exception) {
+                response = Response.status(Status.NOT_FOUND).build();
+                LOG.debug("term not found: " + id);
+            } catch (Exception e) {
+                if (!(e instanceof UnitTestException)) {
+                    LOG.info("unhandled exception", e);
+                }
+                response = Response.status(Status.INTERNAL_SERVER_ERROR).build();
             }
-            response = Response.status(Status.INTERNAL_SERVER_ERROR).build();
         }
 
         return response;
@@ -263,20 +274,25 @@ public class TermResource extends AbstractResource {
     @Path("/{termId}")
     @DELETE
     public Response deleteTerm(@PathParam("termId") String id, @PathParam("version") int version) {
-        LOG.debug("TermResource: deleteTerm()");
 
         Response response = null;
-        try {
-            manager.deleteTerm(id, version);
-            response = Response.noContent().build();
-        } catch (ObjectNotFoundException exception) {
-            response = Response.noContent().build();
-            LOG.debug("term not found: " + id);
-        } catch (Exception e) {
-            if (!(e instanceof UnitTestException)) {
-                LOG.info("unhandled exception", e);
+        if (!StudentUtil.isPossibleUuid(id)) {
+            response = Response.status(Status.BAD_REQUEST).build();
+            LOG.info("attempt to use malformed UUID");
+        } else {
+            LOG.debug("TermResource: deleteTerm(" + id + ")");
+            try {
+                manager.deleteTerm(id, version);
+                response = Response.noContent().build();
+            } catch (ObjectNotFoundException exception) {
+                response = Response.noContent().build();
+                LOG.debug("term not found: " + id);
+            } catch (Exception e) {
+                if (!(e instanceof UnitTestException)) {
+                    LOG.info("unhandled exception", e);
+                }
+                response = Response.status(Status.INTERNAL_SERVER_ERROR).build();
             }
-            response = Response.status(Status.INTERNAL_SERVER_ERROR).build();
         }
 
         return response;

@@ -40,6 +40,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import com.invariantproperties.sandbox.student.domain.Term;
 import com.invariantproperties.sandbox.student.domain.TestRun;
 import com.invariantproperties.sandbox.student.webservice.client.ObjectNotFoundException;
+import com.invariantproperties.sandbox.student.webservice.client.RestClientException;
 import com.invariantproperties.sandbox.student.webservice.client.TermFinderRestClient;
 import com.invariantproperties.sandbox.student.webservice.client.TermManagerRestClient;
 import com.invariantproperties.sandbox.student.webservice.client.TestRunManagerRestClient;
@@ -77,7 +78,12 @@ public class TermRestServerIntegrationTest {
 
     @Test(expected = ObjectNotFoundException.class)
     public void testUnknownTerm() throws IOException {
-        finderClient.getTerm("missing");
+        finderClient.getTerm("11111111-1111-1111-1111-111111111111");
+    }
+
+    @Test(expected = RestClientException.class)
+    public void testBadTermUuid() throws IOException {
+        finderClient.getTerm("bad-uuid");
     }
 
     @Test

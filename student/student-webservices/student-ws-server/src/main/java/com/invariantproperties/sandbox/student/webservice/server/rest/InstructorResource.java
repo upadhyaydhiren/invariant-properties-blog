@@ -50,6 +50,7 @@ import com.invariantproperties.sandbox.student.business.ObjectNotFoundException;
 import com.invariantproperties.sandbox.student.business.TestRunService;
 import com.invariantproperties.sandbox.student.domain.Instructor;
 import com.invariantproperties.sandbox.student.domain.TestRun;
+import com.invariantproperties.sandbox.student.util.StudentUtil;
 
 @Service
 @Path("/instructor")
@@ -202,20 +203,25 @@ public class InstructorResource extends AbstractResource {
     @GET
     @Produces({ MediaType.APPLICATION_JSON, MediaType.TEXT_XML })
     public Response getInstructor(@PathParam("instructorId") String id) {
-        LOG.debug("InstructorResource: getInstructor()");
 
         Response response = null;
-        try {
-            Instructor instructor = finder.findInstructorByUuid(id);
-            response = Response.ok(scrubInstructor(instructor)).build();
-        } catch (ObjectNotFoundException e) {
-            response = Response.status(Status.NOT_FOUND).build();
-            LOG.debug("Instructor not found: " + id);
-        } catch (Exception e) {
-            if (!(e instanceof UnitTestException)) {
-                LOG.info("unhandled exception", e);
+        if (!StudentUtil.isPossibleUuid(id)) {
+            response = Response.status(Status.BAD_REQUEST).build();
+            LOG.info("attempt to use malformed UUID");
+        } else {
+            LOG.debug("InstructorResource: getInstructor(" + id + ")");
+            try {
+                Instructor instructor = finder.findInstructorByUuid(id);
+                response = Response.ok(scrubInstructor(instructor)).build();
+            } catch (ObjectNotFoundException e) {
+                response = Response.status(Status.NOT_FOUND).build();
+                LOG.debug("Instructor not found: " + id);
+            } catch (Exception e) {
+                if (!(e instanceof UnitTestException)) {
+                    LOG.info("unhandled exception", e);
+                }
+                response = Response.status(Status.INTERNAL_SERVER_ERROR).build();
             }
-            response = Response.status(Status.INTERNAL_SERVER_ERROR).build();
         }
 
         return response;
@@ -235,7 +241,6 @@ public class InstructorResource extends AbstractResource {
     @Consumes({ MediaType.APPLICATION_JSON, MediaType.TEXT_XML })
     @Produces({ MediaType.APPLICATION_JSON, MediaType.TEXT_XML })
     public Response updateInstructor(@PathParam("instructorId") String id, NameAndEmailAddress req) {
-        LOG.debug("InstructorResource: updateInstructor()");
 
         final String name = req.getName();
         if ((name == null) || name.isEmpty()) {
@@ -248,18 +253,24 @@ public class InstructorResource extends AbstractResource {
         }
 
         Response response = null;
-        try {
-            final Instructor instructor = finder.findInstructorByUuid(id);
-            final Instructor updatedInstructor = manager.updateInstructor(instructor, name, email);
-            response = Response.ok(scrubInstructor(updatedInstructor)).build();
-        } catch (ObjectNotFoundException exception) {
-            response = Response.status(Status.NOT_FOUND).build();
-            LOG.debug("instructor not found: " + id);
-        } catch (Exception e) {
-            if (!(e instanceof UnitTestException)) {
-                LOG.info("unhandled exception", e);
+        if (!StudentUtil.isPossibleUuid(id)) {
+            response = Response.status(Status.BAD_REQUEST).build();
+            LOG.info("attempt to use malformed UUID");
+        } else {
+            LOG.debug("InstructorResource: updateInstructor(" + id + ")");
+            try {
+                final Instructor instructor = finder.findInstructorByUuid(id);
+                final Instructor updatedInstructor = manager.updateInstructor(instructor, name, email);
+                response = Response.ok(scrubInstructor(updatedInstructor)).build();
+            } catch (ObjectNotFoundException exception) {
+                response = Response.status(Status.NOT_FOUND).build();
+                LOG.debug("instructor not found: " + id);
+            } catch (Exception e) {
+                if (!(e instanceof UnitTestException)) {
+                    LOG.info("unhandled exception", e);
+                }
+                response = Response.status(Status.INTERNAL_SERVER_ERROR).build();
             }
-            response = Response.status(Status.INTERNAL_SERVER_ERROR).build();
         }
 
         return response;
@@ -274,20 +285,25 @@ public class InstructorResource extends AbstractResource {
     @Path("/{instructorId}")
     @DELETE
     public Response deleteInstructor(@PathParam("instructorId") String id, @PathParam("version") int version) {
-        LOG.debug("InstructorResource: deleteInstructor()");
 
         Response response = null;
-        try {
-            manager.deleteInstructor(id, version);
-            response = Response.noContent().build();
-        } catch (ObjectNotFoundException exception) {
-            response = Response.noContent().build();
-            LOG.debug("instructor not found: " + id);
-        } catch (Exception e) {
-            if (!(e instanceof UnitTestException)) {
-                LOG.info("unhandled exception", e);
+        if (!StudentUtil.isPossibleUuid(id)) {
+            response = Response.status(Status.BAD_REQUEST).build();
+            LOG.info("attempt to use malformed UUID");
+        } else {
+            LOG.debug("InstructorResource: deleteInstructor(" + id + ")");
+            try {
+                manager.deleteInstructor(id, version);
+                response = Response.noContent().build();
+            } catch (ObjectNotFoundException exception) {
+                response = Response.noContent().build();
+                LOG.debug("instructor not found: " + id);
+            } catch (Exception e) {
+                if (!(e instanceof UnitTestException)) {
+                    LOG.info("unhandled exception", e);
+                }
+                response = Response.status(Status.INTERNAL_SERVER_ERROR).build();
             }
-            response = Response.status(Status.INTERNAL_SERVER_ERROR).build();
         }
 
         return response;

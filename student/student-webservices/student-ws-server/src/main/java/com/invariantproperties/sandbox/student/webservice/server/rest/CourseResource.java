@@ -50,6 +50,7 @@ import com.invariantproperties.sandbox.student.business.ObjectNotFoundException;
 import com.invariantproperties.sandbox.student.business.TestRunService;
 import com.invariantproperties.sandbox.student.domain.Course;
 import com.invariantproperties.sandbox.student.domain.TestRun;
+import com.invariantproperties.sandbox.student.util.StudentUtil;
 
 @Service
 @Path("/course")
@@ -201,20 +202,25 @@ public class CourseResource extends AbstractResource {
     @GET
     @Produces({ MediaType.APPLICATION_JSON, MediaType.TEXT_XML })
     public Response getCourse(@PathParam("courseId") String id) {
-        LOG.debug("CourseResource: getCourse()");
 
         Response response = null;
-        try {
-            Course course = finder.findCourseByUuid(id);
-            response = Response.ok(scrubCourse(course)).build();
-        } catch (ObjectNotFoundException e) {
-            response = Response.status(Status.NOT_FOUND).build();
-            LOG.debug("course not found: " + id);
-        } catch (Exception e) {
-            if (!(e instanceof UnitTestException)) {
-                LOG.info("unhandled exception", e);
+        if (!StudentUtil.isPossibleUuid(id)) {
+            response = Response.status(Status.BAD_REQUEST).build();
+            LOG.info("attempt to use malformed UUID");
+        } else {
+            LOG.debug("CourseResource: getCourse(" + id + ")");
+            try {
+                Course course = finder.findCourseByUuid(id);
+                response = Response.ok(scrubCourse(course)).build();
+            } catch (ObjectNotFoundException e) {
+                response = Response.status(Status.NOT_FOUND).build();
+                LOG.debug("course not found: " + id);
+            } catch (Exception e) {
+                if (!(e instanceof UnitTestException)) {
+                    LOG.info("unhandled exception", e);
+                }
+                response = Response.status(Status.INTERNAL_SERVER_ERROR).build();
             }
-            response = Response.status(Status.INTERNAL_SERVER_ERROR).build();
         }
 
         return response;
@@ -234,7 +240,6 @@ public class CourseResource extends AbstractResource {
     @Consumes({ MediaType.APPLICATION_JSON, MediaType.TEXT_XML })
     @Produces({ MediaType.APPLICATION_JSON, MediaType.TEXT_XML })
     public Response updateCourse(@PathParam("courseId") String id, CourseInfo req) {
-        LOG.debug("CourseResource: updateCourse()");
 
         final String name = req.getName();
         if ((name == null) || name.isEmpty()) {
@@ -242,19 +247,25 @@ public class CourseResource extends AbstractResource {
         }
 
         Response response = null;
-        try {
-            final Course course = finder.findCourseByUuid(id);
-            final Course updatedCourse = manager.updateCourse(course, name, req.getSummary(), req.getDescription(),
-                    req.getCreditHours());
-            response = Response.ok(scrubCourse(updatedCourse)).build();
-        } catch (ObjectNotFoundException exception) {
-            response = Response.status(Status.NOT_FOUND).build();
-            LOG.debug("course not found: " + id);
-        } catch (Exception e) {
-            if (!(e instanceof UnitTestException)) {
-                LOG.info("unhandled exception", e);
+        if (!StudentUtil.isPossibleUuid(id)) {
+            response = Response.status(Status.BAD_REQUEST).build();
+            LOG.info("attempt to use malformed UUID");
+        } else {
+            LOG.debug("CourseResource: updateCourse(" + id + ")");
+            try {
+                final Course course = finder.findCourseByUuid(id);
+                final Course updatedCourse = manager.updateCourse(course, name, req.getSummary(), req.getDescription(),
+                        req.getCreditHours());
+                response = Response.ok(scrubCourse(updatedCourse)).build();
+            } catch (ObjectNotFoundException exception) {
+                response = Response.status(Status.NOT_FOUND).build();
+                LOG.debug("course not found: " + id);
+            } catch (Exception e) {
+                if (!(e instanceof UnitTestException)) {
+                    LOG.info("unhandled exception", e);
+                }
+                response = Response.status(Status.INTERNAL_SERVER_ERROR).build();
             }
-            response = Response.status(Status.INTERNAL_SERVER_ERROR).build();
         }
 
         return response;
@@ -269,20 +280,25 @@ public class CourseResource extends AbstractResource {
     @Path("/{courseId}")
     @DELETE
     public Response deleteCourse(@PathParam("courseId") String id, @PathParam("version") int version) {
-        LOG.debug("CourseResource: deleteCourse()");
 
         Response response = null;
-        try {
-            manager.deleteCourse(id, version);
-            response = Response.noContent().build();
-        } catch (ObjectNotFoundException exception) {
-            response = Response.noContent().build();
-            LOG.info("course not found: " + id);
-        } catch (Exception e) {
-            if (!(e instanceof UnitTestException)) {
-                LOG.info("unhandled exception", e);
+        if (!StudentUtil.isPossibleUuid(id)) {
+            response = Response.status(Status.BAD_REQUEST).build();
+            LOG.info("attempt to use malformed UUID");
+        } else {
+            LOG.debug("CourseResource: deleteCourse(" + id + ")");
+            try {
+                manager.deleteCourse(id, version);
+                response = Response.noContent().build();
+            } catch (ObjectNotFoundException exception) {
+                response = Response.noContent().build();
+                LOG.info("course not found: " + id);
+            } catch (Exception e) {
+                if (!(e instanceof UnitTestException)) {
+                    LOG.info("unhandled exception", e);
+                }
+                response = Response.status(Status.INTERNAL_SERVER_ERROR).build();
             }
-            response = Response.status(Status.INTERNAL_SERVER_ERROR).build();
         }
 
         return response;

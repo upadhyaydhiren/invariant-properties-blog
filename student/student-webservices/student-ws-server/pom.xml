@@ -69,6 +69,11 @@
 			<groupId>com.invariantproperties.sandbox.student</groupId>
 			<artifactId>student-ws-client</artifactId>
 		</dependency>
+        <dependency>
+            <groupId>com.invariantproperties.sandbox.student</groupId>
+            <artifactId>student-ws-security</artifactId>
+            <scope>runtime</scope>
+        </dependency>
 
 		<dependency>
 			<groupId>log4j</groupId>

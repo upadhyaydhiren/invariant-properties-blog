@@ -42,6 +42,7 @@ import com.invariantproperties.sandbox.student.domain.TestRun;
 import com.invariantproperties.sandbox.student.webservice.client.ClassroomFinderRestClient;
 import com.invariantproperties.sandbox.student.webservice.client.ClassroomManagerRestClient;
 import com.invariantproperties.sandbox.student.webservice.client.ObjectNotFoundException;
+import com.invariantproperties.sandbox.student.webservice.client.RestClientException;
 import com.invariantproperties.sandbox.student.webservice.client.TestRunManagerRestClient;
 import com.invariantproperties.sandbox.student.webservice.client.impl.ClassroomFinderRestClientImpl;
 import com.invariantproperties.sandbox.student.webservice.client.impl.ClassroomManagerRestClientImpl;
@@ -81,7 +82,12 @@ public class ClassroomRestServerIntegrationTest {
 
     @Test(expected = ObjectNotFoundException.class)
     public void testUnknownClassroom() throws IOException {
-        finderClient.getClassroom("missing");
+        finderClient.getClassroom("11111111-1111-1111-1111-111111111111");
+    }
+
+    @Test(expected = RestClientException.class)
+    public void testBadClassroomUuid() throws IOException {
+        finderClient.getClassroom("bad-uuid");
     }
 
     @Test

@@ -47,6 +47,7 @@ import org.springframework.stereotype.Service;
 import com.invariantproperties.sandbox.student.business.ObjectNotFoundException;
 import com.invariantproperties.sandbox.student.business.TestRunService;
 import com.invariantproperties.sandbox.student.domain.TestRun;
+import com.invariantproperties.sandbox.student.util.StudentUtil;
 
 @Service
 @Path("/testRun")
@@ -155,20 +156,25 @@ public class TestRunResource extends AbstractResource {
     @GET
     @Produces({ MediaType.APPLICATION_JSON, MediaType.TEXT_XML })
     public Response getTestRun(@PathParam("testRunId") String id) {
-        LOG.debug("TestRunResource: getTestRun()");
 
         Response response = null;
-        try {
-            TestRun testRun = service.findTestRunByUuid(id);
-            response = Response.ok(scrubTestRun(testRun)).build();
-        } catch (ObjectNotFoundException e) {
-            response = Response.status(Status.NOT_FOUND).build();
-            LOG.debug("testrun not found: " + id);
-        } catch (Exception e) {
-            if (!(e instanceof UnitTestException)) {
-                LOG.info("unhandled exception", e);
+        if (!StudentUtil.isPossibleUuid(id)) {
+            response = Response.status(Status.BAD_REQUEST).build();
+            LOG.info("attempt to use malformed UUID");
+        } else {
+            LOG.debug("TestRunResource: getTestRun(" + id + ")");
+            try {
+                TestRun testRun = service.findTestRunByUuid(id);
+                response = Response.ok(scrubTestRun(testRun)).build();
+            } catch (ObjectNotFoundException e) {
+                response = Response.status(Status.NOT_FOUND).build();
+                LOG.debug("testrun not found: " + id);
+            } catch (Exception e) {
+                if (!(e instanceof UnitTestException)) {
+                    LOG.info("unhandled exception", e);
+                }
+                response = Response.status(Status.INTERNAL_SERVER_ERROR).build();
             }
-            response = Response.status(Status.INTERNAL_SERVER_ERROR).build();
         }
 
         return response;
@@ -183,20 +189,25 @@ public class TestRunResource extends AbstractResource {
     @Path("/{testRunId}")
     @DELETE
     public Response deleteTestRun(@PathParam("testRunId") String id) {
-        LOG.debug("TestRunResource: deleteTestRun()");
 
         Response response = null;
-        try {
-            service.deleteTestRun(id);
-            response = Response.noContent().build();
-        } catch (ObjectNotFoundException exception) {
-            response = Response.noContent().build();
-            LOG.debug("testrun not found: " + id);
-        } catch (Exception e) {
-            if (!(e instanceof UnitTestException)) {
-                LOG.info("unhandled exception", e);
+        if (!StudentUtil.isPossibleUuid(id)) {
+            response = Response.status(Status.BAD_REQUEST).build();
+            LOG.info("attempt to use malformed UUID");
+        } else {
+            LOG.debug("TestRunResource: deleteTestRun(" + id + ")");
+            try {
+                service.deleteTestRun(id);
+                response = Response.noContent().build();
+            } catch (ObjectNotFoundException exception) {
+                response = Response.noContent().build();
+                LOG.debug("testrun not found: " + id);
+            } catch (Exception e) {
+                if (!(e instanceof UnitTestException)) {
+                    LOG.info("unhandled exception", e);
+                }
+                response = Response.status(Status.INTERNAL_SERVER_ERROR).build();
             }
-            response = Response.status(Status.INTERNAL_SERVER_ERROR).build();
         }
 
         return response;

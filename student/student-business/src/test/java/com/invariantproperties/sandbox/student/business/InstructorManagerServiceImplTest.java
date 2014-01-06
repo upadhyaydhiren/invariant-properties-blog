@@ -40,13 +40,14 @@ import com.invariantproperties.sandbox.student.repository.InstructorRepository;
  * @author Bear Giles <bgiles@coyotesong.com>
  */
 public class InstructorManagerServiceImplTest {
+    private static final String UUID = "11111111-1111-1111-1111-111111111111";
 
     @Test
     public void testCreateInstructor() {
         final Instructor expected = new Instructor();
         expected.setName("name");
         expected.setEmailAddress("email");
-        expected.setUuid("[uuid]");
+        expected.setUuid(UUID);
 
         final InstructorRepository repository = Mockito.mock(InstructorRepository.class);
         when(repository.saveAndFlush(any(Instructor.class))).thenReturn(expected);
@@ -71,7 +72,7 @@ public class InstructorManagerServiceImplTest {
         final Instructor expected = new Instructor();
         expected.setName("Alice");
         expected.setName("alice@example.com");
-        expected.setUuid("[uuid]");
+        expected.setUuid(UUID);
 
         final InstructorRepository repository = Mockito.mock(InstructorRepository.class);
         when(repository.findInstructorByUuid(any(String.class))).thenReturn(expected);
@@ -97,7 +98,7 @@ public class InstructorManagerServiceImplTest {
     @Test(expected = PersistenceException.class)
     public void testUpdateInstructorError() {
         final Instructor expected = new Instructor();
-        expected.setUuid("[uuid]");
+        expected.setUuid(UUID);
 
         final InstructorRepository repository = Mockito.mock(InstructorRepository.class);
         when(repository.findInstructorByUuid(any(String.class))).thenReturn(expected);
@@ -110,7 +111,7 @@ public class InstructorManagerServiceImplTest {
     @Test
     public void testDeleteInstructor() {
         final Instructor expected = new Instructor();
-        expected.setUuid("[uuid]");
+        expected.setUuid(UUID);
 
         final InstructorRepository repository = Mockito.mock(InstructorRepository.class);
         when(repository.findInstructorByUuid(any(String.class))).thenReturn(expected);
@@ -126,13 +127,13 @@ public class InstructorManagerServiceImplTest {
         when(repository.findInstructorByUuid(any(String.class))).thenReturn(null);
 
         final InstructorManagerService service = new InstructorManagerServiceImpl(repository);
-        service.deleteInstructor("[uuid]", 0);
+        service.deleteInstructor(UUID, 0);
     }
 
     @Test(expected = PersistenceException.class)
     public void testDeleteInstructorError() {
         final Instructor expected = new Instructor();
-        expected.setUuid("[uuid]");
+        expected.setUuid(UUID);
 
         final InstructorRepository repository = Mockito.mock(InstructorRepository.class);
         when(repository.findInstructorByUuid(any(String.class))).thenReturn(expected);

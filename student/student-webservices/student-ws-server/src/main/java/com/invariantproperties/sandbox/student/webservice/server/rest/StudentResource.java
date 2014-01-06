@@ -50,6 +50,7 @@ import com.invariantproperties.sandbox.student.business.StudentManagerService;
 import com.invariantproperties.sandbox.student.business.TestRunService;
 import com.invariantproperties.sandbox.student.domain.Student;
 import com.invariantproperties.sandbox.student.domain.TestRun;
+import com.invariantproperties.sandbox.student.util.StudentUtil;
 
 @Service
 @Path("/student")
@@ -201,20 +202,25 @@ public class StudentResource extends AbstractResource {
     @GET
     @Produces({ MediaType.APPLICATION_JSON, MediaType.TEXT_XML })
     public Response getStudent(@PathParam("studentId") String id) {
-        LOG.debug("StudentResource: getStudent()");
 
         Response response = null;
-        try {
-            Student student = finder.findStudentByUuid(id);
-            response = Response.ok(scrubStudent(student)).build();
-        } catch (ObjectNotFoundException e) {
-            response = Response.status(Status.NOT_FOUND).build();
-            LOG.debug("student not found: " + id);
-        } catch (Exception e) {
-            if (!(e instanceof UnitTestException)) {
-                LOG.info("unhandled exception", e);
+        if (!StudentUtil.isPossibleUuid(id)) {
+            response = Response.status(Status.BAD_REQUEST).build();
+            LOG.info("attempt to use malformed UUID");
+        } else {
+            LOG.debug("StudentResource: getStudent(" + id + ")");
+            try {
+                Student student = finder.findStudentByUuid(id);
+                response = Response.ok(scrubStudent(student)).build();
+            } catch (ObjectNotFoundException e) {
+                response = Response.status(Status.NOT_FOUND).build();
+                LOG.debug("student not found: " + id);
+            } catch (Exception e) {
+                if (!(e instanceof UnitTestException)) {
+                    LOG.info("unhandled exception", e);
+                }
+                response = Response.status(Status.INTERNAL_SERVER_ERROR).build();
             }
-            response = Response.status(Status.INTERNAL_SERVER_ERROR).build();
         }
 
         return response;
@@ -234,7 +240,6 @@ public class StudentResource extends AbstractResource {
     @Consumes({ MediaType.APPLICATION_JSON, MediaType.TEXT_XML })
     @Produces({ MediaType.APPLICATION_JSON, MediaType.TEXT_XML })
     public Response updateStudent(@PathParam("studentId") String id, NameAndEmailAddress req) {
-        LOG.debug("StudentResource: updateStudent()");
 
         final String name = req.getName();
         if ((name == null) || name.isEmpty()) {
@@ -247,18 +252,24 @@ public class StudentResource extends AbstractResource {
         }
 
         Response response = null;
-        try {
-            final Student student = finder.findStudentByUuid(id);
-            final Student updatedStudent = manager.updateStudent(student, name, email);
-            response = Response.ok(scrubStudent(updatedStudent)).build();
-        } catch (ObjectNotFoundException exception) {
-            response = Response.status(Status.NOT_FOUND).build();
-            LOG.debug("student not found: " + id);
-        } catch (Exception e) {
-            if (!(e instanceof UnitTestException)) {
-                LOG.info("unhandled exception", e);
+        if (!StudentUtil.isPossibleUuid(id)) {
+            response = Response.status(Status.BAD_REQUEST).build();
+            LOG.info("attempt to use malformed UUID");
+        } else {
+            LOG.debug("StudentResource: updateStudent(" + id + ")");
+            try {
+                final Student student = finder.findStudentByUuid(id);
+                final Student updatedStudent = manager.updateStudent(student, name, email);
+                response = Response.ok(scrubStudent(updatedStudent)).build();
+            } catch (ObjectNotFoundException exception) {
+                response = Response.status(Status.NOT_FOUND).build();
+                LOG.debug("student not found: " + id);
+            } catch (Exception e) {
+                if (!(e instanceof UnitTestException)) {
+                    LOG.info("unhandled exception", e);
+                }
+                response = Response.status(Status.INTERNAL_SERVER_ERROR).build();
             }
-            response = Response.status(Status.INTERNAL_SERVER_ERROR).build();
         }
 
         return response;
@@ -273,20 +284,25 @@ public class StudentResource extends AbstractResource {
     @Path("/{studentId}")
     @DELETE
     public Response deleteStudent(@PathParam("studentId") String id, @PathParam("version") int version) {
-        LOG.debug("StudentResource: deleteStudent()");
 
         Response response = null;
-        try {
-            manager.deleteStudent(id, version);
-            response = Response.noContent().build();
-        } catch (ObjectNotFoundException exception) {
-            response = Response.noContent().build();
-            LOG.debug("student not found" + id);
-        } catch (Exception e) {
-            if (!(e instanceof UnitTestException)) {
-                LOG.info("unhandled exception", e);
+        if (!StudentUtil.isPossibleUuid(id)) {
+            response = Response.status(Status.BAD_REQUEST).build();
+            LOG.info("attempt to use malformed UUID");
+        } else {
+            LOG.debug("StudentResource: deleteStudent(" + id + ")");
+            try {
+                manager.deleteStudent(id, version);
+                response = Response.noContent().build();
+            } catch (ObjectNotFoundException exception) {
+                response = Response.noContent().build();
+                LOG.debug("student not found" + id);
+            } catch (Exception e) {
+                if (!(e instanceof UnitTestException)) {
+                    LOG.info("unhandled exception", e);
+                }
+                response = Response.status(Status.INTERNAL_SERVER_ERROR).build();
             }
-            response = Response.status(Status.INTERNAL_SERVER_ERROR).build();
         }
 
         return response;

@@ -40,12 +40,13 @@ import com.invariantproperties.sandbox.student.repository.TermRepository;
  * @author Bear Giles <bgiles@coyotesong.com>
  */
 public class TermManagerServiceImplTest {
+    private static final String UUID = "11111111-1111-1111-1111-111111111111";
 
     @Test
     public void testCreateTerm() {
         final Term expected = new Term();
         expected.setName("name");
-        expected.setUuid("[uuid]");
+        expected.setUuid(UUID);
 
         final TermRepository repository = Mockito.mock(TermRepository.class);
         when(repository.saveAndFlush(any(Term.class))).thenReturn(expected);
@@ -69,7 +70,7 @@ public class TermManagerServiceImplTest {
     public void testUpdateTerm() {
         final Term expected = new Term();
         expected.setName("Fall 2013");
-        expected.setUuid("[uuid]");
+        expected.setUuid(UUID);
 
         final TermRepository repository = Mockito.mock(TermRepository.class);
         when(repository.findTermByUuid(any(String.class))).thenReturn(expected);
@@ -94,7 +95,7 @@ public class TermManagerServiceImplTest {
     @Test(expected = PersistenceException.class)
     public void testUpdateTermError() {
         final Term expected = new Term();
-        expected.setUuid("[uuid]");
+        expected.setUuid(UUID);
 
         final TermRepository repository = Mockito.mock(TermRepository.class);
         when(repository.findTermByUuid(any(String.class))).thenReturn(expected);
@@ -107,7 +108,7 @@ public class TermManagerServiceImplTest {
     @Test
     public void testDeleteTerm() {
         final Term expected = new Term();
-        expected.setUuid("[uuid]");
+        expected.setUuid(UUID);
 
         final TermRepository repository = Mockito.mock(TermRepository.class);
         when(repository.findTermByUuid(any(String.class))).thenReturn(expected);
@@ -123,13 +124,13 @@ public class TermManagerServiceImplTest {
         when(repository.findTermByUuid(any(String.class))).thenReturn(null);
 
         final TermManagerService service = new TermManagerServiceImpl(repository);
-        service.deleteTerm("[uuid]", 0);
+        service.deleteTerm(UUID, 0);
     }
 
     @Test(expected = PersistenceException.class)
     public void testDeleteTermError() {
         final Term expected = new Term();
-        expected.setUuid("[uuid]");
+        expected.setUuid(UUID);
 
         final TermRepository repository = Mockito.mock(TermRepository.class);
         when(repository.findTermByUuid(any(String.class))).thenReturn(expected);
