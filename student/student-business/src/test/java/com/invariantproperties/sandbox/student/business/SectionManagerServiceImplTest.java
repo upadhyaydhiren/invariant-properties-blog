@@ -40,12 +40,13 @@ import com.invariantproperties.sandbox.student.repository.SectionRepository;
  * @author Bear Giles <bgiles@coyotesong.com>
  */
 public class SectionManagerServiceImplTest {
+    private static final String UUID = "11111111-1111-1111-1111-111111111111";
 
     @Test
     public void testCreateSection() {
         final Section expected = new Section();
         expected.setName("name");
-        expected.setUuid("[uuid]");
+        expected.setUuid(UUID);
 
         final SectionRepository repository = Mockito.mock(SectionRepository.class);
         when(repository.saveAndFlush(any(Section.class))).thenReturn(expected);
@@ -69,7 +70,7 @@ public class SectionManagerServiceImplTest {
     public void testUpdateSection() {
         final Section expected = new Section();
         expected.setName("Physics - Fall 2013");
-        expected.setUuid("[uuid]");
+        expected.setUuid(UUID);
 
         final SectionRepository repository = Mockito.mock(SectionRepository.class);
         when(repository.findSectionByUuid(any(String.class))).thenReturn(expected);
@@ -94,7 +95,7 @@ public class SectionManagerServiceImplTest {
     @Test(expected = PersistenceException.class)
     public void testUpdateSectionError() {
         final Section expected = new Section();
-        expected.setUuid("[uuid]");
+        expected.setUuid(UUID);
 
         final SectionRepository repository = Mockito.mock(SectionRepository.class);
         when(repository.findSectionByUuid(any(String.class))).thenReturn(expected);
@@ -107,7 +108,7 @@ public class SectionManagerServiceImplTest {
     @Test
     public void testDeleteSection() {
         final Section expected = new Section();
-        expected.setUuid("[uuid]");
+        expected.setUuid(UUID);
 
         final SectionRepository repository = Mockito.mock(SectionRepository.class);
         when(repository.findSectionByUuid(any(String.class))).thenReturn(expected);
@@ -123,13 +124,13 @@ public class SectionManagerServiceImplTest {
         when(repository.findSectionByUuid(any(String.class))).thenReturn(null);
 
         final SectionManagerService service = new SectionManagerServiceImpl(repository);
-        service.deleteSection("[uuid]", 0);
+        service.deleteSection(UUID, 0);
     }
 
     @Test(expected = PersistenceException.class)
     public void testDeleteSectionError() {
         final Section expected = new Section();
-        expected.setUuid("[uuid]");
+        expected.setUuid(UUID);
 
         final SectionRepository repository = Mockito.mock(SectionRepository.class);
         when(repository.findSectionByUuid(any(String.class))).thenReturn(expected);

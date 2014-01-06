@@ -40,6 +40,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import com.invariantproperties.sandbox.student.domain.Student;
 import com.invariantproperties.sandbox.student.domain.TestRun;
 import com.invariantproperties.sandbox.student.webservice.client.ObjectNotFoundException;
+import com.invariantproperties.sandbox.student.webservice.client.RestClientException;
 import com.invariantproperties.sandbox.student.webservice.client.StudentFinderRestClient;
 import com.invariantproperties.sandbox.student.webservice.client.StudentManagerRestClient;
 import com.invariantproperties.sandbox.student.webservice.client.TestRunManagerRestClient;
@@ -77,7 +78,12 @@ public class StudentRestServerIntegrationTest {
 
     @Test(expected = ObjectNotFoundException.class)
     public void testUnknownStudent() throws IOException {
-        finderClient.getStudent("missing");
+        finderClient.getStudent("11111111-1111-1111-1111-111111111111");
+    }
+
+    @Test(expected = RestClientException.class)
+    public void testBadStudentUuid() throws IOException {
+        finderClient.getStudent("bad-uuid");
     }
 
     @Test

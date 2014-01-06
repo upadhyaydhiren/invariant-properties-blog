@@ -10,7 +10,7 @@
 	<packaging>war</packaging>
 
 	<build>
-	    <finalName>${project.artifactId}</finalName>
+		<finalName>${project.artifactId}</finalName>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -18,57 +18,42 @@
 				<version>2.4</version>
 			</plugin>
 
-            <!-- Run the application using "mvn jetty:run" -->
-            <plugin>
-                <groupId>org.eclipse.jetty</groupId>
-                <artifactId>jetty-maven-plugin</artifactId>
-                <version>9.1.0.v20131115</version>
-                <configuration>
-                    <webApp>
-                        <!-- <useTestScope>true</useTestScope> -->
-                        <!-- <contextPath>/</contextPath> -->
-                        <!-- <extraClasspath>${basedir}/target/test-classes/</extraClasspath> -->
-                    </webApp>
-                    <scanIntervalSeconds>10</scanIntervalSeconds>
-                    <stopPort>18005</stopPort>
-                    <stopKey>STOP</stopKey>
-                    <systemProperties>
-                       <systemProperty>
-                           <name>jetty.port</name>
-                           <value>18080</value>
-                       </systemProperty>
-                    </systemProperties>
-                </configuration>
-                <!-- <executions>
-                    <execution>
-                        <id>start-jetty</id>
-                        <phase>pre-integration-test</phase>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                        <configuration>
-                            <scanIntervalSeconds>0</scanIntervalSeconds>
-                            <daemon>true</daemon>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>stop-jetty</id>
-                        <phase>post-integration-test</phase>
-                        <goals>
-                            <goal>stop</goal>
-                        </goals>
-                    </execution>
-                </executions> -->
-            </plugin>
-            
-            <plugin>
-                <groupId>org.apache.tomcat.maven</groupId>
-                <artifactId>tomcat7-maven-plugin</artifactId>
-                <version>2.2</version>
-                <configuration>
-                    <server>tomcat</server>
-                </configuration>
-            </plugin>
+			<!-- Run the application using "mvn jetty:run" -->
+			<plugin>
+				<groupId>org.eclipse.jetty</groupId>
+				<artifactId>jetty-maven-plugin</artifactId>
+				<version>9.1.0.v20131115</version>
+				<configuration>
+					<webApp>
+						<!-- <useTestScope>true</useTestScope> -->
+						<!-- <contextPath>/</contextPath> -->
+						<!-- <extraClasspath>${basedir}/target/test-classes/</extraClasspath> -->
+					</webApp>
+					<scanIntervalSeconds>10</scanIntervalSeconds>
+					<stopPort>18005</stopPort>
+					<stopKey>STOP</stopKey>
+					<systemProperties>
+						<systemProperty>
+							<name>jetty.port</name>
+							<value>18080</value>
+						</systemProperty>
+					</systemProperties>
+				</configuration>
+				<!-- <executions> <execution> <id>start-jetty</id> <phase>pre-integration-test</phase> 
+					<goals> <goal>run</goal> </goals> <configuration> <scanIntervalSeconds>0</scanIntervalSeconds> 
+					<daemon>true</daemon> </configuration> </execution> <execution> <id>stop-jetty</id> 
+					<phase>post-integration-test</phase> <goals> <goal>stop</goal> </goals> </execution> 
+					</executions> -->
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.tomcat.maven</groupId>
+				<artifactId>tomcat7-maven-plugin</artifactId>
+				<version>2.2</version>
+				<configuration>
+					<server>tomcat</server>
+				</configuration>
+			</plugin>
 		</plugins>
 	</build>
 
@@ -94,6 +79,10 @@
 			<groupId>com.invariantproperties.sandbox.student</groupId>
 			<artifactId>student-ws-server</artifactId>
 		</dependency>
+        <dependency>
+            <groupId>com.invariantproperties.sandbox.student</groupId>
+            <artifactId>student-ws-security</artifactId>
+        </dependency>
 
 		<dependency>
 			<groupId>log4j</groupId>
@@ -244,7 +233,6 @@
 			<scope>runtime</scope>
 		</dependency>
 
-
 		<!-- libraries used by jetty runtime -->
 		<!-- <dependency> <groupId>com.sun.jersey</groupId> <artifactId>jersey-json</artifactId> 
 			<scope>runtime</scope> </dependency> -->
@@ -267,6 +255,12 @@
 		<dependency>
 			<groupId>org.codehaus.jackson</groupId>
 			<artifactId>jackson-jaxrs</artifactId>
+		</dependency>
+
+		<!-- security -->
+		<dependency>
+			<groupId>org.owasp.esapi</groupId>
+			<artifactId>esapi</artifactId>
 		</dependency>
 	</dependencies>
 	<name>Project Student: webservice webapp</name>

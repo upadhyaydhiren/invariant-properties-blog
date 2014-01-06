@@ -40,6 +40,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import com.invariantproperties.sandbox.student.domain.Section;
 import com.invariantproperties.sandbox.student.domain.TestRun;
 import com.invariantproperties.sandbox.student.webservice.client.ObjectNotFoundException;
+import com.invariantproperties.sandbox.student.webservice.client.RestClientException;
 import com.invariantproperties.sandbox.student.webservice.client.SectionFinderRestClient;
 import com.invariantproperties.sandbox.student.webservice.client.SectionManagerRestClient;
 import com.invariantproperties.sandbox.student.webservice.client.TestRunManagerRestClient;
@@ -77,7 +78,12 @@ public class SectionRestServerIntegrationTest {
 
     @Test(expected = ObjectNotFoundException.class)
     public void testUnknownSection() throws IOException {
-        finderClient.getSection("missing");
+        finderClient.getSection("11111111-1111-1111-1111-111111111111");
+    }
+
+    @Test(expected = RestClientException.class)
+    public void testBadSectionUuid() throws IOException {
+        finderClient.getSection("bad-uuid");
     }
 
     @Test

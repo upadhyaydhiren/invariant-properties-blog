@@ -40,12 +40,13 @@ import com.invariantproperties.sandbox.student.repository.ClassroomRepository;
  * @author Bear Giles <bgiles@coyotesong.com>
  */
 public class ClassroomManagerServiceImplTest {
+    private static final String UUID = "11111111-1111-1111-1111-111111111111";
 
     @Test
     public void testCreateClassroom() {
         final Classroom expected = new Classroom();
         expected.setName("name");
-        expected.setUuid("[uuid]");
+        expected.setUuid(UUID);
 
         final ClassroomRepository repository = Mockito.mock(ClassroomRepository.class);
         when(repository.saveAndFlush(any(Classroom.class))).thenReturn(expected);
@@ -69,7 +70,7 @@ public class ClassroomManagerServiceImplTest {
     public void testUpdateClassroom() {
         final Classroom expected = new Classroom();
         expected.setName("Eng 201");
-        expected.setUuid("[uuid]");
+        expected.setUuid(UUID);
 
         final ClassroomRepository repository = Mockito.mock(ClassroomRepository.class);
         when(repository.findClassroomByUuid(any(String.class))).thenReturn(expected);
@@ -94,7 +95,7 @@ public class ClassroomManagerServiceImplTest {
     @Test(expected = PersistenceException.class)
     public void testUpdateClassroomError() {
         final Classroom expected = new Classroom();
-        expected.setUuid("[uuid]");
+        expected.setUuid(UUID);
 
         final ClassroomRepository repository = Mockito.mock(ClassroomRepository.class);
         when(repository.findClassroomByUuid(any(String.class))).thenReturn(expected);
@@ -107,7 +108,7 @@ public class ClassroomManagerServiceImplTest {
     @Test
     public void testDeleteClassroom() {
         final Classroom expected = new Classroom();
-        expected.setUuid("[uuid]");
+        expected.setUuid(UUID);
 
         final ClassroomRepository repository = Mockito.mock(ClassroomRepository.class);
         when(repository.findClassroomByUuid(any(String.class))).thenReturn(expected);
@@ -123,13 +124,13 @@ public class ClassroomManagerServiceImplTest {
         when(repository.findClassroomByUuid(any(String.class))).thenReturn(null);
 
         final ClassroomManagerService service = new ClassroomManagerServiceImpl(repository);
-        service.deleteClassroom("[uuid]", 0);
+        service.deleteClassroom(UUID, 0);
     }
 
     @Test(expected = PersistenceException.class)
     public void testDeleteClassroomError() {
         final Classroom expected = new Classroom();
-        expected.setUuid("[uuid]");
+        expected.setUuid(UUID);
 
         final ClassroomRepository repository = Mockito.mock(ClassroomRepository.class);
         when(repository.findClassroomByUuid(any(String.class))).thenReturn(expected);

@@ -43,6 +43,7 @@ import com.invariantproperties.sandbox.student.domain.TestRun;
 import com.invariantproperties.sandbox.student.webservice.client.CourseFinderRestClient;
 import com.invariantproperties.sandbox.student.webservice.client.CourseManagerRestClient;
 import com.invariantproperties.sandbox.student.webservice.client.ObjectNotFoundException;
+import com.invariantproperties.sandbox.student.webservice.client.RestClientException;
 import com.invariantproperties.sandbox.student.webservice.client.TestRunManagerRestClient;
 import com.invariantproperties.sandbox.student.webservice.client.impl.CourseFinderRestClientImpl;
 import com.invariantproperties.sandbox.student.webservice.client.impl.CourseManagerRestClientImpl;
@@ -79,7 +80,12 @@ public class CourseRestServerIntegrationTest {
 
     @Test(expected = ObjectNotFoundException.class)
     public void testUnknownCourse() throws IOException {
-        finderClient.getCourse("missing");
+        finderClient.getCourse("11111111-1111-1111-1111-111111111111");
+    }
+
+    @Test(expected = RestClientException.class)
+    public void testBadCourseUuid() throws IOException {
+        finderClient.getCourse("bad-uuid");
     }
 
     @Test

@@ -40,13 +40,14 @@ import com.invariantproperties.sandbox.student.repository.StudentRepository;
  * @author Bear Giles <bgiles@coyotesong.com>
  */
 public class StudentManagerServiceImplTest {
+    private static final String UUID = "11111111-1111-1111-1111-111111111111";
 
     @Test
     public void testCreateStudent() {
         final Student expected = new Student();
         expected.setName("name");
         expected.setEmailAddress("email");
-        expected.setUuid("[uuid]");
+        expected.setUuid(UUID);
 
         final StudentRepository repository = Mockito.mock(StudentRepository.class);
         when(repository.saveAndFlush(any(Student.class))).thenReturn(expected);
@@ -71,7 +72,7 @@ public class StudentManagerServiceImplTest {
         final Student expected = new Student();
         expected.setName("Alice");
         expected.setName("alice@example.com");
-        expected.setUuid("[uuid]");
+        expected.setUuid(UUID);
 
         final StudentRepository repository = Mockito.mock(StudentRepository.class);
         when(repository.findStudentByUuid(any(String.class))).thenReturn(expected);
@@ -97,7 +98,7 @@ public class StudentManagerServiceImplTest {
     @Test(expected = PersistenceException.class)
     public void testUpdateStudentError() {
         final Student expected = new Student();
-        expected.setUuid("[uuid]");
+        expected.setUuid(UUID);
 
         final StudentRepository repository = Mockito.mock(StudentRepository.class);
         when(repository.findStudentByUuid(any(String.class))).thenReturn(expected);
@@ -110,7 +111,7 @@ public class StudentManagerServiceImplTest {
     @Test
     public void testDeleteStudent() {
         final Student expected = new Student();
-        expected.setUuid("[uuid]");
+        expected.setUuid(UUID);
 
         final StudentRepository repository = Mockito.mock(StudentRepository.class);
         when(repository.findStudentByUuid(any(String.class))).thenReturn(expected);
@@ -126,13 +127,13 @@ public class StudentManagerServiceImplTest {
         when(repository.findStudentByUuid(any(String.class))).thenReturn(null);
 
         final StudentManagerService service = new StudentManagerServiceImpl(repository);
-        service.deleteStudent("[uuid]", 0);
+        service.deleteStudent(UUID, 0);
     }
 
     @Test(expected = PersistenceException.class)
     public void testDeleteStudentError() {
         final Student expected = new Student();
-        expected.setUuid("[uuid]");
+        expected.setUuid(UUID);
 
         final StudentRepository repository = Mockito.mock(StudentRepository.class);
         when(repository.findStudentByUuid(any(String.class))).thenReturn(expected);

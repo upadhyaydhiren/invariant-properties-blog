@@ -21,6 +21,13 @@
 			<groupId>org.hamcrest</groupId>
 			<artifactId>hamcrest-core</artifactId>
 		</dependency>
+
+		<!-- testing -->
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
 	<name>Project Student: common classes</name>
 </project>

@@ -17,6 +17,20 @@
         </param-value>
     </context-param>
 
+    <filter>
+        <filter-name>REST parameter filter</filter-name>
+        <filter-class>com.invariantproperties.sandbox.student.webservice.security.RestParameterFilter</filter-class>
+        <init-param>
+            <param-name>valid-nouns</param-name>
+            <param-value>classroom,course,instructor,section,student,term,testRun</param-value>
+        </init-param>
+    </filter>
+
+    <filter-mapping>
+        <filter-name>REST parameter filter</filter-name>
+        <servlet-name>REST dispatcher</servlet-name>
+    </filter-mapping>
+
     <listener>
         <listener-class>
             org.springframework.web.context.ContextLoaderListener

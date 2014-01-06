@@ -49,7 +49,7 @@ public class CourseManagerServiceImplTest {
     private static final String DESCRIPTION2 = "description 2";
     private static final Integer HOURS1 = 1;
     private static final Integer HOURS2 = 2;
-    private static final String UUID = "[uuid]";
+    private static final String UUID = "11111111-1111-1111-1111-111111111111";
 
     @Test
     public void testCreateCourse() {

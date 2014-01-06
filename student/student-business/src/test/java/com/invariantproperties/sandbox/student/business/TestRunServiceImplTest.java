@@ -40,11 +40,12 @@ import com.invariantproperties.sandbox.student.repository.TestRunRepository;
  * @author Bear Giles <bgiles@coyotesong.com>
  */
 public class TestRunServiceImplTest {
+    private static final String UUID = "11111111-1111-1111-1111-111111111111";
 
     @Test
     public void testCreateTestRun() {
         final TestRun expected = new TestRun();
-        expected.setUuid("[uuid]");
+        expected.setUuid(UUID);
 
         final TestRunRepository repository = Mockito.mock(TestRunRepository.class);
         when(repository.saveAndFlush(any(TestRun.class))).thenReturn(expected);
@@ -67,7 +68,7 @@ public class TestRunServiceImplTest {
     @Test
     public void testDeleteTestRun() {
         final TestRun expected = new TestRun();
-        expected.setUuid("[uuid]");
+        expected.setUuid(UUID);
 
         final TestRunRepository repository = Mockito.mock(TestRunRepository.class);
         when(repository.findTestRunByUuid(any(String.class))).thenReturn(expected);
@@ -83,13 +84,13 @@ public class TestRunServiceImplTest {
         when(repository.findTestRunByUuid(any(String.class))).thenReturn(null);
 
         final TestRunService service = new TestRunServiceImpl(repository);
-        service.deleteTestRun("[uuid]");
+        service.deleteTestRun(UUID);
     }
 
     @Test(expected = PersistenceException.class)
     public void testDeleteTestRunError() {
         final TestRun expected = new TestRun();
-        expected.setUuid("[uuid]");
+        expected.setUuid(UUID);
 
         final TestRunRepository repository = Mockito.mock(TestRunRepository.class);
         when(repository.findTestRunByUuid(any(String.class))).thenReturn(expected);

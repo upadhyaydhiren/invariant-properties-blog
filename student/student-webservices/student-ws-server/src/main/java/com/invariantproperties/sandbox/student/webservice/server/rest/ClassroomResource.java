@@ -50,6 +50,7 @@ import com.invariantproperties.sandbox.student.business.ObjectNotFoundException;
 import com.invariantproperties.sandbox.student.business.TestRunService;
 import com.invariantproperties.sandbox.student.domain.Classroom;
 import com.invariantproperties.sandbox.student.domain.TestRun;
+import com.invariantproperties.sandbox.student.util.StudentUtil;
 
 @Service
 @Path("/classroom")
@@ -196,20 +197,25 @@ public class ClassroomResource extends AbstractResource {
     @GET
     @Produces({ MediaType.APPLICATION_JSON, MediaType.TEXT_XML })
     public Response getClassroom(@PathParam("classroomId") String id) {
-        LOG.debug("ClassroomResource: getClassroom()");
 
         Response response = null;
-        try {
-            Classroom classroom = finder.findClassroomByUuid(id);
-            response = Response.ok(scrubClassroom(classroom)).build();
-        } catch (ObjectNotFoundException e) {
-            response = Response.status(Status.NOT_FOUND).build();
-            LOG.trace("classroom not found: " + id);
-        } catch (Exception e) {
-            if (!(e instanceof UnitTestException)) {
-                LOG.info("unhandled exception", e);
+        if (!StudentUtil.isPossibleUuid(id)) {
+            response = Response.status(Status.BAD_REQUEST).build();
+            LOG.info("attempt to use malformed UUID");
+        } else {
+            LOG.debug("ClassroomResource: getClassroom(" + id + ")");
+            try {
+                Classroom classroom = finder.findClassroomByUuid(id);
+                response = Response.ok(scrubClassroom(classroom)).build();
+            } catch (ObjectNotFoundException e) {
+                response = Response.status(Status.NOT_FOUND).build();
+                LOG.trace("classroom not found: " + id);
+            } catch (Exception e) {
+                if (!(e instanceof UnitTestException)) {
+                    LOG.info("unhandled exception", e);
+                }
+                response = Response.status(Status.INTERNAL_SERVER_ERROR).build();
             }
-            response = Response.status(Status.INTERNAL_SERVER_ERROR).build();
         }
 
         return response;
@@ -229,7 +235,6 @@ public class ClassroomResource extends AbstractResource {
     @Consumes({ MediaType.APPLICATION_JSON, MediaType.TEXT_XML })
     @Produces({ MediaType.APPLICATION_JSON, MediaType.TEXT_XML })
     public Response updateClassroom(@PathParam("classroomId") String id, Name req) {
-        LOG.debug("ClassroomResource: updateClassroom()");
 
         final String name = req.getName();
         if ((name == null) || name.isEmpty()) {
@@ -237,18 +242,24 @@ public class ClassroomResource extends AbstractResource {
         }
 
         Response response = null;
-        try {
-            final Classroom classroom = finder.findClassroomByUuid(id);
-            final Classroom updatedClassroom = manager.updateClassroom(classroom, name);
-            response = Response.ok(scrubClassroom(updatedClassroom)).build();
-        } catch (ObjectNotFoundException exception) {
-            response = Response.status(Status.NOT_FOUND).build();
-            LOG.debug("classroom not found: " + id);
-        } catch (Exception e) {
-            if (!(e instanceof UnitTestException)) {
-                LOG.info("unhandled exception", e);
+        if (!StudentUtil.isPossibleUuid(id)) {
+            response = Response.status(Status.BAD_REQUEST).build();
+            LOG.info("attempt to use malformed UUID");
+        } else {
+            LOG.debug("ClassroomResource: updateClassroom(" + id + ")");
+            try {
+                final Classroom classroom = finder.findClassroomByUuid(id);
+                final Classroom updatedClassroom = manager.updateClassroom(classroom, name);
+                response = Response.ok(scrubClassroom(updatedClassroom)).build();
+            } catch (ObjectNotFoundException exception) {
+                response = Response.status(Status.NOT_FOUND).build();
+                LOG.debug("classroom not found: " + id);
+            } catch (Exception e) {
+                if (!(e instanceof UnitTestException)) {
+                    LOG.info("unhandled exception", e);
+                }
+                response = Response.status(Status.INTERNAL_SERVER_ERROR).build();
             }
-            response = Response.status(Status.INTERNAL_SERVER_ERROR).build();
         }
 
         return response;
@@ -263,20 +274,25 @@ public class ClassroomResource extends AbstractResource {
     @Path("/{classroomId}")
     @DELETE
     public Response deleteClassroom(@PathParam("classroomId") String id, @PathParam("version") int version) {
-        LOG.debug("ClassroomResource: deleteClassroom()");
 
         Response response = null;
-        try {
-            manager.deleteClassroom(id, version);
-            response = Response.noContent().build();
-        } catch (ObjectNotFoundException exception) {
-            response = Response.noContent().build();
-            LOG.debug("classroom not found: " + id);
-        } catch (Exception e) {
-            if (!(e instanceof UnitTestException)) {
-                LOG.info("unhandled exception", e);
+        if (!StudentUtil.isPossibleUuid(id)) {
+            response = Response.status(Status.BAD_REQUEST).build();
+            LOG.info("attempt to use malformed UUID");
+        } else {
+            LOG.debug("ClassroomResource: deleteClassroom(" + id + ")");
+            try {
+                manager.deleteClassroom(id, version);
+                response = Response.noContent().build();
+            } catch (ObjectNotFoundException exception) {
+                response = Response.noContent().build();
+                LOG.debug("classroom not found: " + id);
+            } catch (Exception e) {
+                if (!(e instanceof UnitTestException)) {
+                    LOG.info("unhandled exception", e);
+                }
+                response = Response.status(Status.INTERNAL_SERVER_ERROR).build();
             }
-            response = Response.status(Status.INTERNAL_SERVER_ERROR).build();
         }
 
         return response;
