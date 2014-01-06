@@ -42,6 +42,7 @@ import com.invariantproperties.sandbox.student.business.CourseManagerService;
 import com.invariantproperties.sandbox.student.domain.Course;
 import com.invariantproperties.sandbox.student.maintenance.util.ExceptionUtil;
 import com.invariantproperties.sandbox.student.maintenance.web.components.CustomForm;
+import com.invariantproperties.sandbox.student.util.StudentUtil;
 import com.invariantproperties.sandbox.student.webservice.client.ObjectNotFoundException;
 import com.invariantproperties.sandbox.student.webservice.client.RestClientFailureException;
 
@@ -140,7 +141,12 @@ public class Editor {
 
     public void setup(Mode mode, String courseUuid) {
         this.mode = mode;
-        this.courseUuid = courseUuid;
+        // this test includes valid 'null' case.
+        if (!StudentUtil.isPossibleUuid(courseUuid)) {
+            this.courseUuid = null;
+        } else {
+            this.courseUuid = courseUuid;
+        }
     }
 
     // setupRender() is called by Tapestry right before it starts rendering the
@@ -149,7 +155,9 @@ public class Editor {
     void setupRender() {
 
         if (mode == Mode.REVIEW) {
-            if (courseUuid == null) {
+            // this test includes valid 'null' case.
+            if (!StudentUtil.isPossibleUuid(courseUuid)) {
+                courseUuid = null;
                 course = null;
                 // Handle null course in the template.
             } else {
@@ -245,11 +253,17 @@ public class Editor {
     // /////////////////////////////////////////////////////////////////////
 
     void onPrepareFromReviewForm() {
-        try {
-            course = courseFinderService.findCourseByUuid(courseUuid);
-        } catch (ObjectNotFoundException e) {
-            // Handle null course in the template.
-            LOG.trace("course not found: " + courseUuid);
+        if (!StudentUtil.isPossibleUuid(courseUuid)) {
+            LOG.info("Invalid CourseUUID");
+            courseUuid = null;
+            course = null;
+        } else {
+            try {
+                course = courseFinderService.findCourseByUuid(courseUuid);
+            } catch (ObjectNotFoundException e) {
+                // Handle null course in the template.
+                LOG.trace("course not found: " + courseUuid);
+            }
         }
     }
 
@@ -267,11 +281,17 @@ public class Editor {
     // form render
 
     void onPrepareForRenderFromUpdateForm() {
-        try {
-            course = courseFinderService.findCourseByUuid(courseUuid);
-        } catch (ObjectNotFoundException e) {
-            // Handle null course in the template.
-            LOG.trace("course not found: " + courseUuid);
+        if (!StudentUtil.isPossibleUuid(courseUuid)) {
+            LOG.info("Invalid CourseUUID");
+            courseUuid = null;
+            course = null;
+        } else {
+            try {
+                course = courseFinderService.findCourseByUuid(courseUuid);
+            } catch (ObjectNotFoundException e) {
+                // Handle null course in the template.
+                LOG.trace("course not found: " + courseUuid);
+            }
         }
 
         // If the form has errors then we're redisplaying after a redirect.
@@ -290,12 +310,18 @@ public class Editor {
 
     void onPrepareForSubmitFromUpdateForm() {
         // Get objects for the form fields to overlay.
-        try {
-            course = courseFinderService.findCourseByUuid(courseUuid);
-        } catch (ObjectNotFoundException e) {
+        if (!StudentUtil.isPossibleUuid(courseUuid)) {
+            LOG.info("Invalid CourseUUID");
+            courseUuid = null;
             course = new Course();
-            updateForm.recordError("Course has been deleted by another process.");
-            LOG.trace("course not found: " + courseUuid);
+        } else {
+            try {
+                course = courseFinderService.findCourseByUuid(courseUuid);
+            } catch (ObjectNotFoundException e) {
+                course = new Course();
+                updateForm.recordError("Course has been deleted by another process.");
+                LOG.trace("course not found: " + courseUuid);
+            }
         }
     }
 
@@ -362,6 +388,13 @@ public class Editor {
     // Handle event "delete"
 
     Object onDelete(String courseUuid) {
+        if (!StudentUtil.isPossibleUuid(courseUuid)) {
+            LOG.info("Invalid CourseUUID");
+            courseUuid = null;
+            course = null;
+            return this;
+        }
+
         this.courseUuid = courseUuid;
         int courseVersion = 0;
 
@@ -413,8 +446,13 @@ public class Editor {
     // Handle event "toUpdate"
 
     boolean onToUpdate(String courseUuid) {
-        mode = Mode.UPDATE;
-        return false;
+        if (!StudentUtil.isPossibleUuid(courseUuid)) {
+            LOG.info("Invalid CourseUUID");
+            return true;
+        } else {
+            mode = Mode.UPDATE;
+            return false;
+        }
     }
 
     // Handle event "toIndex"

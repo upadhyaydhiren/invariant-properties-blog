@@ -15,6 +15,7 @@ import com.invariantproperties.sandbox.student.business.CourseManagerService;
 import com.invariantproperties.sandbox.student.domain.Course;
 import com.invariantproperties.sandbox.student.maintenance.web.pages.course.Editor.Mode;
 import com.invariantproperties.sandbox.student.maintenance.web.tables.CoursePagedDataSource;
+import com.invariantproperties.sandbox.student.util.StudentUtil;
 
 /**
  * Maintenance page for courses.
@@ -64,13 +65,16 @@ public class Index {
      * @param courseUuid
      */
     void onActionFromDelete(String courseUuid) {
-        courseManagerService.deleteCourse(courseUuid, 0);
+        if (!StudentUtil.isPossibleUuid(courseUuid)) {
+            alertManager.error("invalid UUID");
+        } else {
+            courseManagerService.deleteCourse(courseUuid, 0);
+        }
     }
 
     /**
      * Bring up editor page in create mode.
      * 
-     * @param courseUuid
      * @return
      */
     Object onActionFromCreate() {
@@ -81,7 +85,6 @@ public class Index {
     /**
      * Bring up editor page in create mode.
      * 
-     * @param courseUuid
      * @return
      */
     Object onActionFromCreate1() {
@@ -95,8 +98,13 @@ public class Index {
      * @return
      */
     Object onActionFromView(String courseUuid) {
-        editorPage.setup(Mode.REVIEW, courseUuid);
-        return editorPage;
+        if (!StudentUtil.isPossibleUuid(courseUuid)) {
+            alertManager.error("invalid UUID");
+            return this;
+        } else {
+            editorPage.setup(Mode.REVIEW, courseUuid);
+            return editorPage;
+        }
     }
 
     /**
@@ -106,7 +114,12 @@ public class Index {
      * @return
      */
     Object onActionFromUpdate(String courseUuid) {
-        editorPage.setup(Mode.UPDATE, courseUuid);
-        return editorPage;
+        if (!StudentUtil.isPossibleUuid(courseUuid)) {
+            alertManager.error("invalid UUID");
+            return this;
+        } else {
+            editorPage.setup(Mode.UPDATE, courseUuid);
+            return editorPage;
+        }
     }
 }
