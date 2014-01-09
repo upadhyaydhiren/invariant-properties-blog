@@ -208,7 +208,7 @@ public class CourseResource extends AbstractResource {
         try {
             manager.deleteCourse(id, version);
         } catch (ObjectNotFoundException exception) {
-            LOG.debug("instructor not found: " + id);
+            LOG.debug("course not found: " + id);
         }
 
         final Response response = Response.noContent().build();
