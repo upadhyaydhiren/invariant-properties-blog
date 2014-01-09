@@ -15,6 +15,7 @@
             com.invariantproperties.sandbox.student.config.PersistenceJpaConfig
             com.invariantproperties.sandbox.student.config.BusinessApplicationContext
             com.invariantproperties.sandbox.student.webservice.config.RestApplicationContext
+            com.invariantproperties.sandbox.student.webservice.config.RestSecurityApplicationContext
         </param-value>
     </context-param>
 

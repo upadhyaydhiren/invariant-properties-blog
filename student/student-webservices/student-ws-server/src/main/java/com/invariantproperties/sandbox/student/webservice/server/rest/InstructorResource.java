@@ -50,7 +50,6 @@ import com.invariantproperties.sandbox.student.business.ObjectNotFoundException;
 import com.invariantproperties.sandbox.student.business.TestRunService;
 import com.invariantproperties.sandbox.student.domain.Instructor;
 import com.invariantproperties.sandbox.student.domain.TestRun;
-import com.invariantproperties.sandbox.student.util.StudentUtil;
 
 @Service
 @Path("/instructor")
@@ -81,29 +80,13 @@ public class InstructorResource extends AbstractResource {
     }
 
     /**
-     * Unit test constructor.
+     * Set values used in unit tests. (Required due to AOP)
      * 
+     * @param finder
      * @param manager
+     * @param testService
      */
-    InstructorResource(InstructorFinderService finder, TestRunService testService) {
-        this(finder, null, testService);
-    }
-
-    /**
-     * Unit test constructor.
-     * 
-     * @param manager
-     */
-    InstructorResource(InstructorManagerService manager, TestRunService testService) {
-        this(null, manager, testService);
-    }
-
-    /**
-     * Unit test constructor.
-     * 
-     * @param manager
-     */
-    InstructorResource(InstructorFinderService finder, InstructorManagerService manager, TestRunService testService) {
+    void setServices(InstructorFinderService finder, InstructorManagerService manager, TestRunService testService) {
         this.finder = finder;
         this.manager = manager;
         this.testService = testService;
@@ -117,24 +100,15 @@ public class InstructorResource extends AbstractResource {
     @GET
     @Produces({ MediaType.APPLICATION_JSON, MediaType.TEXT_XML })
     public Response findAllInstructors() {
-        LOG.debug("InstructorResource: findAllInstructors()");
 
-        Response response = null;
-        try {
-            List<Instructor> instructors = finder.findAllInstructors();
+        final List<Instructor> instructors = finder.findAllInstructors();
 
-            List<Instructor> results = new ArrayList<Instructor>(instructors.size());
-            for (Instructor instructor : instructors) {
-                results.add(scrubInstructor(instructor));
-            }
-
-            response = Response.ok(results.toArray(EMPTY_INSTRUCTOR_ARRAY)).build();
-        } catch (Exception e) {
-            if (!(e instanceof UnitTestException)) {
-                LOG.info("unhandled exception", e);
-            }
-            response = Response.status(Status.INTERNAL_SERVER_ERROR).build();
+        final List<Instructor> results = new ArrayList<Instructor>(instructors.size());
+        for (Instructor instructor : instructors) {
+            results.add(scrubInstructor(instructor));
         }
+
+        final Response response = Response.ok(results.toArray(EMPTY_INSTRUCTOR_ARRAY)).build();
 
         return response;
     }
@@ -142,52 +116,38 @@ public class InstructorResource extends AbstractResource {
     /**
      * Create a Instructor.
      * 
+     * FIXME: what about uniqueness violations?
+     * 
      * @param req
      * @return
      */
     @POST
     @Consumes({ MediaType.APPLICATION_JSON, MediaType.TEXT_XML })
     @Produces({ MediaType.APPLICATION_JSON, MediaType.TEXT_XML })
-    public Response createInstructor(NameAndEmailAddress req) {
-        LOG.debug("InstructorResource: createInstructor()");
+    public Response createInstructor(NameAndEmailAddressRTO req) {
 
         final String name = req.getName();
-        if ((name == null) || name.isEmpty()) {
-            return Response.status(Status.BAD_REQUEST).entity("'name' is required'").build();
-        }
-
         final String email = req.getEmailAddress();
-        if ((email == null) || email.isEmpty()) {
-            return Response.status(Status.BAD_REQUEST).entity("'email' is required'").build();
-        }
 
         Response response = null;
 
-        try {
-            Instructor instructor = null;
+        Instructor instructor = null;
 
-            if (req.getTestUuid() != null) {
-                TestRun testRun = testService.findTestRunByUuid(req.getTestUuid());
-                if (testRun != null) {
-                    instructor = manager.createInstructorForTesting(name, email, testRun);
-                } else {
-                    response = Response.status(Status.BAD_REQUEST).entity("unknown test UUID").build();
-                }
+        if (req.getTestUuid() != null) {
+            TestRun testRun = testService.findTestRunByUuid(req.getTestUuid());
+            if (testRun != null) {
+                instructor = manager.createInstructorForTesting(name, email, testRun);
             } else {
-                instructor = manager.createInstructor(name, email);
+                response = Response.status(Status.BAD_REQUEST).entity("unknown test UUID").build();
             }
+        } else {
+            instructor = manager.createInstructor(name, email);
+        }
 
-            if (instructor == null) {
-                response = Response.status(Status.INTERNAL_SERVER_ERROR).build();
-            } else {
-                response = Response.created(URI.create(instructor.getUuid())).entity(scrubInstructor(instructor))
-                        .build();
-            }
-        } catch (Exception e) {
-            if (!(e instanceof UnitTestException)) {
-                LOG.info("unhandled exception", e);
-            }
+        if (instructor == null) {
             response = Response.status(Status.INTERNAL_SERVER_ERROR).build();
+        } else {
+            response = Response.created(URI.create(instructor.getUuid())).entity(scrubInstructor(instructor)).build();
         }
 
         return response;
@@ -204,25 +164,9 @@ public class InstructorResource extends AbstractResource {
     @Produces({ MediaType.APPLICATION_JSON, MediaType.TEXT_XML })
     public Response getInstructor(@PathParam("instructorId") String id) {
 
-        Response response = null;
-        if (!StudentUtil.isPossibleUuid(id)) {
-            response = Response.status(Status.BAD_REQUEST).build();
-            LOG.info("attempt to use malformed UUID");
-        } else {
-            LOG.debug("InstructorResource: getInstructor(" + id + ")");
-            try {
-                Instructor instructor = finder.findInstructorByUuid(id);
-                response = Response.ok(scrubInstructor(instructor)).build();
-            } catch (ObjectNotFoundException e) {
-                response = Response.status(Status.NOT_FOUND).build();
-                LOG.debug("Instructor not found: " + id);
-            } catch (Exception e) {
-                if (!(e instanceof UnitTestException)) {
-                    LOG.info("unhandled exception", e);
-                }
-                response = Response.status(Status.INTERNAL_SERVER_ERROR).build();
-            }
-        }
+        // 'object not found' handled by AOP
+        Instructor instructor = finder.findInstructorByUuid(id);
+        final Response response = Response.ok(scrubInstructor(instructor)).build();
 
         return response;
     }
@@ -240,38 +184,15 @@ public class InstructorResource extends AbstractResource {
     @POST
     @Consumes({ MediaType.APPLICATION_JSON, MediaType.TEXT_XML })
     @Produces({ MediaType.APPLICATION_JSON, MediaType.TEXT_XML })
-    public Response updateInstructor(@PathParam("instructorId") String id, NameAndEmailAddress req) {
+    public Response updateInstructor(@PathParam("instructorId") String id, NameAndEmailAddressRTO req) {
 
         final String name = req.getName();
-        if ((name == null) || name.isEmpty()) {
-            return Response.status(Status.BAD_REQUEST).entity("'name' is required'").build();
-        }
-
         final String email = req.getEmailAddress();
-        if ((email == null) || email.isEmpty()) {
-            return Response.status(Status.BAD_REQUEST).entity("'email' is required'").build();
-        }
 
-        Response response = null;
-        if (!StudentUtil.isPossibleUuid(id)) {
-            response = Response.status(Status.BAD_REQUEST).build();
-            LOG.info("attempt to use malformed UUID");
-        } else {
-            LOG.debug("InstructorResource: updateInstructor(" + id + ")");
-            try {
-                final Instructor instructor = finder.findInstructorByUuid(id);
-                final Instructor updatedInstructor = manager.updateInstructor(instructor, name, email);
-                response = Response.ok(scrubInstructor(updatedInstructor)).build();
-            } catch (ObjectNotFoundException exception) {
-                response = Response.status(Status.NOT_FOUND).build();
-                LOG.debug("instructor not found: " + id);
-            } catch (Exception e) {
-                if (!(e instanceof UnitTestException)) {
-                    LOG.info("unhandled exception", e);
-                }
-                response = Response.status(Status.INTERNAL_SERVER_ERROR).build();
-            }
-        }
+        // 'object not found' handled by AOP
+        final Instructor instructor = finder.findInstructorByUuid(id);
+        final Instructor updatedInstructor = manager.updateInstructor(instructor, name, email);
+        final Response response = Response.ok(scrubInstructor(updatedInstructor)).build();
 
         return response;
     }
@@ -284,27 +205,16 @@ public class InstructorResource extends AbstractResource {
      */
     @Path("/{instructorId}")
     @DELETE
-    public Response deleteInstructor(@PathParam("instructorId") String id, @PathParam("version") int version) {
+    public Response deleteInstructor(@PathParam("instructorId") String id, @PathParam("version") Integer version) {
 
-        Response response = null;
-        if (!StudentUtil.isPossibleUuid(id)) {
-            response = Response.status(Status.BAD_REQUEST).build();
-            LOG.info("attempt to use malformed UUID");
-        } else {
-            LOG.debug("InstructorResource: deleteInstructor(" + id + ")");
-            try {
-                manager.deleteInstructor(id, version);
-                response = Response.noContent().build();
-            } catch (ObjectNotFoundException exception) {
-                response = Response.noContent().build();
-                LOG.debug("instructor not found: " + id);
-            } catch (Exception e) {
-                if (!(e instanceof UnitTestException)) {
-                    LOG.info("unhandled exception", e);
-                }
-                response = Response.status(Status.INTERNAL_SERVER_ERROR).build();
-            }
+        // we don't use AOP handler since it's okay for there to be no match
+        try {
+            manager.deleteInstructor(id, version);
+        } catch (ObjectNotFoundException exception) {
+            LOG.debug("instructor not found: " + id);
         }
+
+        final Response response = Response.noContent().build();
 
         return response;
     }

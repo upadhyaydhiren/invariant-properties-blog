@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.invariantproperties.sandbox.student</groupId>
 	<artifactId>student</artifactId>
-	<version>0.0.4-SNAPSHOT</version>
+	<version>0.0.5-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>Project Student</name>
 	<description>
@@ -47,7 +47,7 @@
 	</modules>
 
 	<properties>
-		<project.version>0.0.4-SNAPSHOT</project.version>
+		<project.version>0.0.5-SNAPSHOT</project.version>
 		<spring.version>3.2.3.RELEASE</spring.version>
 		<hibernate.version>4.2.1.Final</hibernate.version>
 		<jersey.version>1.17.1</jersey.version>
@@ -189,11 +189,11 @@
 				<artifactId>student-ws-server</artifactId>
 				<version>${project.version}</version>
 			</dependency>
-            <dependency>
-                <groupId>com.invariantproperties.sandbox.student</groupId>
-                <artifactId>student-ws-security</artifactId>
-                <version>${project.version}</version>
-            </dependency>
+			<dependency>
+				<groupId>com.invariantproperties.sandbox.student</groupId>
+				<artifactId>student-ws-security</artifactId>
+				<version>${project.version}</version>
+			</dependency>
 			<dependency>
 				<groupId>com.invariantproperties.sandbox.student</groupId>
 				<artifactId>student-ws-client</artifactId>
@@ -280,6 +280,16 @@
 				<artifactId>spring-data-commons</artifactId>
 				<version>1.5.2.RELEASE</version>
 			</dependency>
+			<dependency>
+				<groupId>org.aspectj</groupId>
+				<artifactId>aspectjrt</artifactId>
+				<version>1.7.4</version>
+			</dependency>
+            <dependency>
+                <groupId>org.aspectj</groupId>
+                <artifactId>aspectjweaver</artifactId>
+                <version>1.7.4</version>
+            </dependency>
 
 			<dependency>
 				<groupId>org.hamcrest</groupId>

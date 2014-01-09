@@ -47,7 +47,6 @@ import org.springframework.stereotype.Service;
 import com.invariantproperties.sandbox.student.business.ObjectNotFoundException;
 import com.invariantproperties.sandbox.student.business.TestRunService;
 import com.invariantproperties.sandbox.student.domain.TestRun;
-import com.invariantproperties.sandbox.student.util.StudentUtil;
 
 @Service
 @Path("/testRun")
@@ -88,24 +87,14 @@ public class TestRunResource extends AbstractResource {
     @GET
     @Produces({ MediaType.APPLICATION_JSON, MediaType.TEXT_XML })
     public Response findAllTestRuns() {
-        LOG.debug("TestRunResource: findAllTestRuns()");
+        final List<TestRun> testRuns = service.findAllTestRuns();
 
-        Response response = null;
-        try {
-            List<TestRun> testRuns = service.findAllTestRuns();
-
-            List<TestRun> results = new ArrayList<TestRun>(testRuns.size());
-            for (TestRun testRun : testRuns) {
-                results.add(scrubTestRun(testRun));
-            }
-
-            response = Response.ok(results.toArray(EMPTY_TEST_RUN_ARRAY)).build();
-        } catch (Exception e) {
-            if (!(e instanceof UnitTestException)) {
-                LOG.info("unhandled exception", e);
-            }
-            response = Response.status(Status.INTERNAL_SERVER_ERROR).build();
+        final List<TestRun> results = new ArrayList<TestRun>(testRuns.size());
+        for (TestRun testRun : testRuns) {
+            results.add(scrubTestRun(testRun));
         }
+
+        final Response response = Response.ok(results.toArray(EMPTY_TEST_RUN_ARRAY)).build();
 
         return response;
     }
@@ -119,28 +108,21 @@ public class TestRunResource extends AbstractResource {
     @POST
     @Consumes({ MediaType.APPLICATION_JSON, MediaType.TEXT_XML })
     @Produces({ MediaType.APPLICATION_JSON, MediaType.TEXT_XML })
-    public Response createTestRun(Name req) {
+    public Response createTestRun(TestRunNameRTO req) {
         LOG.debug("TestRunResource: createTestRun()");
 
         Response response = null;
 
-        try {
-            TestRun testRun = null;
-            if (req.getName() == null || req.getName().isEmpty()) {
-                testRun = service.createTestRun();
-            } else {
-                testRun = service.createTestRun(req.getName());
-            }
-            if (testRun == null) {
-                response = Response.status(Status.INTERNAL_SERVER_ERROR).build();
-            } else {
-                response = Response.created(URI.create(testRun.getUuid())).entity(scrubTestRun(testRun)).build();
-            }
-        } catch (Exception e) {
-            if (!(e instanceof UnitTestException)) {
-                LOG.info("unhandled exception", e);
-            }
+        TestRun testRun = null;
+        if (req.getName() == null || req.getName().isEmpty()) {
+            testRun = service.createTestRun();
+        } else {
+            testRun = service.createTestRun(req.getName());
+        }
+        if (testRun == null) {
             response = Response.status(Status.INTERNAL_SERVER_ERROR).build();
+        } else {
+            response = Response.created(URI.create(testRun.getUuid())).entity(scrubTestRun(testRun)).build();
         }
 
         return response;
@@ -157,25 +139,9 @@ public class TestRunResource extends AbstractResource {
     @Produces({ MediaType.APPLICATION_JSON, MediaType.TEXT_XML })
     public Response getTestRun(@PathParam("testRunId") String id) {
 
-        Response response = null;
-        if (!StudentUtil.isPossibleUuid(id)) {
-            response = Response.status(Status.BAD_REQUEST).build();
-            LOG.info("attempt to use malformed UUID");
-        } else {
-            LOG.debug("TestRunResource: getTestRun(" + id + ")");
-            try {
-                TestRun testRun = service.findTestRunByUuid(id);
-                response = Response.ok(scrubTestRun(testRun)).build();
-            } catch (ObjectNotFoundException e) {
-                response = Response.status(Status.NOT_FOUND).build();
-                LOG.debug("testrun not found: " + id);
-            } catch (Exception e) {
-                if (!(e instanceof UnitTestException)) {
-                    LOG.info("unhandled exception", e);
-                }
-                response = Response.status(Status.INTERNAL_SERVER_ERROR).build();
-            }
-        }
+        // 'object not found' handled by AOP
+        TestRun testRun = service.findTestRunByUuid(id);
+        final Response response = Response.ok(scrubTestRun(testRun)).build();
 
         return response;
     }
@@ -188,27 +154,16 @@ public class TestRunResource extends AbstractResource {
      */
     @Path("/{testRunId}")
     @DELETE
-    public Response deleteTestRun(@PathParam("testRunId") String id) {
+    public Response deleteTestRun(@PathParam("testRunId") String id, @PathParam("version") Integer version) {
 
-        Response response = null;
-        if (!StudentUtil.isPossibleUuid(id)) {
-            response = Response.status(Status.BAD_REQUEST).build();
-            LOG.info("attempt to use malformed UUID");
-        } else {
-            LOG.debug("TestRunResource: deleteTestRun(" + id + ")");
-            try {
-                service.deleteTestRun(id);
-                response = Response.noContent().build();
-            } catch (ObjectNotFoundException exception) {
-                response = Response.noContent().build();
-                LOG.debug("testrun not found: " + id);
-            } catch (Exception e) {
-                if (!(e instanceof UnitTestException)) {
-                    LOG.info("unhandled exception", e);
-                }
-                response = Response.status(Status.INTERNAL_SERVER_ERROR).build();
-            }
+        // we don't use AOP handler since it's okay for there to be no match
+        try {
+            service.deleteTestRun(id);
+        } catch (ObjectNotFoundException exception) {
+            LOG.debug("testrun not found: " + id);
         }
+
+        final Response response = Response.noContent().build();
 
         return response;
     }

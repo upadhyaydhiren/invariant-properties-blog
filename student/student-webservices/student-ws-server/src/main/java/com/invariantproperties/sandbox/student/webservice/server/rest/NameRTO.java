@@ -24,40 +24,15 @@ package com.invariantproperties.sandbox.student.webservice.server.rest;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
-import com.invariantproperties.sandbox.student.domain.Course;
+import com.invariantproperties.sandbox.student.util.StudentUtil;
 
 /**
  * @author Bear Giles <bgiles@coyotesong.com>
  */
 @XmlRootElement
-public class CourseInfo {
-    private String code;
+public class NameRTO implements Validatable {
     private String name;
-    private String summary;
-    private String description;
-    private Integer creditHours;
     private String testUuid;
-
-    public CourseInfo() {
-
-    }
-
-    public CourseInfo(Course course) {
-        code = course.getCode();
-        name = course.getName();
-        summary = course.getSummary();
-        description = course.getDescription();
-        creditHours = course.getCreditHours();
-        testUuid = (course.getTestRun() == null) ? null : course.getTestRun().getUuid();
-    }
-
-    public String getCode() {
-        return code;
-    }
-
-    public void setCode(String code) {
-        this.code = code;
-    }
 
     public String getName() {
         return name;
@@ -67,35 +42,33 @@ public class CourseInfo {
         this.name = name;
     }
 
-    public String getSummary() {
-        return summary;
-    }
-
-    public void setSummary(String summary) {
-        this.summary = summary;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public Integer getCreditHours() {
-        return creditHours;
-    }
-
-    public void setCreditHours(Integer creditHours) {
-        this.creditHours = creditHours;
-    }
-
     public String getTestUuid() {
         return testUuid;
     }
 
     public void setTestUuid(String testUuid) {
         this.testUuid = testUuid;
+    }
+
+    /**
+     * Validate values.
+     */
+    @Override
+    public boolean validate() {
+        if ((name == null) || name.isEmpty()) {
+            return false;
+        }
+
+        if ((testUuid != null) && !StudentUtil.isPossibleUuid(testUuid)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
+    public String toString() {
+        // FIXME: this is unsafe!
+        return String.format("Name('%s', %s)", name, testUuid);
     }
 }

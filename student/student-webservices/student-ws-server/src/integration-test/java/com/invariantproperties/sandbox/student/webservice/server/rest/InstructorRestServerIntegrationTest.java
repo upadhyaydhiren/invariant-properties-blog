@@ -105,7 +105,7 @@ public class InstructorRestServerIntegrationTest {
         assertTrue(instructors.length > 0);
 
         final String edithName = "Edith : " + testRun.getUuid();
-        final String edithEmail = "edith-" + testRun.getUuid() + "example.com";
+        final String edithEmail = "edith-" + testRun.getUuid() + "@example.com";
         final Instructor actual2 = managerClient.updateInstructor(actual1.getUuid(), edithName, edithEmail);
         assertEquals(edithName, actual2.getName());
         assertEquals(edithEmail, actual2.getEmailAddress());

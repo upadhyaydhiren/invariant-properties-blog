@@ -5,7 +5,7 @@
 	<parent>
 		<artifactId>student-maintenance</artifactId>
 		<groupId>com.invariantproperties.sandbox.student</groupId>
-		<version>0.0.4-SNAPSHOT</version>
+		<version>0.0.5-SNAPSHOT</version>
 	</parent>
 	<artifactId>student-maintenance-webapp</artifactId>
 	<packaging>war</packaging>

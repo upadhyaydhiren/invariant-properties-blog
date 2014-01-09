@@ -80,29 +80,13 @@ public class SectionResource extends AbstractResource {
     }
 
     /**
-     * Unit test constructor.
+     * Set values used in unit tests. (Required due to AOP)
      * 
-     * @param service
+     * @param finder
+     * @param manager
+     * @param testService
      */
-    SectionResource(SectionFinderService finder, TestRunService testService) {
-        this(finder, null, testService);
-    }
-
-    /**
-     * Unit test constructor.
-     * 
-     * @param service
-     */
-    SectionResource(SectionManagerService manager, TestRunService testService) {
-        this(null, manager, testService);
-    }
-
-    /**
-     * Unit test constructor.
-     * 
-     * @param service
-     */
-    SectionResource(SectionFinderService finder, SectionManagerService manager, TestRunService testService) {
+    void setServices(SectionFinderService finder, SectionManagerService manager, TestRunService testService) {
         this.finder = finder;
         this.manager = manager;
         this.testService = testService;
@@ -116,24 +100,15 @@ public class SectionResource extends AbstractResource {
     @GET
     @Produces({ MediaType.APPLICATION_JSON, MediaType.TEXT_XML })
     public Response findAllSections() {
-        LOG.debug("SectionResource: findAllSections()");
 
-        Response response = null;
-        try {
-            List<Section> sections = finder.findAllSections();
+        List<Section> sections = finder.findAllSections();
 
-            List<Section> results = new ArrayList<Section>(sections.size());
-            for (Section section : sections) {
-                results.add(scrubSection(section));
-            }
-
-            response = Response.ok(results.toArray(EMPTY_SECTION_ARRAY)).build();
-        } catch (Exception e) {
-            if (!(e instanceof UnitTestException)) {
-                LOG.info("unhandled exception", e);
-            }
-            response = Response.status(Status.INTERNAL_SERVER_ERROR).build();
+        List<Section> results = new ArrayList<Section>(sections.size());
+        for (Section section : sections) {
+            results.add(scrubSection(section));
         }
+
+        final Response response = Response.ok(results.toArray(EMPTY_SECTION_ARRAY)).build();
 
         return response;
     }
@@ -141,45 +116,36 @@ public class SectionResource extends AbstractResource {
     /**
      * Create a Section.
      * 
+     * FIXME: what about uniqueness violations?
+     * 
      * @param req
      * @return
      */
     @POST
     @Consumes({ MediaType.APPLICATION_JSON, MediaType.TEXT_XML })
     @Produces({ MediaType.APPLICATION_JSON, MediaType.TEXT_XML })
-    public Response createSection(Name req) {
-        LOG.debug("SectionResource: createSection()");
+    public Response createSection(NameRTO req) {
 
         final String name = req.getName();
-        if ((name == null) || name.isEmpty()) {
-            return Response.status(Status.BAD_REQUEST).entity("'name' is required'").build();
-        }
 
         Response response = null;
 
-        try {
-            Section section = null;
+        Section section = null;
 
-            if (req.getTestUuid() != null) {
-                TestRun testRun = testService.findTestRunByUuid(req.getTestUuid());
-                if (testRun != null) {
-                    section = manager.createSectionForTesting(name, testRun);
-                } else {
-                    response = Response.status(Status.BAD_REQUEST).entity("unknown test UUID").build();
-                }
+        if (req.getTestUuid() != null) {
+            TestRun testRun = testService.findTestRunByUuid(req.getTestUuid());
+            if (testRun != null) {
+                section = manager.createSectionForTesting(name, testRun);
             } else {
-                section = manager.createSection(name);
+                response = Response.status(Status.BAD_REQUEST).entity("unknown test UUID").build();
             }
-            if (section == null) {
-                response = Response.status(Status.INTERNAL_SERVER_ERROR).build();
-            } else {
-                response = Response.created(URI.create(section.getUuid())).entity(scrubSection(section)).build();
-            }
-        } catch (Exception e) {
-            if (!(e instanceof UnitTestException)) {
-                LOG.info("unhandled exception", e);
-            }
+        } else {
+            section = manager.createSection(name);
+        }
+        if (section == null) {
             response = Response.status(Status.INTERNAL_SERVER_ERROR).build();
+        } else {
+            response = Response.created(URI.create(section.getUuid())).entity(scrubSection(section)).build();
         }
 
         return response;
@@ -195,21 +161,10 @@ public class SectionResource extends AbstractResource {
     @GET
     @Produces({ MediaType.APPLICATION_JSON, MediaType.TEXT_XML })
     public Response getSection(@PathParam("sectionId") String id) {
-        LOG.debug("SectionResource: getSection()");
 
-        Response response = null;
-        try {
-            Section section = finder.findSectionByUuid(id);
-            response = Response.ok(scrubSection(section)).build();
-        } catch (ObjectNotFoundException e) {
-            response = Response.status(Status.NOT_FOUND).build();
-            LOG.debug("section not found: " + id);
-        } catch (Exception e) {
-            if (!(e instanceof UnitTestException)) {
-                LOG.info("unhandled exception", e);
-            }
-            response = Response.status(Status.INTERNAL_SERVER_ERROR).build();
-        }
+        // 'object not found' handled by AOP
+        Section section = finder.findSectionByUuid(id);
+        final Response response = Response.ok(scrubSection(section)).build();
 
         return response;
     }
@@ -227,28 +182,14 @@ public class SectionResource extends AbstractResource {
     @POST
     @Consumes({ MediaType.APPLICATION_JSON, MediaType.TEXT_XML })
     @Produces({ MediaType.APPLICATION_JSON, MediaType.TEXT_XML })
-    public Response updateSection(@PathParam("sectionId") String id, Name req) {
-        LOG.debug("SectionResource: updateSection()");
+    public Response updateSection(@PathParam("sectionId") String id, NameRTO req) {
 
         final String name = req.getName();
-        if ((name == null) || name.isEmpty()) {
-            return Response.status(Status.BAD_REQUEST).entity("'name' is required'").build();
-        }
 
-        Response response = null;
-        try {
-            final Section section = finder.findSectionByUuid(id);
-            final Section updatedSection = manager.updateSection(section, name);
-            response = Response.ok(scrubSection(updatedSection)).build();
-        } catch (ObjectNotFoundException exception) {
-            response = Response.status(Status.NOT_FOUND).build();
-            LOG.debug("section not found: " + id);
-        } catch (Exception e) {
-            if (!(e instanceof UnitTestException)) {
-                LOG.info("unhandled exception", e);
-            }
-            response = Response.status(Status.INTERNAL_SERVER_ERROR).build();
-        }
+        // 'object not found' handled by AOP
+        final Section section = finder.findSectionByUuid(id);
+        final Section updatedSection = manager.updateSection(section, name);
+        final Response response = Response.ok(scrubSection(updatedSection)).build();
 
         return response;
     }
@@ -261,20 +202,16 @@ public class SectionResource extends AbstractResource {
      */
     @Path("/{sectionId}")
     @DELETE
-    public Response deleteSection(@PathParam("sectionId") String id, @PathParam("version") int version) {
-        Response response = null;
+    public Response deleteSection(@PathParam("sectionId") String id, @PathParam("version") Integer version) {
+
+        // we don't use AOP handler since it's okay for there to be no match
         try {
             manager.deleteSection(id, version);
-            response = Response.noContent().build();
         } catch (ObjectNotFoundException exception) {
-            response = Response.noContent().build();
             LOG.debug("section not found: " + id);
-        } catch (Exception e) {
-            if (!(e instanceof UnitTestException)) {
-                LOG.info("unhandled exception", e);
-            }
-            response = Response.status(Status.INTERNAL_SERVER_ERROR).build();
         }
+
+        final Response response = Response.noContent().build();
 
         return response;
     }

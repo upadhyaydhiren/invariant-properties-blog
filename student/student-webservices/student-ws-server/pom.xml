@@ -4,9 +4,10 @@
 	<parent>
 		<groupId>com.invariantproperties.sandbox.student</groupId>
 		<artifactId>student-webservices</artifactId>
-		<version>0.0.4-SNAPSHOT</version>
+		<version>0.0.5-SNAPSHOT</version>
 	</parent>
 	<artifactId>student-ws-server</artifactId>
+    <name>Project Student: webservice server</name>
 
 	<build>
 		<plugins>
@@ -179,9 +180,13 @@
 		<dependency>
 			<groupId>org.aspectj</groupId>
 			<artifactId>aspectjrt</artifactId>
-			<version>1.7.3</version>
 			<!-- <scope>test</scope> -->
 		</dependency>
+        <dependency>
+            <groupId>org.aspectj</groupId>
+            <artifactId>aspectjweaver</artifactId>
+            <!-- <scope>test</scope> -->
+        </dependency>
 		<dependency>
 			<groupId>javax.validation</groupId>
 			<artifactId>validation-api</artifactId>
@@ -224,5 +229,4 @@
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
-	<name>Project Student: webservice server</name>
 </project>

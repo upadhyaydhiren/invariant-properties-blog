@@ -50,7 +50,6 @@ import com.invariantproperties.sandbox.student.business.ObjectNotFoundException;
 import com.invariantproperties.sandbox.student.business.TestRunService;
 import com.invariantproperties.sandbox.student.domain.Course;
 import com.invariantproperties.sandbox.student.domain.TestRun;
-import com.invariantproperties.sandbox.student.util.StudentUtil;
 
 @Service
 @Path("/course")
@@ -81,29 +80,13 @@ public class CourseResource extends AbstractResource {
     }
 
     /**
-     * Unit test constructor.
+     * Set values used in unit tests. (Required due to AOP)
      * 
      * @param finder
+     * @param manager
+     * @param testService
      */
-    CourseResource(CourseFinderService finder, TestRunService testRunService) {
-        this(finder, null, testRunService);
-    }
-
-    /**
-     * Unit test constructor.
-     * 
-     * @param service
-     */
-    CourseResource(CourseManagerService manager, TestRunService testRunService) {
-        this(null, manager, testRunService);
-    }
-
-    /**
-     * Unit test constructor.
-     * 
-     * @param service
-     */
-    CourseResource(CourseFinderService finder, CourseManagerService manager, TestRunService testRunService) {
+    void setServices(CourseFinderService finder, CourseManagerService manager, TestRunService testRunService) {
         this.finder = finder;
         this.manager = manager;
         this.testRunService = testRunService;
@@ -117,24 +100,14 @@ public class CourseResource extends AbstractResource {
     @GET
     @Produces({ MediaType.APPLICATION_JSON, MediaType.TEXT_XML })
     public Response findAllCourses() {
-        LOG.debug("CourseResource: findAllCourses()");
+        final List<Course> courses = finder.findAllCourses();
 
-        Response response = null;
-        try {
-            List<Course> courses = finder.findAllCourses();
-
-            List<Course> results = new ArrayList<Course>(courses.size());
-            for (Course course : courses) {
-                results.add(scrubCourse(course));
-            }
-
-            response = Response.ok(results.toArray(EMPTY_COURSE_ARRAY)).build();
-        } catch (Exception e) {
-            if (!(e instanceof UnitTestException)) {
-                LOG.info("unhandled exception", e);
-            }
-            response = Response.status(Status.INTERNAL_SERVER_ERROR).build();
+        final List<Course> results = new ArrayList<Course>(courses.size());
+        for (Course course : courses) {
+            results.add(scrubCourse(course));
         }
+
+        final Response response = Response.ok(results.toArray(EMPTY_COURSE_ARRAY)).build();
 
         return response;
     }
@@ -142,51 +115,36 @@ public class CourseResource extends AbstractResource {
     /**
      * Create a Course.
      * 
+     * FIXME: what about uniqueness violations?
+     * 
      * @param req
      * @return
      */
     @POST
     @Consumes({ MediaType.APPLICATION_JSON, MediaType.TEXT_XML })
     @Produces({ MediaType.APPLICATION_JSON, MediaType.TEXT_XML })
-    public Response createCourse(CourseInfo req) {
-        LOG.debug("CourseResource: createCourse()");
-
+    public Response createCourse(CourseInfoRTO req) {
         final String code = req.getCode();
-        if ((code == null) || code.isEmpty()) {
-            return Response.status(Status.BAD_REQUEST).entity("'code' is required'").build();
-        }
-
         final String name = req.getName();
-        if ((name == null) || name.isEmpty()) {
-            return Response.status(Status.BAD_REQUEST).entity("'name' is required'").build();
-        }
 
         Response response = null;
+        Course course = null;
 
-        try {
-            Course course = null;
-
-            if (req.getTestUuid() != null) {
-                TestRun testRun = testRunService.findTestRunByUuid(req.getTestUuid());
-                if (testRun != null) {
-                    course = manager.createCourseForTesting(code, name, req.getSummary(), req.getDescription(),
-                            req.getCreditHours(), testRun);
-                } else {
-                    response = Response.status(Status.BAD_REQUEST).entity("unknown test UUID").build();
-                }
+        if (req.getTestUuid() != null) {
+            TestRun testRun = testRunService.findTestRunByUuid(req.getTestUuid());
+            if (testRun != null) {
+                course = manager.createCourseForTesting(code, name, req.getSummary(), req.getDescription(),
+                        req.getCreditHours(), testRun);
             } else {
-                course = manager.createCourse(code, name, req.getSummary(), req.getDescription(), req.getCreditHours());
+                response = Response.status(Status.BAD_REQUEST).entity("unknown test UUID").build();
             }
-            if (course == null) {
-                response = Response.status(Status.INTERNAL_SERVER_ERROR).build();
-            } else {
-                response = Response.created(URI.create(course.getUuid())).entity(scrubCourse(course)).build();
-            }
-        } catch (Exception e) {
-            if (!(e instanceof UnitTestException)) {
-                LOG.info("unhandled exception", e);
-            }
+        } else {
+            course = manager.createCourse(code, name, req.getSummary(), req.getDescription(), req.getCreditHours());
+        }
+        if (course == null) {
             response = Response.status(Status.INTERNAL_SERVER_ERROR).build();
+        } else {
+            response = Response.created(URI.create(course.getUuid())).entity(scrubCourse(course)).build();
         }
 
         return response;
@@ -203,25 +161,9 @@ public class CourseResource extends AbstractResource {
     @Produces({ MediaType.APPLICATION_JSON, MediaType.TEXT_XML })
     public Response getCourse(@PathParam("courseId") String id) {
 
-        Response response = null;
-        if (!StudentUtil.isPossibleUuid(id)) {
-            response = Response.status(Status.BAD_REQUEST).build();
-            LOG.info("attempt to use malformed UUID");
-        } else {
-            LOG.debug("CourseResource: getCourse(" + id + ")");
-            try {
-                Course course = finder.findCourseByUuid(id);
-                response = Response.ok(scrubCourse(course)).build();
-            } catch (ObjectNotFoundException e) {
-                response = Response.status(Status.NOT_FOUND).build();
-                LOG.debug("course not found: " + id);
-            } catch (Exception e) {
-                if (!(e instanceof UnitTestException)) {
-                    LOG.info("unhandled exception", e);
-                }
-                response = Response.status(Status.INTERNAL_SERVER_ERROR).build();
-            }
-        }
+        // 'object not found' handled by AOP
+        Course course = finder.findCourseByUuid(id);
+        final Response response = Response.ok(scrubCourse(course)).build();
 
         return response;
     }
@@ -239,34 +181,15 @@ public class CourseResource extends AbstractResource {
     @POST
     @Consumes({ MediaType.APPLICATION_JSON, MediaType.TEXT_XML })
     @Produces({ MediaType.APPLICATION_JSON, MediaType.TEXT_XML })
-    public Response updateCourse(@PathParam("courseId") String id, CourseInfo req) {
+    public Response updateCourse(@PathParam("courseId") String id, CourseInfoRTO req) {
 
         final String name = req.getName();
-        if ((name == null) || name.isEmpty()) {
-            return Response.status(Status.BAD_REQUEST).entity("'name' is required'").build();
-        }
 
-        Response response = null;
-        if (!StudentUtil.isPossibleUuid(id)) {
-            response = Response.status(Status.BAD_REQUEST).build();
-            LOG.info("attempt to use malformed UUID");
-        } else {
-            LOG.debug("CourseResource: updateCourse(" + id + ")");
-            try {
-                final Course course = finder.findCourseByUuid(id);
-                final Course updatedCourse = manager.updateCourse(course, name, req.getSummary(), req.getDescription(),
-                        req.getCreditHours());
-                response = Response.ok(scrubCourse(updatedCourse)).build();
-            } catch (ObjectNotFoundException exception) {
-                response = Response.status(Status.NOT_FOUND).build();
-                LOG.debug("course not found: " + id);
-            } catch (Exception e) {
-                if (!(e instanceof UnitTestException)) {
-                    LOG.info("unhandled exception", e);
-                }
-                response = Response.status(Status.INTERNAL_SERVER_ERROR).build();
-            }
-        }
+        // 'object not found' handled by AOP
+        final Course course = finder.findCourseByUuid(id);
+        final Course updatedCourse = manager.updateCourse(course, name, req.getSummary(), req.getDescription(),
+                req.getCreditHours());
+        final Response response = Response.ok(scrubCourse(updatedCourse)).build();
 
         return response;
     }
@@ -279,27 +202,16 @@ public class CourseResource extends AbstractResource {
      */
     @Path("/{courseId}")
     @DELETE
-    public Response deleteCourse(@PathParam("courseId") String id, @PathParam("version") int version) {
+    public Response deleteCourse(@PathParam("courseId") String id, @PathParam("version") Integer version) {
 
-        Response response = null;
-        if (!StudentUtil.isPossibleUuid(id)) {
-            response = Response.status(Status.BAD_REQUEST).build();
-            LOG.info("attempt to use malformed UUID");
-        } else {
-            LOG.debug("CourseResource: deleteCourse(" + id + ")");
-            try {
-                manager.deleteCourse(id, version);
-                response = Response.noContent().build();
-            } catch (ObjectNotFoundException exception) {
-                response = Response.noContent().build();
-                LOG.info("course not found: " + id);
-            } catch (Exception e) {
-                if (!(e instanceof UnitTestException)) {
-                    LOG.info("unhandled exception", e);
-                }
-                response = Response.status(Status.INTERNAL_SERVER_ERROR).build();
-            }
+        // we don't use AOP handler since it's okay for there to be no match
+        try {
+            manager.deleteCourse(id, version);
+        } catch (ObjectNotFoundException exception) {
+            LOG.debug("instructor not found: " + id);
         }
+
+        final Response response = Response.noContent().build();
 
         return response;
     }
