@@ -22,13 +22,30 @@
  */
 package com.invariantproperties.sandbox.student.webservice.server.rest;
 
+import java.util.regex.Pattern;
+
 import javax.xml.bind.annotation.XmlRootElement;
 
+import com.invariantproperties.sandbox.student.util.StudentUtil;
+
 /**
+ * Name and address.
+ * 
  * @author Bear Giles <bgiles@coyotesong.com>
  */
 @XmlRootElement
-public class NameAndEmailAddress {
+public class NameAndEmailAddressRTO implements Validatable {
+
+    // names must be alphabetic, an apostrophe, a dash or a space. (Anne-Marie,
+    // O'Brien). This pattern should accept non-Latin characters.
+    // digits and colon are added to aid testing. Unlikely but possible in real
+    // names.
+    private static final Pattern NAME_PATTERN = Pattern.compile("^[\\p{L}\\p{Digit}' :-]+$");
+
+    // email address must be well-formed. This pattern should accept non-Latin
+    // characters.
+    private static final Pattern EMAIL_PATTERN = Pattern.compile("^[^@]+@([\\p{L}\\p{Digit}-]+\\.)?[\\p{L}]+");
+
     private String name;
     private String emailAddress;
     private String testUuid;
@@ -55,5 +72,31 @@ public class NameAndEmailAddress {
 
     public void setTestUuid(String testUuid) {
         this.testUuid = testUuid;
+    }
+
+    /**
+     * Validate values.
+     */
+    @Override
+    public boolean validate() {
+        if ((name == null) || !NAME_PATTERN.matcher(name).matches()) {
+            return false;
+        }
+
+        if ((emailAddress == null) || !EMAIL_PATTERN.matcher(emailAddress).matches()) {
+            return false;
+        }
+
+        if ((testUuid != null) && !StudentUtil.isPossibleUuid(testUuid)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
+    public String toString() {
+        // FIXME: this is unsafe!
+        return String.format("NameAndEmailAddress('%s', '%s', %s)", name, emailAddress, testUuid);
     }
 }

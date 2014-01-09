@@ -33,26 +33,36 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
+import javax.annotation.Resource;
 import javax.ws.rs.core.Response;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mockito;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import com.invariantproperties.sandbox.student.business.ObjectNotFoundException;
 import com.invariantproperties.sandbox.student.business.StudentFinderService;
 import com.invariantproperties.sandbox.student.business.StudentManagerService;
 import com.invariantproperties.sandbox.student.business.TestRunService;
 import com.invariantproperties.sandbox.student.domain.Student;
+import com.invariantproperties.sandbox.student.webservice.config.TestRestApplicationContext1;
 
 /**
  * Unit tests for StudentResource.
  * 
  * @author Bear Giles <bgiles@coyotesong.com>
  */
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(classes = { TestRestApplicationContext1.class })
 public class StudentResourceTest {
     private Student david = new Student();
     private Student edith = new Student();
+
+    @Resource
+    private StudentResource resource;
 
     @Before
     public void init() {
@@ -76,7 +86,7 @@ public class StudentResourceTest {
 
         final TestRunService testService = Mockito.mock(TestRunService.class);
 
-        final StudentResource resource = new StudentResource(finder, testService);
+        resource.setServices(finder, null, testService);
         final Response response = resource.findAllStudents();
 
         assertEquals(200, response.getStatus());
@@ -97,7 +107,7 @@ public class StudentResourceTest {
 
         final TestRunService testService = Mockito.mock(TestRunService.class);
 
-        final StudentResource resource = new StudentResource(finder, testService);
+        resource.setServices(finder, null, testService);
         final Response response = resource.findAllStudents();
 
         assertEquals(200, response.getStatus());
@@ -112,7 +122,7 @@ public class StudentResourceTest {
 
         final TestRunService testService = Mockito.mock(TestRunService.class);
 
-        final StudentResource resource = new StudentResource(finder, testService);
+        resource.setServices(finder, null, testService);
         final Response response = resource.findAllStudents();
 
         assertEquals(500, response.getStatus());
@@ -127,7 +137,7 @@ public class StudentResourceTest {
 
         final TestRunService testService = Mockito.mock(TestRunService.class);
 
-        final StudentResource resource = new StudentResource(finder, testService);
+        resource.setServices(finder, null, testService);
         final Response response = resource.getStudent(expected.getUuid());
 
         assertEquals(200, response.getStatus());
@@ -145,7 +155,7 @@ public class StudentResourceTest {
 
         final TestRunService testService = Mockito.mock(TestRunService.class);
 
-        final StudentResource resource = new StudentResource(finder, testService);
+        resource.setServices(finder, null, testService);
         final Response response = resource.getStudent(david.getUuid());
 
         assertEquals(404, response.getStatus());
@@ -158,7 +168,7 @@ public class StudentResourceTest {
 
         final TestRunService testService = Mockito.mock(TestRunService.class);
 
-        final StudentResource resource = new StudentResource(finder, testService);
+        resource.setServices(finder, null, testService);
         final Response response = resource.getStudent(david.getUuid());
 
         assertEquals(500, response.getStatus());
@@ -167,7 +177,7 @@ public class StudentResourceTest {
     @Test
     public void testCreateStudent() {
         final Student expected = david;
-        final NameAndEmailAddress req = new NameAndEmailAddress();
+        final NameAndEmailAddressRTO req = new NameAndEmailAddressRTO();
         req.setName(expected.getName());
         req.setEmailAddress(expected.getEmailAddress());
 
@@ -176,7 +186,7 @@ public class StudentResourceTest {
 
         final TestRunService testService = Mockito.mock(TestRunService.class);
 
-        final StudentResource resource = new StudentResource(manager, testService);
+        resource.setServices(null, manager, testService);
         final Response response = resource.createStudent(req);
 
         assertEquals(201, response.getStatus());
@@ -194,7 +204,7 @@ public class StudentResourceTest {
     @Test
     public void testCreateStudentProblem() {
         final Student expected = david;
-        final NameAndEmailAddress req = new NameAndEmailAddress();
+        final NameAndEmailAddressRTO req = new NameAndEmailAddressRTO();
         req.setName(expected.getName());
         req.setEmailAddress(expected.getEmailAddress());
 
@@ -203,7 +213,7 @@ public class StudentResourceTest {
 
         final TestRunService testService = Mockito.mock(TestRunService.class);
 
-        final StudentResource resource = new StudentResource(manager, testService);
+        resource.setServices(null, manager, testService);
         final Response response = resource.createStudent(req);
 
         assertEquals(500, response.getStatus());
@@ -212,7 +222,7 @@ public class StudentResourceTest {
     @Test
     public void testCreateStudentFailure() {
         final Student expected = david;
-        final NameAndEmailAddress req = new NameAndEmailAddress();
+        final NameAndEmailAddressRTO req = new NameAndEmailAddressRTO();
         req.setName(expected.getName());
         req.setEmailAddress(expected.getEmailAddress());
 
@@ -221,7 +231,7 @@ public class StudentResourceTest {
 
         final TestRunService testService = Mockito.mock(TestRunService.class);
 
-        final StudentResource resource = new StudentResource(manager, testService);
+        resource.setServices(null, manager, testService);
         final Response response = resource.createStudent(req);
 
         assertEquals(500, response.getStatus());
@@ -230,7 +240,7 @@ public class StudentResourceTest {
     @Test
     public void testUpdateStudent() {
         final Student expected = david;
-        final NameAndEmailAddress req = new NameAndEmailAddress();
+        final NameAndEmailAddressRTO req = new NameAndEmailAddressRTO();
         req.setName(edith.getName());
         req.setEmailAddress(edith.getEmailAddress());
         final Student updated = new Student();
@@ -246,7 +256,7 @@ public class StudentResourceTest {
 
         final TestRunService testService = Mockito.mock(TestRunService.class);
 
-        final StudentResource resource = new StudentResource(finder, manager, testService);
+        resource.setServices(finder, manager, testService);
         final Response response = resource.updateStudent(expected.getUuid(), req);
 
         assertEquals(200, response.getStatus());
@@ -264,7 +274,7 @@ public class StudentResourceTest {
     @Test
     public void testUpdateStudentProblem() {
         final Student expected = david;
-        final NameAndEmailAddress req = new NameAndEmailAddress();
+        final NameAndEmailAddressRTO req = new NameAndEmailAddressRTO();
         req.setName(expected.getName());
         req.setEmailAddress(expected.getEmailAddress());
 
@@ -273,7 +283,7 @@ public class StudentResourceTest {
 
         final TestRunService testService = Mockito.mock(TestRunService.class);
 
-        final StudentResource resource = new StudentResource(manager, testService);
+        resource.setServices(null, manager, testService);
         final Response response = resource.createStudent(req);
 
         assertEquals(500, response.getStatus());
@@ -282,7 +292,7 @@ public class StudentResourceTest {
     @Test
     public void testUpdateStudentFailure() {
         final Student expected = david;
-        final NameAndEmailAddress req = new NameAndEmailAddress();
+        final NameAndEmailAddressRTO req = new NameAndEmailAddressRTO();
         req.setName(expected.getName());
         req.setEmailAddress(expected.getEmailAddress());
 
@@ -291,7 +301,7 @@ public class StudentResourceTest {
 
         final TestRunService testService = Mockito.mock(TestRunService.class);
 
-        final StudentResource resource = new StudentResource(manager, testService);
+        resource.setServices(null, manager, testService);
         final Response response = resource.createStudent(req);
 
         assertEquals(500, response.getStatus());
@@ -306,7 +316,7 @@ public class StudentResourceTest {
 
         final TestRunService testService = Mockito.mock(TestRunService.class);
 
-        final StudentResource resource = new StudentResource(manager, testService);
+        resource.setServices(null, manager, testService);
         final Response response = resource.deleteStudent(expected.getUuid(), 0);
 
         assertEquals(204, response.getStatus());
@@ -315,7 +325,7 @@ public class StudentResourceTest {
     @Test
     public void testDeleteStudentMissing() {
         final Student expected = david;
-        final Name name = new Name();
+        final NameRTO name = new NameRTO();
         name.setName(expected.getName());
 
         final StudentManagerService manager = Mockito.mock(StudentManagerService.class);
@@ -323,7 +333,7 @@ public class StudentResourceTest {
 
         final TestRunService testService = Mockito.mock(TestRunService.class);
 
-        final StudentResource resource = new StudentResource(manager, testService);
+        resource.setServices(null, manager, testService);
         final Response response = resource.deleteStudent(expected.getUuid(), 0);
 
         assertEquals(204, response.getStatus());
@@ -333,12 +343,15 @@ public class StudentResourceTest {
     public void testDeleteStudentFailure() {
         final Student expected = david;
 
+        final StudentFinderService finder = Mockito.mock(StudentFinderService.class);
+        when(finder.findStudentByUuid(expected.getUuid())).thenReturn(expected);
+
         final StudentManagerService manager = Mockito.mock(StudentManagerService.class);
         doThrow(new UnitTestException()).when(manager).deleteStudent(expected.getUuid(), 0);
 
         final TestRunService testService = Mockito.mock(TestRunService.class);
 
-        final StudentResource resource = new StudentResource(manager, testService);
+        resource.setServices(finder, manager, testService);
         final Response response = resource.deleteStudent(expected.getUuid(), 0);
 
         assertEquals(500, response.getStatus());

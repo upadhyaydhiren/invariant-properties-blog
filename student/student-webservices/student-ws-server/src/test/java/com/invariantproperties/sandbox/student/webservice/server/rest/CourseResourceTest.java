@@ -34,26 +34,36 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
+import javax.annotation.Resource;
 import javax.ws.rs.core.Response;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mockito;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import com.invariantproperties.sandbox.student.business.CourseFinderService;
 import com.invariantproperties.sandbox.student.business.CourseManagerService;
 import com.invariantproperties.sandbox.student.business.ObjectNotFoundException;
 import com.invariantproperties.sandbox.student.business.TestRunService;
 import com.invariantproperties.sandbox.student.domain.Course;
+import com.invariantproperties.sandbox.student.webservice.config.TestRestApplicationContext1;
 
 /**
  * Unit tests for CourseResource.
  * 
  * @author Bear Giles <bgiles@coyotesong.com>
  */
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(classes = { TestRestApplicationContext1.class })
 public class CourseResourceTest {
     private Course physics = new Course();
     private Course mechanics = new Course();
+
+    @Resource
+    private CourseResource resource;
 
     @Before
     public void init() {
@@ -83,7 +93,7 @@ public class CourseResourceTest {
 
         final TestRunService testService = Mockito.mock(TestRunService.class);
 
-        final CourseResource resource = new CourseResource(finder, testService);
+        resource.setServices(finder, null, testService);
         final Response response = resource.findAllCourses();
 
         assertEquals(200, response.getStatus());
@@ -104,7 +114,7 @@ public class CourseResourceTest {
 
         final TestRunService testService = Mockito.mock(TestRunService.class);
 
-        final CourseResource resource = new CourseResource(finder, testService);
+        resource.setServices(finder, null, testService);
         final Response response = resource.findAllCourses();
 
         assertEquals(200, response.getStatus());
@@ -119,7 +129,7 @@ public class CourseResourceTest {
 
         final TestRunService testService = Mockito.mock(TestRunService.class);
 
-        final CourseResource resource = new CourseResource(finder, testService);
+        resource.setServices(finder, null, testService);
         final Response response = resource.findAllCourses();
 
         assertEquals(500, response.getStatus());
@@ -134,7 +144,7 @@ public class CourseResourceTest {
 
         final TestRunService testService = Mockito.mock(TestRunService.class);
 
-        final CourseResource resource = new CourseResource(finder, testService);
+        resource.setServices(finder, null, testService);
         final Response response = resource.getCourse(expected.getUuid());
 
         assertEquals(200, response.getStatus());
@@ -152,7 +162,7 @@ public class CourseResourceTest {
 
         final TestRunService testService = Mockito.mock(TestRunService.class);
 
-        final CourseResource resource = new CourseResource(finder, testService);
+        resource.setServices(finder, null, testService);
         final Response response = resource.getCourse(physics.getUuid());
 
         assertEquals(404, response.getStatus());
@@ -165,7 +175,7 @@ public class CourseResourceTest {
 
         final TestRunService testService = Mockito.mock(TestRunService.class);
 
-        final CourseResource resource = new CourseResource(finder, testService);
+        resource.setServices(finder, null, testService);
         final Response response = resource.getCourse(physics.getUuid());
 
         assertEquals(500, response.getStatus());
@@ -174,7 +184,7 @@ public class CourseResourceTest {
     @Test
     public void testCreateCourse() {
         final Course expected = physics;
-        final CourseInfo info = new CourseInfo(expected);
+        final CourseInfoRTO info = new CourseInfoRTO(expected);
 
         final CourseManagerService manager = Mockito.mock(CourseManagerService.class);
         when(
@@ -183,7 +193,7 @@ public class CourseResourceTest {
 
         final TestRunService testService = Mockito.mock(TestRunService.class);
 
-        final CourseResource resource = new CourseResource(manager, testService);
+        resource.setServices(null, manager, testService);
         final Response response = resource.createCourse(info);
 
         assertEquals(201, response.getStatus());
@@ -197,7 +207,7 @@ public class CourseResourceTest {
     @Test
     public void testCreateCourseBlankName() {
         final Course expected = physics;
-        final CourseInfo info = new CourseInfo(expected);
+        final CourseInfoRTO info = new CourseInfoRTO(expected);
         info.setName("");
 
         final CourseManagerService manager = Mockito.mock(CourseManagerService.class);
@@ -207,7 +217,7 @@ public class CourseResourceTest {
 
         final TestRunService testService = Mockito.mock(TestRunService.class);
 
-        final CourseResource resource = new CourseResource(manager, testService);
+        resource.setServices(null, manager, testService);
         final Response response = resource.createCourse(info);
 
         assertEquals(400, response.getStatus());
@@ -221,7 +231,7 @@ public class CourseResourceTest {
     @Test
     public void testCreateCourseProblem() {
         final Course expected = physics;
-        final CourseInfo info = new CourseInfo(expected);
+        final CourseInfoRTO info = new CourseInfoRTO(expected);
 
         final CourseManagerService manager = Mockito.mock(CourseManagerService.class);
         when(
@@ -229,7 +239,7 @@ public class CourseResourceTest {
                         expected.getDescription(), expected.getCreditHours())).thenReturn(null);
         final TestRunService testService = Mockito.mock(TestRunService.class);
 
-        final CourseResource resource = new CourseResource(manager, testService);
+        resource.setServices(null, manager, testService);
         final Response response = resource.createCourse(info);
 
         assertEquals(500, response.getStatus());
@@ -238,7 +248,7 @@ public class CourseResourceTest {
     @Test
     public void testCreateCourseFailure() {
         final Course expected = physics;
-        final CourseInfo info = new CourseInfo(expected);
+        final CourseInfoRTO info = new CourseInfoRTO(expected);
 
         final CourseManagerService manager = Mockito.mock(CourseManagerService.class);
         when(
@@ -247,7 +257,7 @@ public class CourseResourceTest {
 
         final TestRunService testService = Mockito.mock(TestRunService.class);
 
-        final CourseResource resource = new CourseResource(manager, testService);
+        resource.setServices(null, manager, testService);
         final Response response = resource.createCourse(info);
 
         assertEquals(500, response.getStatus());
@@ -256,7 +266,7 @@ public class CourseResourceTest {
     @Test
     public void testUpdateCourse() {
         final Course expected = physics;
-        final CourseInfo info = new CourseInfo(mechanics);
+        final CourseInfoRTO info = new CourseInfoRTO(mechanics);
         final Course updated = new Course();
         updated.setId(expected.getId());
         updated.setCode(mechanics.getCode());
@@ -275,7 +285,7 @@ public class CourseResourceTest {
 
         final TestRunService testService = Mockito.mock(TestRunService.class);
 
-        final CourseResource resource = new CourseResource(finder, manager, testService);
+        resource.setServices(finder, manager, testService);
         final Response response = resource.updateCourse(expected.getUuid(), info);
 
         assertEquals(200, response.getStatus());
@@ -289,7 +299,7 @@ public class CourseResourceTest {
     @Test
     public void testUpdateCourseBlankName() {
         final Course expected = physics;
-        final CourseInfo info = new CourseInfo();
+        final CourseInfoRTO info = new CourseInfoRTO();
 
         final CourseManagerService manager = Mockito.mock(CourseManagerService.class);
         when(
@@ -298,7 +308,7 @@ public class CourseResourceTest {
 
         final TestRunService testService = Mockito.mock(TestRunService.class);
 
-        final CourseResource resource = new CourseResource(manager, testService);
+        resource.setServices(null, manager, testService);
         final Response response = resource.updateCourse(expected.getUuid(), info);
 
         assertEquals(400, response.getStatus());
@@ -312,7 +322,7 @@ public class CourseResourceTest {
     @Test
     public void testUpdateCourseProblem() {
         final Course expected = physics;
-        final CourseInfo info = new CourseInfo(expected);
+        final CourseInfoRTO info = new CourseInfoRTO(expected);
 
         final CourseManagerService manager = Mockito.mock(CourseManagerService.class);
         when(manager.updateCourse(expected, expected.getName(), expected.getSummary(), expected.getDescription(), 1))
@@ -320,7 +330,7 @@ public class CourseResourceTest {
 
         final TestRunService testService = Mockito.mock(TestRunService.class);
 
-        final CourseResource resource = new CourseResource(manager, testService);
+        resource.setServices(null, manager, testService);
         final Response response = resource.createCourse(info);
 
         assertEquals(500, response.getStatus());
@@ -329,7 +339,7 @@ public class CourseResourceTest {
     @Test
     public void testUpdateCourseFailure() {
         final Course expected = physics;
-        final CourseInfo info = new CourseInfo(expected);
+        final CourseInfoRTO info = new CourseInfoRTO(expected);
 
         final CourseManagerService manager = Mockito.mock(CourseManagerService.class);
         when(manager.updateCourse(expected, expected.getName(), expected.getSummary(), expected.getDescription(), 1))
@@ -337,7 +347,7 @@ public class CourseResourceTest {
 
         final TestRunService testService = Mockito.mock(TestRunService.class);
 
-        final CourseResource resource = new CourseResource(manager, testService);
+        resource.setServices(null, manager, testService);
         final Response response = resource.createCourse(info);
 
         assertEquals(500, response.getStatus());
@@ -352,7 +362,7 @@ public class CourseResourceTest {
 
         final TestRunService testService = Mockito.mock(TestRunService.class);
 
-        final CourseResource resource = new CourseResource(manager, testService);
+        resource.setServices(null, manager, testService);
         final Response response = resource.deleteCourse(expected.getUuid(), 0);
 
         assertEquals(204, response.getStatus());
@@ -367,7 +377,7 @@ public class CourseResourceTest {
 
         final TestRunService testService = Mockito.mock(TestRunService.class);
 
-        final CourseResource resource = new CourseResource(manager, testService);
+        resource.setServices(null, manager, testService);
         final Response response = resource.deleteCourse(expected.getUuid(), 0);
 
         assertEquals(204, response.getStatus());
@@ -377,12 +387,15 @@ public class CourseResourceTest {
     public void testDeleteCourseFailure() {
         final Course expected = physics;
 
+        final CourseFinderService finder = Mockito.mock(CourseFinderService.class);
+        when(finder.findCourseByUuid(expected.getUuid())).thenReturn(expected);
+
         final CourseManagerService manager = Mockito.mock(CourseManagerService.class);
         doThrow(new UnitTestException()).when(manager).deleteCourse(expected.getUuid(), 0);
 
         final TestRunService testService = Mockito.mock(TestRunService.class);
 
-        final CourseResource resource = new CourseResource(manager, testService);
+        resource.setServices(finder, manager, testService);
         final Response response = resource.deleteCourse(expected.getUuid(), 0);
 
         assertEquals(500, response.getStatus());

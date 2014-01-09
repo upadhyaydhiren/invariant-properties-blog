@@ -50,7 +50,6 @@ import com.invariantproperties.sandbox.student.business.TermManagerService;
 import com.invariantproperties.sandbox.student.business.TestRunService;
 import com.invariantproperties.sandbox.student.domain.Term;
 import com.invariantproperties.sandbox.student.domain.TestRun;
-import com.invariantproperties.sandbox.student.util.StudentUtil;
 
 @Service
 @Path("/term")
@@ -81,29 +80,13 @@ public class TermResource extends AbstractResource {
     }
 
     /**
-     * Unit test constructor.
+     * Set values used in unit tests. (Required due to AOP)
      * 
      * @param finder
+     * @param manager
+     * @param testService
      */
-    TermResource(TermFinderService finder, TestRunService testService) {
-        this(finder, null, testService);
-    }
-
-    /**
-     * Unit test constructor.
-     * 
-     * @param finder
-     */
-    TermResource(TermManagerService manager, TestRunService testService) {
-        this(null, manager, testService);
-    }
-
-    /**
-     * Unit test constructor.
-     * 
-     * @param finder
-     */
-    TermResource(TermFinderService finder, TermManagerService manager, TestRunService testService) {
+    void setServices(TermFinderService finder, TermManagerService manager, TestRunService testService) {
         this.finder = finder;
         this.manager = manager;
         this.testService = testService;
@@ -117,24 +100,15 @@ public class TermResource extends AbstractResource {
     @GET
     @Produces({ MediaType.APPLICATION_JSON, MediaType.TEXT_XML })
     public Response findAllTerms() {
-        LOG.debug("TermResource: findAllTerms()");
 
-        Response response = null;
-        try {
-            List<Term> terms = finder.findAllTerms();
+        final List<Term> terms = finder.findAllTerms();
 
-            List<Term> results = new ArrayList<Term>(terms.size());
-            for (Term term : terms) {
-                results.add(scrubTerm(term));
-            }
-
-            response = Response.ok(results.toArray(EMPTY_TERM_ARRAY)).build();
-        } catch (Exception e) {
-            if (!(e instanceof UnitTestException)) {
-                LOG.info("unhandled exception", e);
-            }
-            response = Response.status(Status.INTERNAL_SERVER_ERROR).build();
+        final List<Term> results = new ArrayList<Term>(terms.size());
+        for (Term term : terms) {
+            results.add(scrubTerm(term));
         }
+
+        final Response response = Response.ok(results.toArray(EMPTY_TERM_ARRAY)).build();
 
         return response;
     }
@@ -142,46 +116,36 @@ public class TermResource extends AbstractResource {
     /**
      * Create a Term.
      * 
+     * FIXME: what about uniqueness violations?
+     * 
      * @param req
      * @return
      */
     @POST
     @Consumes({ MediaType.APPLICATION_JSON, MediaType.TEXT_XML })
     @Produces({ MediaType.APPLICATION_JSON, MediaType.TEXT_XML })
-    public Response createTerm(Name req) {
-        LOG.debug("TermResource: createTerm()");
+    public Response createTerm(NameRTO req) {
 
         final String name = req.getName();
-        if ((name == null) || name.isEmpty()) {
-            return Response.status(Status.BAD_REQUEST).entity("'name' is required'").build();
-        }
 
         Response response = null;
+        Term term = null;
 
-        try {
-            Term term = null;
-
-            if (req.getTestUuid() != null) {
-                TestRun testRun = testService.findTestRunByUuid(req.getTestUuid());
-                if (testRun != null) {
-                    term = manager.createTermForTesting(name, testRun);
-                } else {
-                    response = Response.status(Status.BAD_REQUEST).entity("unknown test UUID").build();
-                }
+        if (req.getTestUuid() != null) {
+            TestRun testRun = testService.findTestRunByUuid(req.getTestUuid());
+            if (testRun != null) {
+                term = manager.createTermForTesting(name, testRun);
             } else {
-                term = manager.createTerm(name);
+                response = Response.status(Status.BAD_REQUEST).entity("unknown test UUID").build();
             }
+        } else {
+            term = manager.createTerm(name);
+        }
 
-            if (term == null) {
-                response = Response.status(Status.INTERNAL_SERVER_ERROR).build();
-            } else {
-                response = Response.created(URI.create(term.getUuid())).entity(scrubTerm(term)).build();
-            }
-        } catch (Exception e) {
-            if (!(e instanceof UnitTestException)) {
-                LOG.info("unhandled exception", e);
-            }
+        if (term == null) {
             response = Response.status(Status.INTERNAL_SERVER_ERROR).build();
+        } else {
+            response = Response.created(URI.create(term.getUuid())).entity(scrubTerm(term)).build();
         }
 
         return response;
@@ -198,25 +162,9 @@ public class TermResource extends AbstractResource {
     @Produces({ MediaType.APPLICATION_JSON, MediaType.TEXT_XML })
     public Response getTerm(@PathParam("termId") String id) {
 
-        Response response = null;
-        if (!StudentUtil.isPossibleUuid(id)) {
-            response = Response.status(Status.BAD_REQUEST).build();
-            LOG.info("attempt to use malformed UUID");
-        } else {
-            LOG.debug("TermResource: getTerm(" + id + ")");
-            try {
-                Term term = finder.findTermByUuid(id);
-                response = Response.ok(scrubTerm(term)).build();
-            } catch (ObjectNotFoundException e) {
-                response = Response.status(Status.NOT_FOUND).build();
-                LOG.debug("term not found: " + id);
-            } catch (Exception e) {
-                if (!(e instanceof UnitTestException)) {
-                    LOG.info("unhandled exception", e);
-                }
-                response = Response.status(Status.INTERNAL_SERVER_ERROR).build();
-            }
-        }
+        // 'object not found' handled by AOP
+        Term term = finder.findTermByUuid(id);
+        final Response response = Response.ok(scrubTerm(term)).build();
 
         return response;
     }
@@ -234,33 +182,14 @@ public class TermResource extends AbstractResource {
     @POST
     @Consumes({ MediaType.APPLICATION_JSON, MediaType.TEXT_XML })
     @Produces({ MediaType.APPLICATION_JSON, MediaType.TEXT_XML })
-    public Response updateTerm(@PathParam("termId") String id, Name req) {
+    public Response updateTerm(@PathParam("termId") String id, NameRTO req) {
 
         final String name = req.getName();
-        if ((name == null) || name.isEmpty()) {
-            return Response.status(Status.BAD_REQUEST).entity("'name' is required'").build();
-        }
 
-        Response response = null;
-        if (!StudentUtil.isPossibleUuid(id)) {
-            response = Response.status(Status.BAD_REQUEST).build();
-            LOG.info("attempt to use malformed UUID");
-        } else {
-            LOG.debug("TermResource: updateTerm(" + id + ")");
-            try {
-                final Term term = finder.findTermByUuid(id);
-                final Term updatedTerm = manager.updateTerm(term, name);
-                response = Response.ok(scrubTerm(updatedTerm)).build();
-            } catch (ObjectNotFoundException exception) {
-                response = Response.status(Status.NOT_FOUND).build();
-                LOG.debug("term not found: " + id);
-            } catch (Exception e) {
-                if (!(e instanceof UnitTestException)) {
-                    LOG.info("unhandled exception", e);
-                }
-                response = Response.status(Status.INTERNAL_SERVER_ERROR).build();
-            }
-        }
+        // 'object not found' handled by AOP
+        final Term term = finder.findTermByUuid(id);
+        final Term updatedTerm = manager.updateTerm(term, name);
+        final Response response = Response.ok(scrubTerm(updatedTerm)).build();
 
         return response;
     }
@@ -273,27 +202,16 @@ public class TermResource extends AbstractResource {
      */
     @Path("/{termId}")
     @DELETE
-    public Response deleteTerm(@PathParam("termId") String id, @PathParam("version") int version) {
+    public Response deleteTerm(@PathParam("termId") String id, @PathParam("version") Integer version) {
 
-        Response response = null;
-        if (!StudentUtil.isPossibleUuid(id)) {
-            response = Response.status(Status.BAD_REQUEST).build();
-            LOG.info("attempt to use malformed UUID");
-        } else {
-            LOG.debug("TermResource: deleteTerm(" + id + ")");
-            try {
-                manager.deleteTerm(id, version);
-                response = Response.noContent().build();
-            } catch (ObjectNotFoundException exception) {
-                response = Response.noContent().build();
-                LOG.debug("term not found: " + id);
-            } catch (Exception e) {
-                if (!(e instanceof UnitTestException)) {
-                    LOG.info("unhandled exception", e);
-                }
-                response = Response.status(Status.INTERNAL_SERVER_ERROR).build();
-            }
+        // we don't use AOP handler since it's okay for there to be no match
+        try {
+            manager.deleteTerm(id, version);
+        } catch (ObjectNotFoundException exception) {
+            LOG.debug("term not found: " + id);
         }
+
+        final Response response = Response.noContent().build();
 
         return response;
     }

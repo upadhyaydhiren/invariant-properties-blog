@@ -33,26 +33,36 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
+import javax.annotation.Resource;
 import javax.ws.rs.core.Response;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mockito;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import com.invariantproperties.sandbox.student.business.ClassroomFinderService;
 import com.invariantproperties.sandbox.student.business.ClassroomManagerService;
 import com.invariantproperties.sandbox.student.business.ObjectNotFoundException;
 import com.invariantproperties.sandbox.student.business.TestRunService;
 import com.invariantproperties.sandbox.student.domain.Classroom;
+import com.invariantproperties.sandbox.student.webservice.config.TestRestApplicationContext1;
 
 /**
  * Unit tests for ClassroomResource.
  * 
  * @author Bear Giles <bgiles@coyotesong.com>
  */
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(classes = { TestRestApplicationContext1.class })
 public class ClassroomResourceTest {
     private Classroom eng201 = new Classroom();
     private Classroom eng202 = new Classroom();
+
+    @Resource
+    private ClassroomResource resource;
 
     @Before
     public void init() {
@@ -74,7 +84,7 @@ public class ClassroomResourceTest {
 
         final TestRunService testService = Mockito.mock(TestRunService.class);
 
-        final ClassroomResource resource = new ClassroomResource(finder, testService);
+        resource.setServices(finder, null, testService);
         final Response response = resource.findAllClassrooms();
 
         assertEquals(200, response.getStatus());
@@ -94,7 +104,7 @@ public class ClassroomResourceTest {
 
         final TestRunService testService = Mockito.mock(TestRunService.class);
 
-        final ClassroomResource resource = new ClassroomResource(finder, testService);
+        resource.setServices(finder, null, testService);
         final Response response = resource.findAllClassrooms();
 
         assertEquals(200, response.getStatus());
@@ -109,7 +119,7 @@ public class ClassroomResourceTest {
 
         final TestRunService testService = Mockito.mock(TestRunService.class);
 
-        final ClassroomResource resource = new ClassroomResource(finder, testService);
+        resource.setServices(finder, null, testService);
         final Response response = resource.findAllClassrooms();
 
         assertEquals(500, response.getStatus());
@@ -124,7 +134,7 @@ public class ClassroomResourceTest {
 
         final TestRunService testService = Mockito.mock(TestRunService.class);
 
-        final ClassroomResource resource = new ClassroomResource(finder, testService);
+        resource.setServices(finder, null, testService);
         final Response response = resource.getClassroom(expected.getUuid());
 
         assertEquals(200, response.getStatus());
@@ -141,7 +151,7 @@ public class ClassroomResourceTest {
 
         final TestRunService testService = Mockito.mock(TestRunService.class);
 
-        final ClassroomResource resource = new ClassroomResource(finder, testService);
+        resource.setServices(finder, null, testService);
         final Response response = resource.getClassroom(eng201.getUuid());
 
         assertEquals(404, response.getStatus());
@@ -154,7 +164,7 @@ public class ClassroomResourceTest {
 
         final TestRunService testService = Mockito.mock(TestRunService.class);
 
-        final ClassroomResource resource = new ClassroomResource(finder, testService);
+        resource.setServices(finder, null, testService);
         final Response response = resource.getClassroom(eng201.getUuid());
 
         assertEquals(500, response.getStatus());
@@ -163,7 +173,7 @@ public class ClassroomResourceTest {
     @Test
     public void testCreateClassroom() {
         final Classroom expected = eng201;
-        final Name name = new Name();
+        final NameRTO name = new NameRTO();
         name.setName(expected.getName());
 
         final ClassroomManagerService manager = Mockito.mock(ClassroomManagerService.class);
@@ -171,7 +181,7 @@ public class ClassroomResourceTest {
 
         final TestRunService testService = Mockito.mock(TestRunService.class);
 
-        final ClassroomResource resource = new ClassroomResource(manager, testService);
+        resource.setServices(null, manager, testService);
         final Response response = resource.createClassroom(name);
 
         assertEquals(201, response.getStatus());
@@ -182,14 +192,14 @@ public class ClassroomResourceTest {
 
     @Test
     public void testCreateClassroomBlankName() {
-        final Name name = new Name();
+        final NameRTO name = new NameRTO();
 
         final ClassroomManagerService manager = Mockito.mock(ClassroomManagerService.class);
         when(manager.createClassroom(name.getName())).thenReturn(null);
 
         final TestRunService testService = Mockito.mock(TestRunService.class);
 
-        final ClassroomResource resource = new ClassroomResource(manager, testService);
+        resource.setServices(null, manager, testService);
         final Response response = resource.createClassroom(name);
 
         assertEquals(400, response.getStatus());
@@ -203,7 +213,7 @@ public class ClassroomResourceTest {
     @Test
     public void testCreateClassroomProblem() {
         final Classroom expected = eng201;
-        final Name name = new Name();
+        final NameRTO name = new NameRTO();
         name.setName(expected.getName());
 
         final ClassroomManagerService manager = Mockito.mock(ClassroomManagerService.class);
@@ -211,7 +221,7 @@ public class ClassroomResourceTest {
 
         final TestRunService testService = Mockito.mock(TestRunService.class);
 
-        final ClassroomResource resource = new ClassroomResource(manager, testService);
+        resource.setServices(null, manager, testService);
         final Response response = resource.createClassroom(name);
 
         assertEquals(500, response.getStatus());
@@ -220,7 +230,7 @@ public class ClassroomResourceTest {
     @Test
     public void testCreateClassroomFailure() {
         final Classroom expected = eng201;
-        final Name name = new Name();
+        final NameRTO name = new NameRTO();
         name.setName(expected.getName());
 
         final ClassroomManagerService manager = Mockito.mock(ClassroomManagerService.class);
@@ -228,7 +238,7 @@ public class ClassroomResourceTest {
 
         final TestRunService testService = Mockito.mock(TestRunService.class);
 
-        final ClassroomResource resource = new ClassroomResource(manager, testService);
+        resource.setServices(null, manager, testService);
         final Response response = resource.createClassroom(name);
 
         assertEquals(500, response.getStatus());
@@ -237,7 +247,7 @@ public class ClassroomResourceTest {
     @Test
     public void testUpdateClassroom() {
         final Classroom expected = eng201;
-        final Name name = new Name();
+        final NameRTO name = new NameRTO();
         name.setName(eng202.getName());
         final Classroom updated = new Classroom();
         updated.setId(expected.getId());
@@ -251,7 +261,7 @@ public class ClassroomResourceTest {
 
         final TestRunService testService = Mockito.mock(TestRunService.class);
 
-        final ClassroomResource resource = new ClassroomResource(finder, manager, testService);
+        resource.setServices(finder, manager, testService);
         final Response response = resource.updateClassroom(expected.getUuid(), name);
 
         assertEquals(200, response.getStatus());
@@ -264,14 +274,17 @@ public class ClassroomResourceTest {
     @Test
     public void testUpdateClassroomBlankName() {
         final Classroom expected = eng201;
-        final Name name = new Name();
+        final NameRTO name = new NameRTO();
+
+        final ClassroomFinderService finder = Mockito.mock(ClassroomFinderService.class);
+        when(finder.findClassroomByUuid(expected.getUuid())).thenReturn(expected);
 
         final ClassroomManagerService manager = Mockito.mock(ClassroomManagerService.class);
         when(manager.createClassroom(name.getName())).thenReturn(null);
 
         final TestRunService testService = Mockito.mock(TestRunService.class);
 
-        final ClassroomResource resource = new ClassroomResource(manager, testService);
+        resource.setServices(finder, manager, testService);
         final Response response = resource.updateClassroom(expected.getUuid(), name);
 
         assertEquals(400, response.getStatus());
@@ -285,7 +298,7 @@ public class ClassroomResourceTest {
     @Test
     public void testUpdateClassroomProblem() {
         final Classroom expected = eng201;
-        final Name name = new Name();
+        final NameRTO name = new NameRTO();
         name.setName(expected.getName());
 
         final ClassroomManagerService manager = Mockito.mock(ClassroomManagerService.class);
@@ -293,7 +306,7 @@ public class ClassroomResourceTest {
 
         final TestRunService testService = Mockito.mock(TestRunService.class);
 
-        final ClassroomResource resource = new ClassroomResource(manager, testService);
+        resource.setServices(null, manager, testService);
         final Response response = resource.createClassroom(name);
 
         assertEquals(500, response.getStatus());
@@ -302,7 +315,7 @@ public class ClassroomResourceTest {
     @Test
     public void testUpdateClassroomFailure() {
         final Classroom expected = eng201;
-        final Name name = new Name();
+        final NameRTO name = new NameRTO();
         name.setName(expected.getName());
 
         final ClassroomManagerService manager = Mockito.mock(ClassroomManagerService.class);
@@ -310,7 +323,7 @@ public class ClassroomResourceTest {
 
         final TestRunService testService = Mockito.mock(TestRunService.class);
 
-        final ClassroomResource resource = new ClassroomResource(manager, testService);
+        resource.setServices(null, manager, testService);
         final Response response = resource.createClassroom(name);
 
         assertEquals(500, response.getStatus());
@@ -325,7 +338,7 @@ public class ClassroomResourceTest {
 
         final TestRunService testService = Mockito.mock(TestRunService.class);
 
-        final ClassroomResource resource = new ClassroomResource(manager, testService);
+        resource.setServices(null, manager, testService);
         final Response response = resource.deleteClassroom(expected.getUuid(), 0);
 
         assertEquals(204, response.getStatus());
@@ -334,7 +347,7 @@ public class ClassroomResourceTest {
     @Test
     public void testDeleteClassroomMissing() {
         final Classroom expected = eng201;
-        final Name name = new Name();
+        final NameRTO name = new NameRTO();
         name.setName(expected.getName());
 
         final ClassroomManagerService manager = Mockito.mock(ClassroomManagerService.class);
@@ -342,7 +355,7 @@ public class ClassroomResourceTest {
 
         final TestRunService testService = Mockito.mock(TestRunService.class);
 
-        final ClassroomResource resource = new ClassroomResource(null, manager, testService);
+        resource.setServices(null, manager, testService);
         final Response response = resource.deleteClassroom(expected.getUuid(), 0);
 
         assertEquals(204, response.getStatus());
@@ -357,7 +370,7 @@ public class ClassroomResourceTest {
 
         final TestRunService testService = Mockito.mock(TestRunService.class);
 
-        final ClassroomResource resource = new ClassroomResource(null, manager, testService);
+        resource.setServices(null, manager, testService);
         final Response response = resource.deleteClassroom(expected.getUuid(), 0);
 
         assertEquals(500, response.getStatus());

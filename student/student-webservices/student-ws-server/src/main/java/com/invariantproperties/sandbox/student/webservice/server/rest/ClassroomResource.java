@@ -50,7 +50,6 @@ import com.invariantproperties.sandbox.student.business.ObjectNotFoundException;
 import com.invariantproperties.sandbox.student.business.TestRunService;
 import com.invariantproperties.sandbox.student.domain.Classroom;
 import com.invariantproperties.sandbox.student.domain.TestRun;
-import com.invariantproperties.sandbox.student.util.StudentUtil;
 
 @Service
 @Path("/classroom")
@@ -71,7 +70,7 @@ public class ClassroomResource extends AbstractResource {
     private ClassroomManagerService manager;
 
     @Resource
-    private TestRunService testService;
+    private TestRunService testRunService;
 
     /**
      * Default constructor.
@@ -81,32 +80,16 @@ public class ClassroomResource extends AbstractResource {
     }
 
     /**
-     * Unit test constructor.
+     * Set values used in unit tests. (Required due to AOP)
      * 
-     * @param service
+     * @param finder
+     * @param manager
+     * @param testService
      */
-    ClassroomResource(ClassroomFinderService finder, TestRunService testService) {
-        this(finder, null, testService);
-    }
-
-    /**
-     * Unit test constructor.
-     * 
-     * @param service
-     */
-    ClassroomResource(ClassroomManagerService manager, TestRunService testService) {
-        this(null, manager, testService);
-    }
-
-    /**
-     * Unit test constructor.
-     * 
-     * @param service
-     */
-    ClassroomResource(ClassroomFinderService finder, ClassroomManagerService manager, TestRunService testService) {
+    void setServices(ClassroomFinderService finder, ClassroomManagerService manager, TestRunService testService) {
         this.finder = finder;
         this.manager = manager;
-        this.testService = testService;
+        this.testRunService = testService;
     }
 
     /**
@@ -117,24 +100,14 @@ public class ClassroomResource extends AbstractResource {
     @GET
     @Produces({ MediaType.APPLICATION_JSON, MediaType.TEXT_XML })
     public Response findAllClassrooms() {
-        LOG.debug("ClassroomResource: findAllClassrooms()");
+        final List<Classroom> classrooms = finder.findAllClassrooms();
 
-        Response response = null;
-        try {
-            List<Classroom> classrooms = finder.findAllClassrooms();
-
-            List<Classroom> results = new ArrayList<Classroom>(classrooms.size());
-            for (Classroom classroom : classrooms) {
-                results.add(scrubClassroom(classroom));
-            }
-
-            response = Response.ok(results.toArray(EMPTY_CLASSROOM_ARRAY)).build();
-        } catch (Exception e) {
-            if (!(e instanceof UnitTestException)) {
-                LOG.info("unhandled exception", e);
-            }
-            response = Response.status(Status.INTERNAL_SERVER_ERROR).build();
+        final List<Classroom> results = new ArrayList<Classroom>(classrooms.size());
+        for (Classroom classroom : classrooms) {
+            results.add(scrubClassroom(classroom));
         }
+
+        final Response response = Response.ok(results.toArray(EMPTY_CLASSROOM_ARRAY)).build();
 
         return response;
     }
@@ -142,46 +115,36 @@ public class ClassroomResource extends AbstractResource {
     /**
      * Create a Classroom.
      * 
+     * FIXME: what about uniqueness violations?
+     * 
      * @param req
      * @return
      */
     @POST
     @Consumes({ MediaType.APPLICATION_JSON, MediaType.TEXT_XML })
     @Produces({ MediaType.APPLICATION_JSON, MediaType.TEXT_XML })
-    public Response createClassroom(Name req) {
-        LOG.debug("ClassroomResource: createClassroom()");
-
+    public Response createClassroom(NameRTO req) {
         final String name = req.getName();
-        if ((name == null) || name.isEmpty()) {
-            return Response.status(Status.BAD_REQUEST).entity("'name' is required'").build();
-        }
 
         Response response = null;
 
-        try {
-            Classroom classroom = null;
+        Classroom classroom = null;
 
-            if (req.getTestUuid() != null) {
-                TestRun testRun = testService.findTestRunByUuid(req.getTestUuid());
-                if (testRun != null) {
-                    classroom = manager.createClassroomForTesting(name, testRun);
-                } else {
-                    response = Response.status(Status.BAD_REQUEST).entity("unknown test UUID").build();
-                }
+        if (req.getTestUuid() != null) {
+            TestRun testRun = testRunService.findTestRunByUuid(req.getTestUuid());
+            if (testRun != null) {
+                classroom = manager.createClassroomForTesting(name, testRun);
             } else {
-                classroom = manager.createClassroom(name);
+                response = Response.status(Status.BAD_REQUEST).entity("unknown test UUID").build();
             }
+        } else {
+            classroom = manager.createClassroom(name);
+        }
 
-            if (classroom == null) {
-                response = Response.status(Status.INTERNAL_SERVER_ERROR).build();
-            } else {
-                response = Response.created(URI.create(classroom.getUuid())).entity(scrubClassroom(classroom)).build();
-            }
-        } catch (Exception e) {
-            if (!(e instanceof UnitTestException)) {
-                LOG.info("unhandled exception", e);
-            }
+        if (classroom == null) {
             response = Response.status(Status.INTERNAL_SERVER_ERROR).build();
+        } else {
+            response = Response.created(URI.create(classroom.getUuid())).entity(scrubClassroom(classroom)).build();
         }
 
         return response;
@@ -198,25 +161,9 @@ public class ClassroomResource extends AbstractResource {
     @Produces({ MediaType.APPLICATION_JSON, MediaType.TEXT_XML })
     public Response getClassroom(@PathParam("classroomId") String id) {
 
-        Response response = null;
-        if (!StudentUtil.isPossibleUuid(id)) {
-            response = Response.status(Status.BAD_REQUEST).build();
-            LOG.info("attempt to use malformed UUID");
-        } else {
-            LOG.debug("ClassroomResource: getClassroom(" + id + ")");
-            try {
-                Classroom classroom = finder.findClassroomByUuid(id);
-                response = Response.ok(scrubClassroom(classroom)).build();
-            } catch (ObjectNotFoundException e) {
-                response = Response.status(Status.NOT_FOUND).build();
-                LOG.trace("classroom not found: " + id);
-            } catch (Exception e) {
-                if (!(e instanceof UnitTestException)) {
-                    LOG.info("unhandled exception", e);
-                }
-                response = Response.status(Status.INTERNAL_SERVER_ERROR).build();
-            }
-        }
+        // 'object not found' handled by AOP
+        final Classroom classroom = finder.findClassroomByUuid(id);
+        final Response response = Response.ok(scrubClassroom(classroom)).build();
 
         return response;
     }
@@ -234,33 +181,13 @@ public class ClassroomResource extends AbstractResource {
     @POST
     @Consumes({ MediaType.APPLICATION_JSON, MediaType.TEXT_XML })
     @Produces({ MediaType.APPLICATION_JSON, MediaType.TEXT_XML })
-    public Response updateClassroom(@PathParam("classroomId") String id, Name req) {
-
+    public Response updateClassroom(@PathParam("classroomId") String id, NameRTO req) {
         final String name = req.getName();
-        if ((name == null) || name.isEmpty()) {
-            return Response.status(Status.BAD_REQUEST).entity("'name' is required'").build();
-        }
 
-        Response response = null;
-        if (!StudentUtil.isPossibleUuid(id)) {
-            response = Response.status(Status.BAD_REQUEST).build();
-            LOG.info("attempt to use malformed UUID");
-        } else {
-            LOG.debug("ClassroomResource: updateClassroom(" + id + ")");
-            try {
-                final Classroom classroom = finder.findClassroomByUuid(id);
-                final Classroom updatedClassroom = manager.updateClassroom(classroom, name);
-                response = Response.ok(scrubClassroom(updatedClassroom)).build();
-            } catch (ObjectNotFoundException exception) {
-                response = Response.status(Status.NOT_FOUND).build();
-                LOG.debug("classroom not found: " + id);
-            } catch (Exception e) {
-                if (!(e instanceof UnitTestException)) {
-                    LOG.info("unhandled exception", e);
-                }
-                response = Response.status(Status.INTERNAL_SERVER_ERROR).build();
-            }
-        }
+        // 'object not found' handled by AOP
+        final Classroom classroom = finder.findClassroomByUuid(id);
+        final Classroom updatedClassroom = manager.updateClassroom(classroom, name);
+        final Response response = Response.ok(scrubClassroom(updatedClassroom)).build();
 
         return response;
     }
@@ -273,27 +200,16 @@ public class ClassroomResource extends AbstractResource {
      */
     @Path("/{classroomId}")
     @DELETE
-    public Response deleteClassroom(@PathParam("classroomId") String id, @PathParam("version") int version) {
+    public Response deleteClassroom(@PathParam("classroomId") String id, @PathParam("version") Integer version) {
 
-        Response response = null;
-        if (!StudentUtil.isPossibleUuid(id)) {
-            response = Response.status(Status.BAD_REQUEST).build();
-            LOG.info("attempt to use malformed UUID");
-        } else {
-            LOG.debug("ClassroomResource: deleteClassroom(" + id + ")");
-            try {
-                manager.deleteClassroom(id, version);
-                response = Response.noContent().build();
-            } catch (ObjectNotFoundException exception) {
-                response = Response.noContent().build();
-                LOG.debug("classroom not found: " + id);
-            } catch (Exception e) {
-                if (!(e instanceof UnitTestException)) {
-                    LOG.info("unhandled exception", e);
-                }
-                response = Response.status(Status.INTERNAL_SERVER_ERROR).build();
-            }
+        // we don't use AOP handler since it's okay for there to be no match
+        try {
+            manager.deleteClassroom(id, version);
+        } catch (ObjectNotFoundException exception) {
+            LOG.debug("classroom not found: " + id);
         }
+
+        final Response response = Response.noContent().build();
 
         return response;
     }
