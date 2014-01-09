@@ -56,7 +56,7 @@ public class CheckPostValues {
      * @return
      * @throws Throwable
      */
-    @Around("target(com.invariantproperties.sandbox.student.webservice.server.rest.AbstractResource) && args(validatable,..)")
+    @Around("target(com.invariantproperties.sandbox.student.webservice.server.rest.AbstractResource) && args(rto,..)")
     public Object checkParametersCreate(ProceedingJoinPoint pjp, Validatable rto) throws Throwable {
         final Logger log = Logger.getLogger(pjp.getSignature().getDeclaringType());
         final String name = pjp.getSignature().getName();
@@ -87,7 +87,7 @@ public class CheckPostValues {
      * @return
      * @throws Throwable
      */
-    @Around("target(com.invariantproperties.sandbox.student.webservice.server.rest.AbstractResource) && args(uuid,validatable,..)")
+    @Around("target(com.invariantproperties.sandbox.student.webservice.server.rest.AbstractResource) && args(uuid,rto,..)")
     public Object checkParametersUpdate(ProceedingJoinPoint pjp, String uuid, Validatable rto) throws Throwable {
         final Logger log = Logger.getLogger(pjp.getSignature().getDeclaringType());
         final String name = pjp.getSignature().getName();
