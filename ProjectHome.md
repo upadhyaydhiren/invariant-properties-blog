@@ -1,0 +1,1 @@
+This project contains code and maven projects associated with the invariant properties blog. I hope the code snippets will be easier to find by searching the googlecode repository than a self-hosted wordpress blog.
